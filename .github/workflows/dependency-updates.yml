@@ -1,0 +1,165 @@
+name: Dependency Updates
+
+on:
+  schedule:
+    # Run weekly on Mondays at 2 AM UTC
+    - cron: '0 2 * * 1'
+  workflow_dispatch:
+
+jobs:
+  update-dependencies:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      # Update Web Frontend Dependencies
+      - name: Update web-frontend dependencies
+        run: |
+          cd web-frontend
+          npm update
+          npm audit fix
+
+      # Update Mobile App Dependencies
+      - name: Update mobile-app dependencies
+        run: |
+          cd mobile-app
+          npm update
+          npm audit fix
+
+      # Update Web Backend Dependencies
+      - name: Update web-backend dependencies
+        run: |
+          cd web-backend
+          python -m pip install --upgrade pip
+          pip-review --auto
+
+      # Update AI Services Dependencies
+      - name: Update ai-services dependencies
+        run: |
+          cd ai-services
+          python -m pip install --upgrade pip
+          pip-review --auto
+
+      # Create Pull Request
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: |
+            chore: Update dependencies
+
+            - Updated Node.js dependencies for web-frontend and mobile-app
+            - Updated Python dependencies for web-backend and ai-services
+            - Fixed security vulnerabilities
+          title: 'chore: Update dependencies'
+          body: |
+            ## 🤖 Automated Dependency Updates
+
+            This PR updates dependencies across all services to their latest versions.
+
+            ### Changes Made
+            - **Web Frontend**: Updated Node.js dependencies and fixed security issues
+            - **Mobile App**: Updated React Native and mobile dependencies
+            - **Web Backend**: Updated Python packages and FastAPI dependencies
+            - **AI Services**: Updated ML and data processing libraries
+
+            ### Testing Required
+            - [ ] Run full test suite
+            - [ ] Test application functionality
+            - [ ] Verify no breaking changes
+            - [ ] Check performance impact
+
+            ### Deployment Notes
+            - Review changelog for breaking changes
+            - Test in staging environment first
+            - Monitor for any runtime issues
+          branch: automated/dependency-updates
+          delete-branch: true
+          labels: |
+            dependencies
+            automated
+            security
+
+  security-updates:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      # Security updates for Node.js
+      - name: Security audit and fix (Node.js)
+        run: |
+          cd web-frontend && npm audit fix --audit-level=moderate
+          cd ../mobile-app && npm audit fix --audit-level=moderate
+
+      # Security updates for Python
+      - name: Security updates (Python)
+        run: |
+          cd web-backend && pip install --upgrade pip && pip list --outdated --format=json | jq -r '.[] | select(.latest_version > .version) | .name + "==" + .latest_version' | xargs pip install
+          cd ../ai-services && pip install --upgrade pip && pip list --outdated --format=json | jq -r '.[] | select(.latest_version > .version) | .name + "==" + .latest_version' | xargs pip install
+
+      # Create Security Update PR
+      - name: Create Security Update PR
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: |
+            security: Update dependencies for security fixes
+
+            - Fixed security vulnerabilities in Node.js dependencies
+            - Updated Python packages with security patches
+            - Applied automated security fixes
+          title: 'security: Update dependencies for security fixes'
+          body: |
+            ## 🔒 Security Dependency Updates
+
+            This PR addresses security vulnerabilities found in dependencies.
+
+            ### Security Fixes Applied
+            - **Node.js Dependencies**: Fixed moderate and high severity vulnerabilities
+            - **Python Dependencies**: Updated packages with security patches
+            - **Automated Fixes**: Applied available security patches
+
+            ### Verification Required
+            - [ ] Review security advisories
+            - [ ] Test affected functionality
+            - [ ] Verify no regressions introduced
+            - [ ] Update security documentation if needed
+
+            ### Risk Assessment
+            - [ ] Low risk - only patch-level updates
+            - [ ] Medium risk - minor version updates
+            - [ ] High risk - major version updates requiring testing
+          branch: security/dependency-updates
+          delete-branch: true
+          labels: |
+            security
+            dependencies
+            automated
+            urgent

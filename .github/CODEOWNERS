@@ -1,0 +1,111 @@
+# Fataplus Agritech Platform - Code Ownership
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Global owners - must review all changes
+* @fefe @fataplus-admin
+
+# Web Frontend (Next.js/React)
+web-frontend/ @fefe @frontend-team
+web-frontend/src/components/ @fefe @ui-team
+web-frontend/src/pages/ @fefe @frontend-team
+web-frontend/package.json @fefe @devops-team
+
+# Web Backend (FastAPI/Python)
+web-backend/ @fefe @backend-team
+web-backend/src/routes/ @fefe @api-team
+web-backend/src/services/ @fefe @backend-team
+web-backend/src/models/ @fefe @data-team
+web-backend/requirements.txt @fefe @devops-team
+
+# Mobile Application (React Native)
+mobile-app/ @fefe @mobile-team
+mobile-app/src/components/ @fefe @mobile-team
+mobile-app/android/ @fefe @mobile-team
+mobile-app/ios/ @fefe @mobile-team
+mobile-app/package.json @fefe @devops-team
+
+# AI Services (Python/ML)
+ai-services/ @fefe @ai-team
+ai-services/weather/ @fefe @ai-team
+ai-services/livestock/ @fefe @ai-team
+ai-services/market/ @fefe @ai-team
+ai-services/gamification/ @fefe @ai-team
+ai-services/requirements.txt @fefe @devops-team
+
+# Infrastructure & DevOps
+infrastructure/ @fefe @devops-team
+infrastructure/docker/ @fefe @devops-team
+infrastructure/k8s/ @fefe @devops-team
+infrastructure/terraform/ @fefe @devops-team
+infrastructure/monitoring/ @fefe @devops-team
+
+# Tools & Scripts
+tools/ @fefe @devops-team
+scripts/ @fefe @devops-team
+
+# Documentation
+*.md @fefe @docs-team
+docs/ @fefe @docs-team
+README.md @fefe @docs-team
+
+# Specifications & Requirements
+specs/ @fefe @product-team
+specs/*/spec.md @fefe @product-team
+specs/*/plan.md @fefe @product-team
+specs/*/roadmap.md @fefe @product-team
+
+# API Contracts
+specs/*/contracts/ @fefe @api-team
+*.yaml @fefe @api-team
+
+# Security & Compliance
+# Require security team review for authentication, encryption, and compliance
+**/auth*/ @fefe @security-team
+**/security*/ @fefe @security-team
+**/encrypt*/ @fefe @security-team
+**/compliance*/ @fefe @security-team
+
+# Database & Data Models
+**/models/ @fefe @data-team
+**/migrations/ @fefe @data-team
+**/schemas/ @fefe @data-team
+
+# Testing
+**/tests/ @fefe @qa-team
+**/test*/ @fefe @qa-team
+**/*.test.* @fefe @qa-team
+**/*.spec.* @fefe @qa-team
+
+# CI/CD & Configuration
+.github/ @fefe @devops-team
+.github/workflows/ @fefe @devops-team
+.github/CODEOWNERS @fefe @admin-team
+.gitignore @fefe @devops-team
+Dockerfile* @fefe @devops-team
+docker-compose* @fefe @devops-team
+
+# Dependencies & Package Management
+package.json @fefe @devops-team
+requirements.txt @fefe @devops-team
+pyproject.toml @fefe @devops-team
+Pipfile* @fefe @devops-team
+
+# Environment & Configuration
+.env* @fefe @security-team
+config*/ @fefe @devops-team
+**/config/ @fefe @devops-team
+
+# Emergency Contacts
+# For critical infrastructure changes
+infrastructure/k8s/ @fefe @devops-team @admin-team
+infrastructure/terraform/ @fefe @devops-team @admin-team
+
+# Special Reviews Required
+# Database schema changes require DBA review
+**/alembic/ @fefe @data-team @dba-team
+**/migrations/ @fefe @data-team @dba-team
+
+# AI Model changes require ML engineering review
+ai-services/**/*.py @fefe @ai-team @ml-engineer-team
+**/*model*/ @fefe @ai-team @ml-engineer-team
+**/*train*/ @fefe @ai-team @ml-engineer-team
