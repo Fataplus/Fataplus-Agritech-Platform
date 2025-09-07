@@ -1,0 +1,435 @@
+openapi: 3.0.3
+info:
+  title: Fataplus Contexts API
+  version: 1.0.0
+  description: Multi-context management endpoints for Fataplus platform
+
+servers:
+  - url: https://api.fataplus.ag
+    description: Production server
+  - url: http://localhost:8000
+    description: Development server
+
+security:
+  - BearerAuth: []
+
+paths:
+  /contexts:
+    get:
+      summary: Get available contexts for organization
+      parameters:
+        - name: organization_id
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [weather, livestock, market, gamification, learning]
+        - name: is_active
+          in: query
+          schema:
+            type: boolean
+            default: true
+      responses:
+        '200':
+          description: List of contexts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  contexts:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Context'
+                  total:
+                    type: integer
+
+    post:
+      summary: Create new context
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - organization_id
+                - name
+                - type
+              properties:
+                organization_id:
+                  type: string
+                  format: uuid
+                name:
+                  type: string
+                  minLength: 1
+                  maxLength: 255
+                type:
+                  type: string
+                  enum: [weather, livestock, market, gamification, learning]
+                description:
+                  type: string
+                configuration:
+                  type: object
+                data_sources:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      type:
+                        type: string
+                      url:
+                        type: string
+                        format: uri
+                ai_models:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      version:
+                        type: string
+                      endpoint:
+                        type: string
+                permissions:
+                  type: object
+      responses:
+        '201':
+          description: Context created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Context'
+
+  /contexts/{context_id}:
+    get:
+      summary: Get context details
+      parameters:
+        - name: context_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Context details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Context'
+
+    put:
+      summary: Update context
+      parameters:
+        - name: context_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  minLength: 1
+                  maxLength: 255
+                description:
+                  type: string
+                configuration:
+                  type: object
+                data_sources:
+                  type: array
+                  items:
+                    type: object
+                ai_models:
+                  type: array
+                  items:
+                    type: object
+                permissions:
+                  type: object
+                is_active:
+                  type: boolean
+      responses:
+        '200':
+          description: Context updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Context'
+
+    delete:
+      summary: Delete context
+      parameters:
+        - name: context_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Context deleted
+
+  /contexts/{context_id}/instances:
+    get:
+      summary: Get context instances
+      parameters:
+        - name: context_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: user_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: farm_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: List of context instances
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  instances:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ContextInstance'
+
+    post:
+      summary: Create context instance
+      parameters:
+        - name: context_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - user_id
+              properties:
+                user_id:
+                  type: string
+                  format: uuid
+                farm_id:
+                  type: string
+                  format: uuid
+                configuration:
+                  type: object
+      responses:
+        '201':
+          description: Context instance created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContextInstance'
+
+  /contexts/{context_id}/data:
+    get:
+      summary: Get context data
+      parameters:
+        - name: context_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: user_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: farm_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: start_date
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: end_date
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Context data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                  metadata:
+                    type: object
+
+    post:
+      summary: Add data to context
+      parameters:
+        - name: context_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - user_id
+                - data
+              properties:
+                user_id:
+                  type: string
+                  format: uuid
+                farm_id:
+                  type: string
+                  format: uuid
+                data:
+                  type: object
+                metadata:
+                  type: object
+      responses:
+        '201':
+          description: Data added to context
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  status:
+                    type: string
+
+components:
+  schemas:
+    Context:
+      type: object
+      required:
+        - id
+        - organization_id
+        - name
+        - type
+        - is_active
+        - version
+        - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        organization_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        type:
+          type: string
+          enum: [weather, livestock, market, gamification, learning]
+        description:
+          type: string
+        configuration:
+          type: object
+        data_sources:
+          type: array
+          items:
+            type: object
+        ai_models:
+          type: array
+          items:
+            type: object
+        ui_components:
+          type: object
+        permissions:
+          type: object
+        is_active:
+          type: boolean
+        version:
+          type: string
+        created_by:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    ContextInstance:
+      type: object
+      required:
+        - id
+        - context_id
+        - user_id
+        - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        context_id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        farm_id:
+          type: string
+          format: uuid
+        configuration:
+          type: object
+        state:
+          type: object
+        last_sync:
+          type: string
+          format: date-time
+        is_offline:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer

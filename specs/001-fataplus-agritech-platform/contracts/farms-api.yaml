@@ -1,0 +1,521 @@
+openapi: 3.0.3
+info:
+  title: Fataplus Farms API
+  version: 1.0.0
+  description: Farm and agricultural entity management endpoints
+
+servers:
+  - url: https://api.fataplus.ag
+    description: Production server
+  - url: http://localhost:8000
+    description: Development server
+
+security:
+  - BearerAuth: []
+
+paths:
+  /farms:
+    get:
+      summary: Get farms in organization
+      parameters:
+        - name: organization_id
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [active, inactive, abandoned]
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+      responses:
+        '200':
+          description: List of farms
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  farms:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Farm'
+                  total:
+                    type: integer
+
+    post:
+      summary: Create new farm
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - organization_id
+                - name
+                - location
+              properties:
+                organization_id:
+                  type: string
+                  format: uuid
+                name:
+                  type: string
+                  minLength: 1
+                  maxLength: 255
+                description:
+                  type: string
+                location:
+                  type: object
+                  required:
+                    - latitude
+                    - longitude
+                  properties:
+                    latitude:
+                      type: number
+                      minimum: -90
+                      maximum: 90
+                    longitude:
+                      type: number
+                      minimum: -180
+                      maximum: 180
+                address:
+                  type: object
+                  properties:
+                    street:
+                      type: string
+                    city:
+                      type: string
+                    region:
+                      type: string
+                    postal_code:
+                      type: string
+                    country:
+                      type: string
+                total_area:
+                  type: number
+                  minimum: 0
+                usable_area:
+                  type: number
+                  minimum: 0
+                soil_type:
+                  type: string
+                irrigation_type:
+                  type: string
+                ownership_type:
+                  type: string
+                  enum: [owned, leased, shared]
+      responses:
+        '201':
+          description: Farm created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Farm'
+
+  /farms/{farm_id}:
+    get:
+      summary: Get farm details
+      parameters:
+        - name: farm_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Farm details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Farm'
+
+    put:
+      summary: Update farm
+      parameters:
+        - name: farm_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  minLength: 1
+                  maxLength: 255
+                description:
+                  type: string
+                location:
+                  type: object
+                  properties:
+                    latitude:
+                      type: number
+                      minimum: -90
+                      maximum: 90
+                    longitude:
+                      type: number
+                      minimum: -180
+                      maximum: 180
+                total_area:
+                  type: number
+                  minimum: 0
+                usable_area:
+                  type: number
+                  minimum: 0
+                soil_type:
+                  type: string
+                irrigation_type:
+                  type: string
+      responses:
+        '200':
+          description: Farm updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Farm'
+
+  /farms/{farm_id}/crops:
+    get:
+      summary: Get crops for farm
+      parameters:
+        - name: farm_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [planned, planted, growing, harvested, failed]
+      responses:
+        '200':
+          description: List of crops
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  crops:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Crop'
+
+    post:
+      summary: Add crop to farm
+      parameters:
+        - name: farm_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - crop_type
+                - planting_date
+                - area_planted
+              properties:
+                crop_type:
+                  type: string
+                variety:
+                  type: string
+                planting_date:
+                  type: string
+                  format: date
+                expected_harvest_date:
+                  type: string
+                  format: date
+                area_planted:
+                  type: number
+                  minimum: 0
+                expected_yield:
+                  type: number
+                  minimum: 0
+      responses:
+        '201':
+          description: Crop added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Crop'
+
+  /farms/{farm_id}/livestock:
+    get:
+      summary: Get livestock for farm
+      parameters:
+        - name: farm_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: animal_type
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [active, sold, deceased, culled]
+      responses:
+        '200':
+          description: List of livestock
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  livestock:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Livestock'
+
+    post:
+      summary: Add livestock to farm
+      parameters:
+        - name: farm_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - animal_type
+                - tag_number
+                - gender
+              properties:
+                animal_type:
+                  type: string
+                breed:
+                  type: string
+                tag_number:
+                  type: string
+                birth_date:
+                  type: string
+                  format: date
+                gender:
+                  type: string
+                  enum: [male, female]
+                weight:
+                  type: number
+                  minimum: 0
+      responses:
+        '201':
+          description: Livestock added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Livestock'
+
+components:
+  schemas:
+    Farm:
+      type: object
+      required:
+        - id
+        - organization_id
+        - name
+        - location
+        - status
+        - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        organization_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        location:
+          type: object
+          properties:
+            latitude:
+              type: number
+            longitude:
+              type: number
+        address:
+          type: object
+          properties:
+            street:
+              type: string
+            city:
+              type: string
+            region:
+              type: string
+            postal_code:
+              type: string
+            country:
+              type: string
+        total_area:
+          type: number
+        usable_area:
+          type: number
+        soil_type:
+          type: string
+        irrigation_type:
+          type: string
+        ownership_type:
+          type: string
+          enum: [owned, leased, shared]
+        registration_number:
+          type: string
+        certification_status:
+          type: array
+          items:
+            type: object
+        status:
+          type: string
+          enum: [active, inactive, abandoned]
+        created_by:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    Crop:
+      type: object
+      required:
+        - id
+        - farm_id
+        - crop_type
+        - planting_date
+        - area_planted
+        - status
+      properties:
+        id:
+          type: string
+          format: uuid
+        farm_id:
+          type: string
+          format: uuid
+        crop_type:
+          type: string
+        variety:
+          type: string
+        planting_date:
+          type: string
+          format: date
+        expected_harvest_date:
+          type: string
+          format: date
+        actual_harvest_date:
+          type: string
+          format: date
+        area_planted:
+          type: number
+        expected_yield:
+          type: number
+        actual_yield:
+          type: number
+        status:
+          type: string
+          enum: [planned, planted, growing, harvested, failed]
+        health_status:
+          type: object
+        notes:
+          type: string
+        metadata:
+          type: object
+
+    Livestock:
+      type: object
+      required:
+        - id
+        - farm_id
+        - animal_type
+        - tag_number
+        - gender
+        - status
+      properties:
+        id:
+          type: string
+          format: uuid
+        farm_id:
+          type: string
+          format: uuid
+        animal_type:
+          type: string
+        breed:
+          type: string
+        tag_number:
+          type: string
+        birth_date:
+          type: string
+          format: date
+        gender:
+          type: string
+          enum: [male, female]
+        weight:
+          type: number
+        health_status:
+          type: object
+        vaccination_history:
+          type: array
+          items:
+            type: object
+        production_data:
+          type: object
+        location:
+          type: object
+          properties:
+            latitude:
+              type: number
+            longitude:
+              type: number
+        status:
+          type: string
+          enum: [active, sold, deceased, culled]
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
