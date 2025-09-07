@@ -23,7 +23,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: web-frontend/package-lock.json
+          cache-dependency-path: web-frontend/package.json
 
       - name: Install dependencies
         run: |
@@ -103,23 +103,23 @@ jobs:
       - name: Lint code
         run: |
           cd web-backend
-          flake8 src/ --count --select=E9,F63,F7,F82 --show-source --statistics
-          flake8 src/ --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --exclude=.git,__pycache__,build,dist
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics --exclude=.git,__pycache__,build,dist
 
       - name: Type check
         run: |
           cd web-backend
-          mypy src/ --ignore-missing-imports
+          mypy . --ignore-missing-imports --exclude=venv/ --exclude=__pycache__/ --exclude=.git/
 
       - name: Run unit tests
         run: |
           cd web-backend
-          pytest tests/unit/ -v --cov=src --cov-report=xml
+          pytest . -v -k "test_" --cov=. --cov-report=xml -x
 
       - name: Run integration tests
         run: |
           cd web-backend
-          pytest tests/integration/ -v
+          pytest . -v -k "integration" -x
 
       - name: Upload test coverage
         uses: codecov/codecov-action@v3
@@ -140,7 +140,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: mobile-app/package-lock.json
+          cache-dependency-path: mobile-app/package.json
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -209,23 +209,23 @@ jobs:
       - name: Lint code
         run: |
           cd ai-services
-          flake8 src/ --count --select=E9,F63,F7,F82 --show-source --statistics
-          flake8 src/ --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --exclude=.git,__pycache__,build,dist
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics --exclude=.git,__pycache__,build,dist
 
       - name: Type check
         run: |
           cd ai-services
-          mypy src/ --ignore-missing-imports
+          mypy . --ignore-missing-imports --exclude=venv/ --exclude=__pycache__/ --exclude=.git/
 
       - name: Run unit tests
         run: |
           cd ai-services
-          pytest tests/unit/ -v --cov=src --cov-report=xml
+          pytest . -v -k "test_" --cov=. --cov-report=xml -x
 
       - name: Run integration tests
         run: |
           cd ai-services
-          pytest tests/integration/ -v
+          pytest . -v -k "integration" -x
 
       - name: Upload test coverage
         uses: codecov/codecov-action@v3

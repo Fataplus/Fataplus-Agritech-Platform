@@ -1,0 +1,167 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgis/postgis:15-3.4
+    container_name: fataplus-postgres
+    environment:
+      POSTGRES_DB: fataplus
+      POSTGRES_USER: fataplus
+      POSTGRES_PASSWORD: fataplus_password
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infrastructure/docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fataplus -d fataplus"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - fataplus-network
+
+  # Redis Cache & Session Store
+  redis:
+    image: redis:7-alpine
+    container_name: fataplus-redis
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    networks:
+      - fataplus-network
+
+  # MinIO Object Storage
+  minio:
+    image: minio/minio:latest
+    container_name: fataplus-minio
+    environment:
+      MINIO_ACCESS_KEY: fataplus_access_key
+      MINIO_SECRET_KEY: fataplus_secret_key
+    volumes:
+      - minio_data:/data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    networks:
+      - fataplus-network
+
+  # Web Frontend (Next.js)
+  web-frontend:
+    build:
+      context: ./web-frontend
+      dockerfile: Dockerfile
+    container_name: fataplus-web-frontend
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://web-backend:8000
+      - NEXT_PUBLIC_AI_API_URL=http://ai-services:8001
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./web-frontend:/app
+      - /app/node_modules
+    depends_on:
+      - web-backend
+      - ai-services
+    networks:
+      - fataplus-network
+    command: npm run dev
+
+  # Web Backend (FastAPI)
+  web-backend:
+    build:
+      context: ./web-backend
+      dockerfile: Dockerfile
+    container_name: fataplus-web-backend
+    environment:
+      - DATABASE_URL=postgresql://fataplus:fataplus_password@postgres:5432/fataplus
+      - REDIS_URL=redis://redis:6379
+      - MINIO_ENDPOINT=minio:9000
+      - MINIO_ACCESS_KEY=fataplus_access_key
+      - MINIO_SECRET_KEY=fataplus_secret_key
+      - AI_SERVICES_URL=http://ai-services:8001
+      - ENVIRONMENT=development
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./web-backend:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    networks:
+      - fataplus-network
+
+  # AI Services (Python/ML)
+  ai-services:
+    build:
+      context: ./ai-services
+      dockerfile: Dockerfile
+    container_name: fataplus-ai-services
+    environment:
+      - DATABASE_URL=postgresql://fataplus:fataplus_password@postgres:5432/fataplus
+      - REDIS_URL=redis://redis:6379
+      - MINIO_ENDPOINT=minio:9000
+      - MINIO_ACCESS_KEY=fataplus_access_key
+      - MINIO_SECRET_KEY=fataplus_secret_key
+      - ENVIRONMENT=development
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./ai-services:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    networks:
+      - fataplus-network
+
+  # Mobile App Development (Optional - for Expo/React Native)
+  # Uncomment if you want to run mobile development in Docker
+  # mobile-dev:
+  #   build:
+  #     context: ./mobile-app
+  #     dockerfile: Dockerfile
+  #   container_name: fataplus-mobile-dev
+  #   environment:
+  #     - EXPO_DEVTOOLS_LISTEN_ADDRESS=0.0.0.0
+  #   ports:
+  #     - "19000:19000"
+  #     - "19001:19001"
+  #     - "19002:19002"
+  #   volumes:
+  #     - ./mobile-app:/app
+  #     - /app/node_modules
+  #   networks:
+  #     - fataplus-network
+
+volumes:
+  postgres_data:
+  redis_data:
+  minio_data:
+
+networks:
+  fataplus-network:
+    driver: bridge
