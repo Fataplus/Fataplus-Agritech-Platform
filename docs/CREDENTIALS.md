@@ -103,14 +103,18 @@ REDIS_MASTER_NAME=fataplus-master
 ```bash
 # MinIO Server Configuration (Development)
 MINIO_ENDPOINT=http://localhost:9000
-MINIO_ACCESS_KEY=fataplus_access_key
-MINIO_SECRET_KEY=fataplus_secret_key
+MINIO_ROOT_USER=fataplus_access_key
+MINIO_ROOT_PASSWORD=fataplus_secret_key
 MINIO_REGION=us-east-1
 
 # MinIO Console Access
 MINIO_CONSOLE_URL=http://localhost:9001
-MINIO_CONSOLE_USERNAME=fataplus_access_key  # Same as access key
-MINIO_CONSOLE_PASSWORD=fataplus_secret_key  # Same as secret key
+MINIO_CONSOLE_USERNAME=fataplus_access_key  # Same as root user
+MINIO_CONSOLE_PASSWORD=fataplus_secret_key  # Same as root password
+
+# Legacy Environment Variables (Deprecated)
+# MINIO_ACCESS_KEY=fataplus_access_key  # Use MINIO_ROOT_USER instead
+# MINIO_SECRET_KEY=fataplus_secret_key  # Use MINIO_ROOT_PASSWORD instead
 
 # Default Bucket
 MINIO_DEFAULT_BUCKET=fataplus-files
@@ -340,8 +344,8 @@ REDIS_URL=redis://localhost:6379/0
 
 # MinIO (Local Development)
 MINIO_ENDPOINT=http://localhost:9000
-MINIO_ACCESS_KEY=fataplus_access_key
-MINIO_SECRET_KEY=fataplus_secret_key
+MINIO_ROOT_USER=fataplus_access_key
+MINIO_ROOT_PASSWORD=fataplus_secret_key
 ```
 
 ### Development Tools

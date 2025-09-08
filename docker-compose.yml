@@ -45,8 +45,8 @@ services:
     image: minio/minio:latest
     container_name: fataplus-minio
     environment:
-      MINIO_ACCESS_KEY: fataplus_access_key
-      MINIO_SECRET_KEY: fataplus_secret_key
+      MINIO_ROOT_USER: fataplus_access_key
+      MINIO_ROOT_PASSWORD: fataplus_secret_key
     volumes:
       - minio_data:/data
     ports:
@@ -93,8 +93,8 @@ services:
       - DATABASE_URL=postgresql://fataplus:fataplus_password@postgres:5432/fataplus
       - REDIS_URL=redis://redis:6379
       - MINIO_ENDPOINT=minio:9000
-      - MINIO_ACCESS_KEY=fataplus_access_key
-      - MINIO_SECRET_KEY=fataplus_secret_key
+      - MINIO_ROOT_USER=fataplus_access_key
+      - MINIO_ROOT_PASSWORD=fataplus_secret_key
       - AI_SERVICES_URL=http://ai-services:8001
       - ENVIRONMENT=development
     ports:
@@ -121,8 +121,8 @@ services:
       - DATABASE_URL=postgresql://fataplus:fataplus_password@postgres:5432/fataplus
       - REDIS_URL=redis://redis:6379
       - MINIO_ENDPOINT=minio:9000
-      - MINIO_ACCESS_KEY=fataplus_access_key
-      - MINIO_SECRET_KEY=fataplus_secret_key
+      - MINIO_ROOT_USER=fataplus_access_key
+      - MINIO_ROOT_PASSWORD=fataplus_secret_key
       - ENVIRONMENT=development
     ports:
       - "8001:8001"
