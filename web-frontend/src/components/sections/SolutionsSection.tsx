@@ -68,7 +68,7 @@ const SolutionsSection: React.FC = () => {
             Solutions for Every Agricultural Stakeholder
           </h2>
           <p className="text-section-subtitle">
-            Whether you're a smallholder farmer, agribusiness owner, cooperative member,
+            Whether you&apos;re a smallholder farmer, agribusiness owner, cooperative member,
             or government official, we have tailored solutions for your specific needs.
           </p>
         </div>
