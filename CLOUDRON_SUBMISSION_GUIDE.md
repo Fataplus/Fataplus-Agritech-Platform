@@ -155,8 +155,8 @@ education, mobile-money, ai, offline, multilingual, farming, cooperative
 ```
 
 ### Support Information
-- **Email**: contact@fataplus.com
-- **Documentation**: https://docs.fataplus.com
+- **Email**: contact@fata.plus
+- **Documentation**: https://docs.fata.plus
 - **Source Code**: https://github.com/Fataplus/Fataplus-Agritech-Platform
 - **Community**: GitHub Discussions
 
@@ -260,14 +260,14 @@ curl -v http://localhost:3000/health
 ## 📞 Contact Information
 
 **Developer Team**: Fataplus Team  
-**Primary Contact**: contact@fataplus.com  
-**Technical Support**: support@fataplus.com  
-**Documentation**: https://docs.fataplus.com  
+**Primary Contact**: contact@fata.plus  
+**Technical Support**: support@fata.plus  
+**Documentation**: https://docs.fata.plus  
 
 **Business Information**:
 - Company: Fataplus
 - Address: [Your Address]
-- Website: https://fataplus.com
+- Website: https://fata.plus
 - License: MIT
 
 ---

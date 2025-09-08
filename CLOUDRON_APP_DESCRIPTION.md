@@ -158,9 +158,9 @@ Fataplus transforms African agriculture through intelligent technology, addressi
 - **Video Tutorials**: Visual learning resources
 
 #### Support Channels
-- **Email Support**: contact@fataplus.com
+- **Email Support**: contact@fata.plus
 - **Community Forum**: GitHub Discussions
-- **Documentation Site**: https://docs.fataplus.com
+- **Documentation Site**: https://docs.fata.plus
 - **Bug Reports**: GitHub Issues
 
 #### Updates and Maintenance
@@ -236,9 +236,9 @@ Fataplus transforms African agriculture through intelligent technology, addressi
 ## Contact Information
 
 **Developer**: Fataplus Team  
-**Email**: contact@fataplus.com  
-**Website**: https://fataplus.com  
-**Documentation**: https://docs.fataplus.com  
+**Email**: contact@fata.plus  
+**Website**: https://fata.plus  
+**Documentation**: https://docs.fata.plus  
 **Source Code**: https://github.com/Fataplus/Fataplus-Agritech-Platform  
 **License**: MIT  
 

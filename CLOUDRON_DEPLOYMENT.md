@@ -332,7 +332,7 @@ curl https://my.fata.plus/api/v1/ldap/status
 
 - 📖 **Documentation**: `/docs/CREDENTIALS.md`
 - 🐛 **Issue Tracking**: GitHub Issues
-- 📧 **Support**: contact@fataplus.com
+- 📧 **Support**: contact@fata.plus
 - 🌐 **Cloudron Docs**: https://docs.cloudron.io
 
 ## Security Best Practices

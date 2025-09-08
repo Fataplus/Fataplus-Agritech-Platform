@@ -170,7 +170,7 @@ export default function LoginPage() {
                   size="sm"
                   onClick={() => {
                     setFormData({
-                      email: 'demo@fataplus.com',
+                      email: 'demo@fata.plus',
                       password: 'demo123'
                     });
                   }}

@@ -1,7 +1,7 @@
 {
     "id": "io.fataplus.agritech",
     "title": "Fataplus AgriTech Platform",
-    "author": "Fataplus Team <contact@fataplus.com>",
+    "author": "Fataplus Team <contact@fata.plus>",
     "description": "Comprehensive SaaS platform for African agriculture featuring weather intelligence, livestock management, e-commerce, LMS, mobile money integration, and AI-powered insights. Designed specifically for rural connectivity challenges with offline-first architecture and multi-language support.",
     "tagline": "Building the future of African Agriculture",
     "version": "1.0.0",
@@ -17,8 +17,8 @@
         "ldap": {}
     },
     "manifestVersion": 2,
-    "website": "https://fataplus.com",
-    "contactEmail": "contact@fataplus.com",
+    "website": "https://fata.plus",
+    "contactEmail": "contact@fata.plus",
     "developer": "Fataplus Team",
     "license": "MIT",
     "icon": "file://icon.png",
@@ -39,7 +39,7 @@
     ],
     "mediaLinks": [
         "https://github.com/Fataplus/Fataplus-Agritech-Platform",
-        "https://docs.fataplus.com"
+        "https://docs.fata.plus"
     ],
     "screenshots": [
         "file://screenshot-dashboard.png",
@@ -102,5 +102,5 @@
             "defaultValue": true
         }
     },
-    "postInstallMessage": "🎉 Fataplus AgriTech Platform has been successfully installed!\n\n📋 Next Steps:\n1. Configure LDAP settings in the app configuration\n2. Set up API keys for external services (OpenWeatherMap, Stripe, etc.)\n3. Create your first admin user through the web interface\n4. Access the application at your Cloudron domain\n\n🌍 Platform Features:\n• Weather Intelligence & AI Predictions\n• Livestock Management & Health Tracking\n• Agricultural E-commerce Marketplace\n• Learning Management System\n• Mobile Money Integration (M-Pesa, Airtel Money)\n• Multi-language Support\n• Offline-first Design\n\n📖 Documentation: https://docs.fataplus.com\n🐛 Support: contact@fataplus.com\n💬 Community: https://github.com/Fataplus/Fataplus-Agritech-Platform/discussions"
+    "postInstallMessage": "🎉 Fataplus AgriTech Platform has been successfully installed!\n\n📋 Next Steps:\n1. Configure LDAP settings in the app configuration\n2. Set up API keys for external services (OpenWeatherMap, Stripe, etc.)\n3. Create your first admin user through the web interface\n4. Access the application at your Cloudron domain\n\n🌍 Platform Features:\n• Weather Intelligence & AI Predictions\n• Livestock Management & Health Tracking\n• Agricultural E-commerce Marketplace\n• Learning Management System\n• Mobile Money Integration (M-Pesa, Airtel Money)\n• Multi-language Support\n• Offline-first Design\n\n📖 Documentation: https://docs.fata.plus\n🐛 Support: contact@fata.plus\n💬 Community: https://github.com/Fataplus/Fataplus-Agritech-Platform/discussions"
 }

@@ -313,8 +313,8 @@ generate_submission_info() {
 
 ## Support Information
 - **Developer**: Fataplus Team
-- **Email**: contact@fataplus.com
-- **Documentation**: https://docs.fataplus.com
+- **Email**: contact@fata.plus
+- **Documentation**: https://docs.fata.plus
 - **Source**: https://github.com/Fataplus/Fataplus-Agritech-Platform
 
 ## Notes
@@ -345,7 +345,7 @@ show_next_steps() {
     echo "cloudron install --image $IMAGE_TAG --location yourdomain.com"
     echo ""
     echo "Documentation: CLOUDRON_APP_DESCRIPTION.md"
-    echo "Support: contact@fataplus.com"
+    echo "Support: contact@fata.plus"
 }
 
 # Main build process

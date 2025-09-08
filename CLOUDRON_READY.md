@@ -61,7 +61,7 @@ fataplus-agritech/
 2. **App Information**: Use details from `CLOUDRON_APP_DESCRIPTION.md`
 3. **Screenshots**: Upload 5-6 feature screenshots
 4. **Category**: Business & Productivity / Agriculture
-5. **Support Info**: contact@fataplus.com
+5. **Support Info**: contact@fata.plus
 
 ### 4. App Store Listing Details
 
@@ -135,9 +135,9 @@ ecommerce, education, mobile-money, ai, offline, multilingual
 ## 📞 Support Information
 
 **Developer**: Fataplus Team  
-**Email**: contact@fataplus.com  
-**Website**: https://fataplus.com  
-**Documentation**: https://docs.fataplus.com  
+**Email**: contact@fata.plus  
+**Website**: https://fata.plus  
+**Documentation**: https://docs.fata.plus  
 **Source Code**: https://github.com/Fataplus/Fataplus-Agritech-Platform  
 **Community**: GitHub Discussions  
 
