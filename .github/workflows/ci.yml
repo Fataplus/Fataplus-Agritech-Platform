@@ -5,6 +5,21 @@ on:
     branches: [ main, develop, staging ]
   pull_request:
     branches: [ main, develop, staging ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+        - production
+        - staging
+      force_deploy:
+        description: 'Force deployment even if tests fail'
+        required: false
+        default: false
+        type: boolean
 
 env:
   NODE_VERSION: '18'
@@ -375,33 +390,220 @@ jobs:
 
           echo "All quality gates passed! ✅"
 
-  # Deploy to Staging (only on main/develop branches)
-  deploy-staging:
+  # Build Production Docker Images
+  build-production:
     runs-on: ubuntu-latest
     needs: quality-gate
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
-    environment: staging
+    if: github.ref == 'refs/heads/main'
+    outputs:
+      image-tag: ${{ steps.meta.outputs.tags }}
+      image-digest: ${{ steps.build.outputs.digest }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Deploy to Staging
-        run: |
-          echo "Deploying to staging environment..."
-          # Add your staging deployment commands here
-          # This could include:
-          # - Building Docker images
-          # - Pushing to container registry
-          # - Updating Kubernetes manifests
-          # - Running database migrations
-          # - Health checks
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      - name: Run Staging Tests
-        run: |
-          echo "Running staging environment tests..."
-          # Add integration tests against staging environment
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Notify Deployment
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push Cloudron image
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile.cloudron
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64
+
+      - name: Generate deployment artifact
         run: |
-          echo "Staging deployment completed successfully!"
-          # Add notification commands (Slack, Discord, etc.)
+          mkdir -p deployment
+          echo "IMAGE_TAG=${{ steps.meta.outputs.tags }}" > deployment/deploy.env
+          echo "IMAGE_DIGEST=${{ steps.build.outputs.digest }}" >> deployment/deploy.env
+          echo "COMMIT_SHA=${{ github.sha }}" >> deployment/deploy.env
+          echo "COMMIT_REF=${{ github.ref_name }}" >> deployment/deploy.env
+          cp docker-compose.cloudron.yml deployment/
+          cp CloudronManifest.json deployment/
+
+      - name: Upload deployment artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployment-${{ github.sha }}
+          path: deployment/
+          retention-days: 30
+
+  # Deploy to Production Cloudron
+  deploy-production:
+    runs-on: ubuntu-latest
+    needs: [quality-gate, build-production]
+    if: github.ref == 'refs/heads/main'
+    environment: 
+      name: production
+      url: https://my.fata.plus
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download deployment artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: deployment-${{ github.sha }}
+          path: deployment/
+
+      - name: Load deployment variables
+        run: |
+          source deployment/deploy.env
+          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+          echo "IMAGE_DIGEST=$IMAGE_DIGEST" >> $GITHUB_ENV
+          echo "COMMIT_SHA=$COMMIT_SHA" >> $GITHUB_ENV
+
+      - name: Setup SSH connection to Cloudron
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.CLOUDRON_SSH_PRIVATE_KEY }}" > ~/.ssh/cloudron_key
+          chmod 600 ~/.ssh/cloudron_key
+          ssh-keyscan -H ${{ secrets.CLOUDRON_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy to Cloudron
+        run: |
+          # Create deployment script
+          cat > deploy_script.sh << 'EOF'
+          #!/bin/bash
+          set -e
+          
+          echo "🚀 Starting Fataplus deployment to Cloudron..."
+          
+          # Cloudron app configuration
+          CLOUDRON_APP_ID="${{ secrets.CLOUDRON_APP_ID }}"
+          CLOUDRON_DOMAIN="${{ secrets.CLOUDRON_DOMAIN }}"
+          IMAGE_TAG="${{ env.IMAGE_TAG }}"
+          
+          # Login to Cloudron
+          cloudron login ${{ secrets.CLOUDRON_HOST }} --token ${{ secrets.CLOUDRON_ACCESS_TOKEN }}
+          
+          # Pull the latest image
+          echo "📦 Pulling Docker image: $IMAGE_TAG"
+          docker pull $IMAGE_TAG
+          
+          # Update the app with new image
+          echo "🔄 Updating Cloudron app..."
+          cloudron update --app $CLOUDRON_APP_ID --image $IMAGE_TAG
+          
+          # Wait for deployment to complete
+          echo "⏳ Waiting for deployment to complete..."
+          cloudron status --app $CLOUDRON_APP_ID --wait
+          
+          # Run post-deployment health checks
+          echo "🔍 Running health checks..."
+          sleep 30
+          
+          # Check application health
+          response=$(curl -s -o /dev/null -w "%{http_code}" https://$CLOUDRON_DOMAIN/health || echo "000")
+          if [ "$response" = "200" ]; then
+            echo "✅ Application is healthy (HTTP $response)"
+          else
+            echo "❌ Application health check failed (HTTP $response)"
+            exit 1
+          fi
+          
+          # Check API health
+          api_response=$(curl -s -o /dev/null -w "%{http_code}" https://$CLOUDRON_DOMAIN/api/health || echo "000")
+          if [ "$api_response" = "200" ]; then
+            echo "✅ API is healthy (HTTP $api_response)"
+          else
+            echo "❌ API health check failed (HTTP $api_response)"
+            exit 1
+          fi
+          
+          echo "🎉 Deployment completed successfully!"
+          EOF
+          
+          # Execute deployment script on Cloudron server
+          scp -i ~/.ssh/cloudron_key deploy_script.sh ${{ secrets.CLOUDRON_USER }}@${{ secrets.CLOUDRON_HOST }}:/tmp/
+          ssh -i ~/.ssh/cloudron_key ${{ secrets.CLOUDRON_USER }}@${{ secrets.CLOUDRON_HOST }} "chmod +x /tmp/deploy_script.sh && /tmp/deploy_script.sh"
+
+      - name: Run Post-Deployment Tests
+        run: |
+          echo "🧪 Running post-deployment integration tests..."
+          
+          # Wait for services to be fully ready
+          sleep 60
+          
+          # Test main application
+          echo "Testing main application..."
+          curl -f https://my.fata.plus/health || exit 1
+          
+          # Test API endpoints
+          echo "Testing API endpoints..."
+          curl -f https://my.fata.plus/api/health || exit 1
+          curl -f https://my.fata.plus/docs || exit 1
+          
+          # Test MCP server
+          echo "Testing MCP server..."
+          curl -f https://my.fata.plus/mcp/health || exit 1
+          
+          # Test authentication endpoints
+          echo "Testing authentication..."
+          response=$(curl -s -o /dev/null -w "%{http_code}" https://my.fata.plus/auth/login)
+          if [ "$response" = "200" ] || [ "$response" = "401" ]; then
+            echo "✅ Auth endpoint accessible"
+          else
+            echo "❌ Auth endpoint failed (HTTP $response)"
+            exit 1
+          fi
+          
+          echo "✅ All integration tests passed!"
+
+      - name: Update Deployment Status
+        if: always()
+        run: |
+          if [ "${{ job.status }}" = "success" ]; then
+            echo "✅ Production deployment successful!"
+            echo "🌐 Application URL: https://my.fata.plus"
+            echo "📊 API Documentation: https://my.fata.plus/docs"
+            echo "🤖 MCP Server: https://my.fata.plus/mcp"
+          else
+            echo "❌ Production deployment failed!"
+            echo "🔄 Consider rolling back or investigating the issue."
+          fi
+
+      - name: Cleanup SSH keys
+        if: always()
+        run: |
+          rm -f ~/.ssh/cloudron_key
+
+      - name: Send Deployment Notification
+        if: always()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          channel: '#deployments'
+          text: |
+            🚀 Fataplus Production Deployment
+            📝 Commit: ${{ github.sha }}
+            👤 Author: ${{ github.actor }}
+            🌐 URL: https://my.fata.plus
+            📊 Status: ${{ job.status }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

@@ -83,14 +83,27 @@ cd web-backend && pip install -r requirements.txt && python main.py
 
 ### Production Deployment
 
-#### Cloudron Deployment (Recommended)
+#### 🚀 Automatic CI/CD Deployment
+Push to `main` branch automatically deploys to production:
 ```bash
-# Deploy to Cloudron
-docker build -f Dockerfile.cloudron -t fataplus-cloudron .
-docker-compose -f docker-compose.cloudron.yml up -d
+git push origin main  # Triggers automatic deployment to https://my.fata.plus
 ```
 
-#### Manual Production Deployment
+The CI/CD pipeline:
+- ✅ Runs comprehensive tests on all components
+- ✅ Builds production Docker images
+- ✅ Deploys to Cloudron with zero downtime
+- ✅ Performs health checks and integration tests
+- ✅ Sends deployment notifications
+- ✅ Automatic rollback on failure
+
+#### Manual Cloudron Deployment
+```bash
+# Deploy to Cloudron manually
+CLOUDRON_APP_ID=your-app-id ./deploy-cloudron.sh
+```
+
+#### Production Environment Setup
 ```bash
 # Set up production environment
 cp .env.production .env
@@ -186,6 +199,59 @@ cd mcp-server && npm test
 
 # Mobile App
 cd mobile-app && npm test
+
+# Production validation
+./validate-production.sh
+
+# Health checks
+./health-check.sh --domain my.fata.plus
+```
+
+## 🚀 CI/CD Pipeline
+
+### Automatic Deployment
+The platform includes a comprehensive CI/CD pipeline that automatically deploys to production on every push to the `main` branch.
+
+#### Pipeline Stages
+1. **🔍 Quality Assurance**
+   - Lint code and type checking
+   - Unit and integration tests
+   - Security scanning with CodeQL and Trivy
+   - Docker image builds and validation
+
+2. **📦 Build & Package**
+   - Build production Docker images
+   - Push to GitHub Container Registry
+   - Generate deployment artifacts
+
+3. **🚀 Deploy to Production**
+   - Zero-downtime deployment to Cloudron
+   - Automatic backup before deployment
+   - Health checks and integration tests
+   - Automatic rollback on failure
+
+4. **📊 Monitoring & Notifications**
+   - Post-deployment health validation
+   - Slack notifications
+   - Deployment status reporting
+
+#### Deployment Triggers
+- **Automatic**: Push to `main` branch → Deploy to https://my.fata.plus
+- **Manual**: GitHub Actions workflow dispatch
+- **Scheduled**: Daily health checks and dependency updates
+
+#### Setup CI/CD
+1. Configure GitHub secrets (see [CICD_DEPLOYMENT.md](./CICD_DEPLOYMENT.md))
+2. Set up Cloudron access tokens and SSH keys
+3. Configure notification webhooks (optional)
+4. Push to `main` branch to trigger first deployment
+
+```bash
+# Quick setup example
+git checkout main
+git add .
+git commit -m "feat: trigger production deployment"
+git push origin main  # 🚀 Deploys to https://my.fata.plus
 ```
 
 ## 🤖 AI Integration (MCP Server)
