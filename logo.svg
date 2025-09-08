@@ -1,0 +1,19 @@
+<svg width="200" height="80" viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg">
+  <!-- Logo Background -->
+  <rect width="200" height="80" fill="none"/>
+  
+  <!-- Icon Part -->
+  <g transform="translate(20, 40)">
+    <!-- Simplified plant icon -->
+    <rect x="-2" y="15" width="4" height="20" fill="#4A7C3C" rx="2"/>
+    <ellipse cx="-8" cy="8" rx="6" ry="4" fill="#6BAF47" transform="rotate(-30)"/>
+    <ellipse cx="8" cy="5" rx="6" ry="4" fill="#6BAF47" transform="rotate(30)"/>
+    <ellipse cx="-5" cy="0" rx="7" ry="5" fill="#7BC144" transform="rotate(-15)"/>
+    <ellipse cx="5" cy="-3" rx="7" ry="5" fill="#7BC144" transform="rotate(15)"/>
+    <circle cx="0" cy="-8" r="4" fill="#8CC739"/>
+  </g>
+  
+  <!-- Text Logo -->
+  <text x="50" y="35" fill="#2D5A27" font-family="Arial, sans-serif" font-size="24" font-weight="bold">FATAPLUS</text>
+  <text x="50" y="55" fill="#6BAF47" font-family="Arial, sans-serif" font-size="12">AgriTech Platform</text>
+</svg>

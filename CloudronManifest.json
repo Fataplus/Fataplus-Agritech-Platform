@@ -1,12 +1,12 @@
 {
-    "id": "io.fataplus.fataplus-agritech-platform",
+    "id": "io.fataplus.agritech",
     "title": "Fataplus AgriTech Platform",
-    "author": "Fataplus Team",
-    "description": "Multi-context SaaS platform for African agriculture with weather intelligence, livestock management, e-commerce, LMS, and gamification",
-    "tagline": "Build the future of African Agriculture",
+    "author": "Fataplus Team <contact@fataplus.com>",
+    "description": "Comprehensive SaaS platform for African agriculture featuring weather intelligence, livestock management, e-commerce, LMS, mobile money integration, and AI-powered insights. Designed specifically for rural connectivity challenges with offline-first architecture and multi-language support.",
+    "tagline": "Building the future of African Agriculture",
     "version": "1.0.0",
     "healthCheckPath": "/health",
-    "httpPort": 8000,
+    "httpPort": 3000,
     "addons": {
         "postgresql": {
             "version": "15"
@@ -14,145 +14,93 @@
         "redis": {
             "version": "7"
         },
-        "minio": {
-            "version": "latest"
-        },
         "ldap": {}
     },
     "manifestVersion": 2,
     "website": "https://fataplus.com",
     "contactEmail": "contact@fataplus.com",
+    "developer": "Fataplus Team",
+    "license": "MIT",
     "icon": "file://icon.png",
+    "logo": "file://logo.svg",
     "tags": [
         "agritech",
-        "saas",
         "agriculture",
+        "saas",
         "africa",
-        "meteorology",
+        "weather",
         "livestock",
         "ecommerce",
         "education",
-        "gamification"
+        "mobile-money",
+        "ai",
+        "offline",
+        "multilingual"
     ],
     "mediaLinks": [
-        "https://github.com/Fataplus/Fataplus-Agritech-Platform"
+        "https://github.com/Fataplus/Fataplus-Agritech-Platform",
+        "https://docs.fataplus.com"
+    ],
+    "screenshots": [
+        "file://screenshot-dashboard.png",
+        "file://screenshot-weather.png",
+        "file://screenshot-livestock.png",
+        "file://screenshot-marketplace.png",
+        "file://screenshot-mobile.png"
     ],
     "changelog": {
-        "1.0.0": "Initial release with core authentication, database setup, and multi-context architecture"
+        "1.0.0": "Initial release featuring: Multi-context SaaS architecture, Weather intelligence with AI predictions, Livestock management with health tracking, E-commerce marketplace, Learning Management System, Mobile money integration (M-Pesa, Airtel Money), LDAP authentication, Multi-language support (Swahili, French, Arabic, Portuguese), Offline-first design, Model Context Protocol (MCP) server for AI integration"
     },
-    "optionalMemoryLimit": 1024,
-    "optionalCpuLimit": 1000,
-    "maxMemoryLimit": 2048,
-    "maxCpuLimit": 2000,
+    "memoryLimit": 1073741824,
+    "optionalMemoryLimit": 1073741824,
+    "maxMemoryLimit": 2147483648,
     "minBoxVersion": "7.1.0",
-    "tcpPorts": {
-        "WEB_PORT": {
-            "title": "Web Frontend Port",
-            "description": "Port for Next.js frontend",
-            "defaultValue": 3000,
-            "containerPort": 3000
-        },
-        "API_PORT": {
-            "title": "API Backend Port",
-            "description": "Port for FastAPI backend",
-            "defaultValue": 8000,
-            "containerPort": 8000
-        },
-        "AI_PORT": {
-            "title": "AI Services Port",
-            "description": "Port for AI/ML services",
-            "defaultValue": 8001,
-            "containerPort": 8001
-        }
-    },
+    "installationNotes": "This app requires configuration of external API keys for full functionality. Weather data requires OpenWeatherMap API key. Payment processing requires Stripe/mobile money provider credentials.",
     "env": {
-        "NODE_ENV": {
-            "type": "string",
-            "description": "Node.js environment",
-            "defaultValue": "production"
-        },
-        "ENVIRONMENT": {
-            "type": "string",
-            "description": "Application environment",
-            "defaultValue": "production"
-        },
         "JWT_SECRET_KEY": {
             "type": "password",
-            "description": "JWT secret key for authentication"
-        },
-        "LDAP_ENABLED": {
-            "type": "boolean",
-            "description": "Enable LDAP authentication",
-            "defaultValue": true
-        },
-        "LDAP_SERVER": {
-            "type": "string",
-            "description": "LDAP server hostname",
-            "defaultValue": "localhost"
-        },
-        "LDAP_PORT": {
-            "type": "number",
-            "description": "LDAP server port",
-            "defaultValue": 389
-        },
-        "LDAP_USE_SSL": {
-            "type": "boolean",
-            "description": "Use SSL for LDAP connection",
-            "defaultValue": false
-        },
-        "LDAP_BASE_DN": {
-            "type": "string",
-            "description": "LDAP base DN",
-            "defaultValue": "dc=cloudron,dc=local"
-        },
-        "LDAP_BIND_DN": {
-            "type": "string",
-            "description": "LDAP bind DN for service account"
-        },
-        "LDAP_BIND_PASSWORD": {
-            "type": "password",
-            "description": "LDAP bind password for service account"
-        },
-        "LDAP_USER_SEARCH_FILTER": {
-            "type": "string",
-            "description": "LDAP user search filter",
-            "defaultValue": "(uid={username})"
-        },
-        "LDAP_USER_DISPLAY_NAME_ATTRIBUTE": {
-            "type": "string",
-            "description": "LDAP attribute for user display name",
-            "defaultValue": "cn"
-        },
-        "LDAP_USER_EMAIL_ATTRIBUTE": {
-            "type": "string",
-            "description": "LDAP attribute for user email",
-            "defaultValue": "mail"
+            "description": "JWT secret key for authentication (auto-generated if not provided)"
         },
         "OPENWEATHER_API_KEY": {
             "type": "password",
-            "description": "OpenWeatherMap API key for weather data"
+            "description": "OpenWeatherMap API key for weather data (optional - get from openweathermap.org)"
         },
         "STRIPE_PUBLIC_KEY": {
             "type": "string",
-            "description": "Stripe public key for payments"
+            "description": "Stripe public key for payment processing (optional)"
         },
         "STRIPE_SECRET_KEY": {
             "type": "password",
-            "description": "Stripe secret key for payments"
+            "description": "Stripe secret key for payment processing (optional)"
         },
-        "SENDGRID_API_KEY": {
+        "MPESA_API_KEY": {
             "type": "password",
-            "description": "SendGrid API key for email services"
+            "description": "M-Pesa API key for mobile money payments (optional)"
         },
         "AIRTEL_API_KEY": {
             "type": "password",
-            "description": "Airtel Money API key for mobile payments"
+            "description": "Airtel Money API key for mobile payments (optional)"
         },
-        "AIRTEL_API_SECRET": {
+        "SENDGRID_API_KEY": {
             "type": "password",
-            "description": "Airtel Money API secret for mobile payments"
+            "description": "SendGrid API key for email notifications (optional)"
+        },
+        "DEFAULT_LANGUAGE": {
+            "type": "string",
+            "description": "Default platform language",
+            "defaultValue": "en",
+            "enum": ["en", "sw", "fr", "ar", "pt"]
+        },
+        "ENABLE_MOBILE_MONEY": {
+            "type": "boolean",
+            "description": "Enable mobile money payment integration",
+            "defaultValue": true
+        },
+        "ENABLE_AI_FEATURES": {
+            "type": "boolean",
+            "description": "Enable AI-powered features and predictions",
+            "defaultValue": true
         }
     },
-    "postInstallMessage": "🎉 Fataplus AgriTech Platform has been successfully installed!\n\n📋 Next Steps:\n1. Configure LDAP settings in the app configuration\n2. Set up API keys for external services (OpenWeatherMap, Stripe, etc.)\n3. Create your first admin user\n4. Access the application at your Cloudron domain\n\n📖 Documentation: https://docs.fataplus.com\n🐛 Support: contact@fataplus.com",
-    "logo": "file://logo.svg"
+    "postInstallMessage": "🎉 Fataplus AgriTech Platform has been successfully installed!\n\n📋 Next Steps:\n1. Configure LDAP settings in the app configuration\n2. Set up API keys for external services (OpenWeatherMap, Stripe, etc.)\n3. Create your first admin user through the web interface\n4. Access the application at your Cloudron domain\n\n🌍 Platform Features:\n• Weather Intelligence & AI Predictions\n• Livestock Management & Health Tracking\n• Agricultural E-commerce Marketplace\n• Learning Management System\n• Mobile Money Integration (M-Pesa, Airtel Money)\n• Multi-language Support\n• Offline-first Design\n\n📖 Documentation: https://docs.fataplus.com\n🐛 Support: contact@fataplus.com\n💬 Community: https://github.com/Fataplus/Fataplus-Agritech-Platform/discussions"
 }

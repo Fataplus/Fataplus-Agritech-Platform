@@ -1,0 +1,32 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="512" height="512" fill="#2D5A27"/>
+  
+  <!-- Main Icon - Stylized Plant/Growth -->
+  <g transform="translate(256, 256)">
+    <!-- Stem -->
+    <rect x="-8" y="100" width="16" height="120" fill="#4A7C3C" rx="8"/>
+    
+    <!-- Leaves -->
+    <ellipse cx="-40" cy="50" rx="35" ry="20" fill="#6BAF47" transform="rotate(-30)"/>
+    <ellipse cx="40" cy="30" rx="35" ry="20" fill="#6BAF47" transform="rotate(30)"/>
+    <ellipse cx="-30" cy="0" rx="40" ry="25" fill="#7BC144" transform="rotate(-15)"/>
+    <ellipse cx="30" cy="-20" rx="40" ry="25" fill="#7BC144" transform="rotate(15)"/>
+    
+    <!-- Central Growth Point -->
+    <circle cx="0" cy="-40" r="25" fill="#8CC739"/>
+    
+    <!-- Technology Elements -->
+    <circle cx="-80" cy="-80" r="8" fill="#FFD700" opacity="0.9"/>
+    <circle cx="80" cy="-60" r="6" fill="#FF6B35" opacity="0.9"/>
+    <circle cx="-60" cy="80" r="7" fill="#4ECDC4" opacity="0.9"/>
+    
+    <!-- Connection Lines (representing data/connectivity) -->
+    <line x1="-80" y1="-80" x2="-40" y2="-20" stroke="#FFD700" stroke-width="2" opacity="0.7"/>
+    <line x1="80" y1="-60" x2="40" y2="-10" stroke="#FF6B35" stroke-width="2" opacity="0.7"/>
+    <line x1="-60" y1="80" x2="-20" y2="20" stroke="#4ECDC4" stroke-width="2" opacity="0.7"/>
+  </g>
+  
+  <!-- Text -->
+  <text x="256" y="450" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="36" font-weight="bold">FATAPLUS</text>
+</svg>
