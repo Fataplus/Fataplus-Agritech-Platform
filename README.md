@@ -3,8 +3,9 @@
 **Building the future of African Agriculture through context-driven, AI-powered digital solutions**
 
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/Version-1.0.0-green.svg)]()
-[![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen.svg)]()
+[![Version](https://img.shields.io/badge/Version-1.0.0--prod-green.svg)]()
+[![Build Status](https://img.shields.io/badge/Build-Production%20Ready-brightgreen.svg)]()
+[![Deployment](https://img.shields.io/badge/Deployment-Cloudron%20Ready-blue.svg)]()
 
 ## 🌟 Vision
 
@@ -51,19 +52,21 @@ Fataplus is a multi-context SaaS platform designed specifically for African agri
 
 ## 🚀 Quick Start
 
-### 1. Clone the repository
+### Development Environment
+
+#### 1. Clone the repository
 ```bash
 git clone https://github.com/your-org/fataplus.git
 cd fataplus
 ```
 
-### 2. Set up environment variables
+#### 2. Set up environment variables
 ```bash
 cp .env.example .env
 # Edit .env with your configuration
 ```
 
-### 3. Start development environment
+#### 3. Start development environment
 ```bash
 # Start all services
 docker-compose up -d
@@ -73,10 +76,32 @@ cd web-frontend && npm install && npm run dev
 cd web-backend && pip install -r requirements.txt && python main.py
 ```
 
-### 4. Access the application
+#### 4. Access the application
 - **Web App**: http://localhost:3000
 - **API Documentation**: http://localhost:8000/docs
 - **Mobile App**: Follow mobile setup instructions
+
+### Production Deployment
+
+#### Cloudron Deployment (Recommended)
+```bash
+# Deploy to Cloudron
+docker build -f Dockerfile.cloudron -t fataplus-cloudron .
+docker-compose -f docker-compose.cloudron.yml up -d
+```
+
+#### Manual Production Deployment
+```bash
+# Set up production environment
+cp .env.production .env
+# Edit .env with production values
+
+# Deploy using production configuration
+docker-compose -f docker-compose.production.yml up -d
+```
+
+#### Cloud Deployment
+Refer to [PRODUCTION_DEPLOYMENT.md](./PRODUCTION_DEPLOYMENT.md) for detailed cloud deployment instructions.
 
 ## 📁 Project Structure
 
