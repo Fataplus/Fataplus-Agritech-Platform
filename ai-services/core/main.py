@@ -4,7 +4,6 @@ Machine learning and AI components for agricultural applications
 """
 
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
 
 # Create FastAPI application
 app = FastAPI(
@@ -13,15 +12,6 @@ app = FastAPI(
     version="1.0.0",
     docs_url="/docs",
     redoc_url="/redoc"
-)
-
-# Configure CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # Configure appropriately for production
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
 )
 
 @app.get("/")

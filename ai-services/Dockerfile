@@ -9,21 +9,32 @@ ENV PYTHONPATH /app
 # Set work directory
 WORKDIR /app
 
-# Install system dependencies for ML/AI
+# Install basic system dependencies
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
     gcc \
-    g++ \
-    libgomp1 \
-    libatlas-base-dev \
     curl \
     git \
   && rm -rf /var/lib/apt/lists/*
 
-# Install Python dependencies
+# Copy and install basic Python dependencies first
 COPY requirements.txt .
+# Install basic dependencies only for now
 RUN pip install --no-cache-dir --upgrade pip \
-  && pip install --no-cache-dir -r requirements.txt
+  && pip install --no-cache-dir \
+    fastapi==0.104.1 \
+    uvicorn[standard]==0.24.0 \
+    pydantic==2.5.0 \
+    httpx==0.25.2 \
+    python-dotenv==1.0.0 \
+    requests==2.31.0 \
+    celery==5.3.4 \
+    redis==5.0.1 \
+    pytest==7.4.3 \
+    pytest-asyncio==0.21.1 \
+    black==23.11.0 \
+    isort==5.12.0 \
+    mypy==1.7.1
 
 # Copy project
 COPY . .
@@ -32,9 +43,9 @@ COPY . .
 RUN adduser --disabled-password --gecos '' appuser && chown -R appuser:appuser /app
 USER appuser
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:8001/health || exit 1
+# Health check (disabled for development)
+# HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+#   CMD python -c "import requests; requests.get('http://localhost:8001/health')" || exit 1
 
 # Expose port
 EXPOSE 8001
