@@ -1,4 +1,4 @@
-# Data Model: MCP Server for Fataplus Design System
+# Data Model: MCP Server for Fataplus Agritech Platform
 
 **Feature Branch**: `003-mcp-server-for`  
 **Created**: 2025-01-09  
@@ -8,7 +8,112 @@
 
 ## Overview
 
-This document defines the comprehensive data structures and interfaces for the MCP (Model Context Protocol) server that enables AI tools to interact intelligently with the Fataplus Design System. The data model encompasses MCP protocol structures, agricultural context intelligence, cultural adaptation data, and design system metadata.
+This document defines the comprehensive data structures and interfaces for the MCP (Model Context Protocol) server that enables AI tools to interact intelligently with the entire Fataplus Agritech Platform. The data model encompasses MCP protocol structures, platform architecture metadata, service integrations, agricultural context intelligence, cultural adaptation data, and complete development workflow patterns.
+
+## Platform Architecture Data Models
+
+### Service Architecture Models
+
+#### Platform Service Registry
+```typescript
+interface PlatformService {
+  id: string;
+  name: string;
+  type: ServiceType;
+  version: string;
+  description: string;
+  
+  // Service configuration
+  endpoints: ServiceEndpoint[];
+  port: number;
+  baseUrl: string;
+  healthCheck: HealthCheckConfig;
+  
+  // Platform integration
+  dependencies: ServiceDependency[];
+  integrations: ServiceIntegration[];
+  authentication: AuthenticationConfig;
+  
+  // Agricultural context
+  agriculturalCapabilities: AgriculturalCapability[];
+  supportedContexts: AgriculturalContext[];
+  
+  // Deployment information
+  deployment: DeploymentConfig;
+  monitoring: MonitoringConfig;
+  scaling: ScalingConfig;
+}
+
+type ServiceType = 
+  | 'frontend'      // Next.js web application
+  | 'backend'       // FastAPI backend services
+  | 'ai-service'    // AI/ML microservices
+  | 'mobile'        // React Native application
+  | 'database'      // PostgreSQL/Redis services
+  | 'infrastructure' // Supporting services
+  | 'gateway';      // API gateway/proxy
+
+interface ServiceEndpoint {
+  path: string;
+  method: HTTPMethod;
+  description: string;
+  requestSchema?: JSONSchema;
+  responseSchema?: JSONSchema;
+  authentication: AuthRequirement;
+  rateLimit?: RateLimitConfig;
+  agriculturalContext?: AgriculturalContextRelevance;
+}
+```
+
+#### Database Architecture Models
+```typescript
+interface DatabaseSchema {
+  id: string;
+  name: string;
+  type: 'postgresql' | 'redis' | 'spatial';
+  version: string;
+  
+  // Schema definition
+  tables: TableSchema[];
+  relationships: TableRelationship[];
+  indexes: IndexDefinition[];
+  migrations: MigrationHistory[];
+  
+  // Agricultural data models
+  agriculturalEntities: AgriculturalEntity[];
+  spatialData: SpatialDataConfig[];
+  
+  // Performance and optimization
+  partitioning: PartitioningStrategy[];
+  caching: CachingStrategy[];
+  backup: BackupConfig;
+}
+
+interface TableSchema {
+  name: string;
+  description: string;
+  columns: ColumnDefinition[];
+  constraints: TableConstraint[];
+  triggers: TriggerDefinition[];
+  
+  // Agricultural context
+  agriculturalPurpose?: string;
+  dataClassification: DataClassification;
+  regionSpecific: boolean;
+  
+  // PostGIS spatial extensions
+  spatialColumns?: SpatialColumnDefinition[];
+  spatialIndexes?: SpatialIndexDefinition[];
+}
+
+interface AgriculturalEntity {
+  tableName: string;
+  entityType: 'farm' | 'crop' | 'livestock' | 'equipment' | 'weather' | 'market';
+  relationships: EntityRelationship[];
+  businessRules: BusinessRule[];
+  validationRules: ValidationRule[];
+}
+```
 
 ## MCP Protocol Data Models
 

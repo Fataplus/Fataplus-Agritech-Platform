@@ -1,4 +1,4 @@
-# Implementation Plan: MCP Server for Fataplus Design System
+# Implementation Plan: MCP Server for Fataplus Agritech Platform
 
 **Feature Branch**: `003-mcp-server-for`  
 **Created**: 2025-01-09  
@@ -8,11 +8,11 @@
 
 ## Overview
 
-This implementation plan details the technical approach for building an MCP (Model Context Protocol) server that provides AI tools and development environments with intelligent access to the Fataplus Design System. The server will enable AI-powered design assistance, automated documentation generation, and context-aware component recommendations for African agricultural interfaces.
+This implementation plan details the technical approach for building a comprehensive MCP (Model Context Protocol) server that provides AI tools and development environments with intelligent access to the entire Fataplus Agritech Platform. The server will enable AI-powered full-stack development assistance, automated code generation across all services, and context-aware recommendations for complete agricultural solutions.
 
 ## Technical Architecture
 
-### MCP Server Architecture
+### Comprehensive MCP Server Architecture
 ```
 mcp-server/
 ├── src/
@@ -20,78 +20,121 @@ mcp-server/
 │   │   ├── protocol.ts      # MCP specification implementation
 │   │   ├── handlers.ts      # Request handlers
 │   │   └── auth.ts          # Authentication & authorization
-│   ├── services/            # Core business logic
-│   │   ├── design-system.ts # Design system data service
+│   ├── services/            # Platform service integrations
+│   │   ├── frontend.ts      # Next.js frontend service integration
+│   │   ├── backend.ts       # FastAPI backend service integration
+│   │   ├── ai-services.ts   # AI/ML services integration
+│   │   ├── database.ts      # PostgreSQL/Redis database integration
+│   │   ├── design-system.ts # Design system service
 │   │   ├── agricultural.ts  # Agricultural context intelligence
-│   │   ├── cultural.ts      # Cultural adaptation service
-│   │   └── recommendations.ts # AI recommendation engine
+│   │   └── cultural.ts      # Cultural adaptation service
 │   ├── data/                # Data access layer
-│   │   ├── tokens.ts        # Design token access
+│   │   ├── schemas.ts       # Database schema access
+│   │   ├── apis.ts          # API specification access
 │   │   ├── components.ts    # Component metadata access
-│   │   └── knowledge.ts     # Agricultural knowledge base
+│   │   ├── contexts.ts      # Agricultural context data
+│   │   └── deployments.ts   # Deployment configuration access
 │   ├── ai/                  # AI/ML capabilities
-│   │   ├── context-analyzer.ts # Context understanding
-│   │   ├── pattern-matcher.ts  # Pattern recognition
-│   │   └── recommender.ts   # Recommendation algorithms
+│   │   ├── platform-analyzer.ts # Full platform understanding
+│   │   ├── workflow-matcher.ts  # Agricultural workflow patterns
+│   │   ├── architecture-recommender.ts # Architecture recommendations
+│   │   └── code-generator.ts    # Full-stack code generation
+│   ├── integration/         # Platform service integrations
+│   │   ├── nextjs.ts        # Next.js project analysis
+│   │   ├── fastapi.ts       # FastAPI service integration
+│   │   ├── postgresql.ts    # Database schema integration
+│   │   ├── docker.ts        # Container configuration integration
+│   │   └── monitoring.ts    # Platform monitoring integration
 │   └── utils/               # Shared utilities
 │       ├── validators.ts    # Request validation
 │       ├── cache.ts         # Caching strategies
 │       └── logger.ts        # Logging and monitoring
-├── data/                    # Static data files
+├── data/                    # Platform metadata
+│   ├── platform/            # Platform architecture data
+│   │   ├── services.json    # Service definitions
+│   │   ├── apis.json        # API specifications
+│   │   ├── databases.json   # Database schemas
+│   │   └── deployments.json # Deployment configurations
 │   ├── agricultural/        # Agricultural knowledge base
-│   │   ├── crops.json       # Crop database
-│   │   ├── livestock.json   # Livestock information
-│   │   └── practices.json   # Farming practices
+│   │   ├── contexts.json    # Agricultural contexts
+│   │   ├── workflows.json   # Farming workflows
+│   │   └── integrations.json # Platform integrations
 │   ├── cultural/            # Cultural adaptation data
 │   │   ├── regions.json     # African regional data
-│   │   ├── languages.json   # Language specifications
-│   │   └── guidelines.json  # Cultural guidelines
-│   └── design-system/       # Design system metadata
-│       ├── tokens.json      # Design token definitions
-│       ├── components.json  # Component specifications
-│       └── patterns.json    # UI pattern definitions
+│   │   ├── localizations.json # Platform localizations
+│   │   └── adaptations.json # Cultural platform adaptations
+│   └── patterns/            # Development patterns
+│       ├── frontend.json    # Frontend development patterns
+│       ├── backend.json     # Backend development patterns
+│       ├── ai-integration.json # AI service patterns
+│       └── deployment.json  # Deployment patterns
 ├── tests/                   # Test suites
 │   ├── unit/               # Unit tests
-│   ├── integration/        # Integration tests
-│   └── e2e/                # End-to-end tests
+│   ├── integration/        # Service integration tests
+│   └── e2e/                # End-to-end platform tests
 └── docs/                   # Documentation
-    ├── api/                # API documentation
-    ├── integration/        # Integration guides
-    └── examples/           # Usage examples
+    ├── api/                # MCP API documentation
+    ├── platform/           # Platform integration guides
+    └── examples/           # Full-stack usage examples
 ```
 
 ### MCP Protocol Implementation
 
-#### Core MCP Interfaces
+#### Enhanced MCP Protocol Types for Platform-Wide Access
 ```typescript
-// MCP Protocol Types
-interface MCPRequest {
-  method: string;
-  params: any;
-  id: string;
-}
-
-interface MCPResponse {
-  result?: any;
-  error?: MCPError;
-  id: string;
-}
-
-interface MCPError {
-  code: number;
-  message: string;
-  data?: any;
-}
-
-// Fataplus-specific MCP Methods
+// Fataplus Platform MCP Methods
 type FataplusMCPMethod = 
-  | 'design-system/get-components'
-  | 'design-system/get-tokens'
-  | 'design-system/recommend-components'
-  | 'design-system/validate-usage'
-  | 'agricultural/analyze-context'
-  | 'cultural/get-adaptations'
-  | 'documentation/generate-examples';
+  // Frontend and Design System
+  | 'frontend/get-components'
+  | 'frontend/get-pages'
+  | 'frontend/get-design-tokens'
+  | 'frontend/recommend-ui-patterns'
+  
+  // Backend API Services
+  | 'backend/get-api-routes'
+  | 'backend/get-database-schemas'
+  | 'backend/get-auth-patterns'
+  | 'backend/recommend-api-design'
+  
+  // AI Services
+  | 'ai/get-models'
+  | 'ai/get-data-pipelines'
+  | 'ai/recommend-ml-architecture'
+  | 'ai/generate-training-data'
+  
+  // Platform Architecture
+  | 'platform/get-service-architecture'
+  | 'platform/get-deployment-configs'
+  | 'platform/recommend-scaling-strategy'
+  | 'platform/validate-architecture'
+  
+  // Agricultural Intelligence
+  | 'agricultural/analyze-complete-workflow'
+  | 'agricultural/recommend-platform-contexts'
+  | 'agricultural/get-integration-patterns'
+  
+  // Cultural and Regional
+  | 'cultural/get-platform-adaptations'
+  | 'cultural/recommend-localization'
+  | 'cultural/validate-regional-compliance'
+  
+  // Development and DevOps
+  | 'devops/get-ci-cd-patterns'
+  | 'devops/recommend-monitoring'
+  | 'devops/generate-deployment-scripts'
+  | 'code/generate-full-stack-solution';
+
+interface PlatformMCPParams {
+  // Platform context
+  service?: 'frontend' | 'backend' | 'ai-services' | 'mobile' | 'all';
+  context?: AgriculturalPlatformContext;
+  cultural?: CulturalContext;
+  
+  // Development context
+  stackPreference?: 'typescript' | 'python' | 'mixed';
+  deploymentTarget?: 'docker' | 'kubernetes' | 'cloudron';
+  scalingRequirements?: ScalingRequirements;
+}
 ```
 
 #### Agricultural Context Understanding

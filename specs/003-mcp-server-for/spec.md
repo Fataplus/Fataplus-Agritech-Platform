@@ -1,92 +1,105 @@
-# Feature Specification: MCP Server for Fataplus Design System
+# Feature Specification: MCP Server for Fataplus Agritech Platform
 
 **Feature Branch**: `003-mcp-server-for`  
 **Created**: 2025-01-09  
 **Status**: Draft  
-**Input**: User description: "MCP Server for Design System"
+**Input**: User description: "MCP Server for the whole Fataplus project"
 
 ---
 
 ## Executive Summary
 
-The MCP (Model Context Protocol) Server for Fataplus Design System provides a standardized interface for AI models and development tools to interact with the design system programmatically. This server exposes design tokens, component definitions, usage guidelines, and cultural adaptations through a structured API that enables AI-powered design assistance, automated documentation generation, and intelligent component recommendations.
+The MCP (Model Context Protocol) Server for Fataplus Agritech Platform provides a comprehensive, standardized interface for AI models and development tools to interact with the entire Fataplus ecosystem programmatically. This server exposes the complete platform architecture including design system components, backend APIs, AI services, agricultural data models, multi-context modules, and cultural adaptations through a unified API that enables AI-powered development assistance, automated code generation, and intelligent agricultural solutions.
 
 ### Strategic Context
-As the Fataplus Design System grows to serve diverse African agricultural contexts, an MCP server will:
-- **Enable AI-powered design assistance** for developers and designers
-- **Provide structured access** to design tokens, components, and guidelines
-- **Support automated documentation** and code generation workflows
-- **Facilitate intelligent recommendations** based on agricultural contexts and cultural needs
-- **Integrate with development tools** for enhanced productivity
+As the Fataplus Agritech Platform scales to serve diverse African agricultural stakeholders across multiple contexts, a comprehensive MCP server will:
+- **Enable AI-powered full-stack development** for agricultural applications
+- **Provide structured access** to the entire platform architecture and APIs
+- **Support automated documentation** and code generation for all services
+- **Facilitate intelligent recommendations** for agricultural contexts, APIs, and business logic
+- **Integrate with development tools** for complete platform development workflows
+- **Enable AI understanding** of agricultural domain knowledge and multi-context architecture
 
 ### Current State Analysis
 The Fataplus project currently has:
-- Established design system specification (Feature 002)
-- UI component library in `/web-frontend/src/components/ui/`
-- Design system showcase page at [`fataplus-design.tsx`](file:///Users/fefe/Documents/Documents%20-%20MacBook%20Pro%20de%20Fenohery/Fataplus-Cloudron%20R&D/FP-09/web-frontend/src/pages/fataplus-design.tsx)
-- Tailwind CSS configuration with custom tokens
-- TypeScript definitions for components
+- **Microservices Architecture**: Next.js frontend (port 3000), FastAPI backend (port 8000), AI services (port 8001)
+- **Design System**: UI component library and design token system (Feature 002)
+- **Agricultural Contexts**: Multi-context SaaS platform for weather, livestock, crops, market
+- **Database Layer**: PostgreSQL with PostGIS for spatial data, Redis for caching
+- **AI/ML Services**: TensorFlow/PyTorch models for agricultural predictions
+- **Mobile Application**: React Native app with offline-first capabilities
+- **Cultural Adaptations**: Multi-language support (Swahili, French, Arabic, Portuguese)
+- **Authentication**: LDAP integration and RBAC system
 
 ### Vision Statement
-"Create an intelligent, AI-accessible interface to the Fataplus Design System that empowers developers, designers, and AI tools to build culturally-aware agricultural interfaces more efficiently and accurately."
+"Create an intelligent, AI-accessible interface to the entire Fataplus Agritech Platform that empowers developers, AI tools, and agricultural domain experts to build, deploy, and scale culturally-aware agricultural solutions across Africa more efficiently and accurately."
 
 ## User Scenarios & Testing
 
 ### Primary User Stories
 
-#### AI-Powered Development Assistant Story
-"As an AI development assistant helping to build agricultural interfaces, I want to access comprehensive design system information through a standardized protocol so that I can provide accurate component recommendations, generate culturally-appropriate code, and suggest accessibility improvements based on the specific agricultural context."
+#### AI-Powered Full-Stack Development Assistant Story
+"As an AI development assistant helping to build complete agricultural applications, I want to access comprehensive platform information through a standardized protocol so that I can provide accurate recommendations for frontend components, backend APIs, database schemas, AI model integrations, and deployment configurations based on specific agricultural contexts and business requirements."
 
-#### Frontend Developer Story
-"As a frontend developer building agricultural applications, I want my IDE and AI tools to automatically suggest appropriate Fataplus components, design tokens, and patterns based on my current context so that I can build consistent interfaces faster without manually searching through documentation."
+#### Full-Stack Developer Story
+"As a full-stack developer building agricultural applications on Fataplus, I want my IDE and AI tools to automatically suggest appropriate components, APIs, database models, and architectural patterns based on my current context so that I can build end-to-end solutions faster without manually searching through multiple service documentations."
 
-#### Design Tool Integration Story
-"As a design tool (Figma plugin, VS Code extension), I want to programmatically access design tokens, component specifications, and cultural guidelines so that I can provide real-time validation, suggestions, and automated code generation aligned with Fataplus standards."
+#### Platform Integration Tool Story
+"As a development tool (IDE extension, CI/CD pipeline, monitoring system), I want to programmatically access the complete Fataplus platform architecture, API specifications, database schemas, and deployment configurations so that I can provide real-time validation, automated testing, and intelligent deployment recommendations."
 
-#### Agricultural Context Expert Story
-"As an agricultural domain expert working with AI tools, I want the system to understand agricultural contexts (crops, livestock, seasons, regions) and provide relevant component recommendations so that interfaces accurately reflect farming practices and cultural considerations."
+#### Agricultural Solution Architect Story
+"As an agricultural domain expert working with AI tools to design platform solutions, I want the system to understand complete agricultural workflows (from data collection to market analysis) and recommend appropriate platform contexts, API integrations, and data models so that solutions accurately reflect farming practices and business requirements."
+
+#### DevOps and Platform Engineer Story
+"As a DevOps engineer managing Fataplus deployments, I want AI tools to understand the complete platform architecture, containerization setup, service dependencies, and monitoring requirements so that I can automate deployment, scaling, and maintenance tasks across different African regions and infrastructure setups."
 
 ### Acceptance Scenarios
 
-#### Scenario 1: Component Discovery and Recommendation
-**Given** a developer is building a livestock management interface
-**When** an AI tool queries the MCP server for relevant components
-**Then** the server returns livestock-specific components (health cards, breeding trackers)
-**And** includes usage guidelines for African livestock management contexts
-**And** provides accessibility considerations for rural environments
-**And** suggests appropriate design tokens for agricultural themes
+#### Scenario 1: Full-Stack Agricultural Application Development
+**Given** a developer is building a complete livestock management system
+**When** an AI tool queries the MCP server for relevant platform resources
+**Then** the server returns frontend components (livestock health cards, breeding trackers)
+**And** includes backend API endpoints for livestock data management
+**And** provides database schema for livestock records with PostGIS spatial data
+**And** suggests AI service integration for disease prediction
+**And** includes deployment configuration for African regional hosting
+**And** provides cultural adaptations for the target region
 
-#### Scenario 2: Cultural Adaptation Guidance
-**Given** a designer is adapting interfaces for West African markets
-**When** an AI tool requests cultural adaptation information
-**Then** the server provides region-specific guidelines and color meanings
-**And** recommends appropriate iconography for the target culture
-**And** suggests text direction and typography adjustments
-**And** includes examples of successful cultural adaptations
+#### Scenario 2: Multi-Context Platform Integration
+**Given** a developer is building a farm management dashboard combining weather, crops, and market data
+**When** an AI tool requests platform integration recommendations
+**Then** the server identifies relevant contexts (weather-context, crop-context, market-context)
+**And** provides API endpoints for each context with authentication requirements
+**And** suggests data synchronization patterns between contexts
+**And** includes offline-first implementation strategies
+**And** provides real-time collaboration features for cooperatives
 
-#### Scenario 3: Design Token Access and Validation
-**Given** a development tool needs to validate design consistency
-**When** it queries the MCP server for current design tokens
-**Then** the server returns structured token information with semantic meanings
-**And** includes agricultural context associations for each token
-**And** provides validation rules for token usage
-**And** includes accessibility compliance information
+#### Scenario 3: API and Database Schema Guidance
+**Given** a developer needs to extend the platform with new agricultural data types
+**When** they query for database and API extension patterns
+**Then** the server provides PostgreSQL schema patterns with PostGIS extensions
+**And** includes FastAPI route patterns with proper authentication
+**And** suggests data validation schemas using Pydantic models
+**And** provides Alembic migration examples
+**And** includes Redis caching strategies for agricultural data
 
-#### Scenario 4: Agricultural Context-Aware Suggestions
-**Given** an AI assistant is helping build a crop management dashboard
-**When** it requests components for "rice farming in Madagascar"
-**Then** the server returns crop-specific components and patterns
-**And** includes seasonal considerations for rice cultivation
-**And** suggests appropriate data visualization components
-**And** provides Malagasy cultural and linguistic adaptations
+#### Scenario 4: AI Service Integration and Deployment
+**Given** an AI engineer wants to add crop disease detection to the platform
+**When** they request AI service integration guidance
+**Then** the server provides AI service architecture patterns (TensorFlow/PyTorch)
+**And** includes API integration patterns with the main backend
+**And** suggests model deployment strategies using Docker
+**And** provides data pipeline patterns for agricultural image processing
+**And** includes monitoring and logging configurations
 
-#### Scenario 5: Documentation Generation
-**Given** an automated documentation tool needs to generate component guides
-**When** it requests comprehensive component information
-**Then** the server provides structured component metadata
-**And** includes code examples for different agricultural contexts
-**And** provides accessibility testing procedures
-**And** includes cultural sensitivity guidelines
+#### Scenario 5: Cultural and Regional Platform Adaptation
+**Given** a team is deploying Fataplus to a new African country
+**When** they request platform adaptation guidance
+**Then** the server provides cultural adaptation checklists
+**And** includes language localization patterns (i18next integration)
+**And** suggests regional API customizations
+**And** provides mobile money integration patterns for the region
+**And** includes regulatory compliance considerations
 
 ### Edge Cases
 
@@ -115,78 +128,73 @@ The Fataplus project currently has:
 ### Functional Requirements
 
 #### MCP Server Foundation
-- **FR-001**: System MUST implement Model Context Protocol (MCP) specification for standardized AI tool integration
-- **FR-002**: System MUST provide secure authentication and authorization for MCP client connections
-- **FR-003**: System MUST support real-time querying of design system components, tokens, and documentation
-- **FR-004**: System MUST maintain version compatibility with multiple design system releases
-- **FR-005**: System MUST provide structured responses in JSON format with comprehensive metadata
+- **FR-001**: System MUST implement Model Context Protocol (MCP) specification for standardized AI tool integration across the entire platform
+- **FR-002**: System MUST provide secure authentication and authorization for MCP client connections with role-based access control
+- **FR-003**: System MUST support real-time querying of all platform services (frontend, backend, AI services, database schemas)
+- **FR-004**: System MUST maintain version compatibility with multiple platform releases and service versions
+- **FR-005**: System MUST provide structured responses in JSON format with comprehensive metadata for all platform components
 
-#### Design System Data Access
-- **FR-006**: System MUST expose all design tokens with semantic meanings and usage contexts
-- **FR-007**: System MUST provide component definitions including props, variants, states, and accessibility features
-- **FR-008**: System MUST include agricultural context metadata for each component and pattern
-- **FR-009**: System MUST serve cultural adaptation guidelines and region-specific recommendations
-- **FR-010**: System MUST provide usage examples with code snippets for different agricultural scenarios
+#### Platform Architecture Access
+- **FR-006**: System MUST expose complete microservices architecture information (Next.js frontend, FastAPI backend, AI services)
+- **FR-007**: System MUST provide API specifications for all backend services with authentication and rate limiting details
+- **FR-008**: System MUST include database schema information (PostgreSQL with PostGIS, Redis caching patterns)
+- **FR-009**: System MUST serve deployment configurations (Docker containers, docker-compose, Kubernetes manifests)
+- **FR-010**: System MUST provide inter-service communication patterns and service discovery mechanisms
 
-#### AI-Powered Recommendations
-- **FR-011**: System MUST analyze context (agricultural use case, region, user type) to provide relevant component suggestions
-- **FR-012**: System MUST recommend appropriate design tokens based on agricultural themes and cultural contexts
-- **FR-013**: System MUST suggest accessibility improvements based on target user demographics and environments
-- **FR-014**: System MUST provide pattern recommendations for complex agricultural interface requirements
-- **FR-015**: System MUST validate design choices against Fataplus design system guidelines
+#### Agricultural Platform Intelligence
+- **FR-011**: System MUST understand complete agricultural workflows across all platform contexts (weather, livestock, crops, market, LMS)
+- **FR-012**: System MUST provide context-aware recommendations for API integrations and data models
+- **FR-013**: System MUST suggest appropriate AI service integrations based on agricultural use cases
+- **FR-014**: System MUST recommend data visualization patterns for agricultural analytics
+- **FR-015**: System MUST validate platform architecture choices against agricultural business requirements
 
-#### Agricultural Context Intelligence
-- **FR-016**: System MUST understand agricultural contexts (crops, livestock, seasons, farming practices)
-- **FR-017**: System MUST provide region-specific recommendations for different African countries
-- **FR-018**: System MUST support multi-language contexts and provide appropriate adaptations
-- **FR-019**: System MUST include seasonal considerations in component and pattern recommendations
-- **FR-020**: System MUST understand user types (farmers, cooperatives, agribusinesses) and tailor responses
+#### Full-Stack Development Support
+- **FR-016**: System MUST provide frontend component recommendations with corresponding backend API patterns
+- **FR-017**: System MUST generate complete API endpoint specifications with request/response schemas
+- **FR-018**: System MUST suggest database migration patterns using Alembic for new agricultural data types
+- **FR-019**: System MUST provide authentication and authorization patterns (LDAP integration, RBAC)
+- **FR-020**: System MUST recommend caching strategies and offline-first implementation patterns
 
-#### Documentation and Examples
-- **FR-021**: System MUST generate contextual documentation based on requested agricultural scenarios
-- **FR-022**: System MUST provide code examples in TypeScript/React format with proper imports
-- **FR-023**: System MUST include accessibility testing procedures for recommended components
-- **FR-024**: System MUST serve cultural sensitivity guidelines for target regions
-- **FR-025**: System MUST provide migration guides when recommending component updates
+#### AI and ML Service Integration
+- **FR-021**: System MUST provide AI service architecture patterns for agricultural machine learning models
+- **FR-022**: System MUST suggest data pipeline patterns for agricultural image and sensor data processing
+- **FR-023**: System MUST recommend model deployment strategies using Docker and FastAPI
+- **FR-024**: System MUST provide integration patterns between AI services and main backend APIs
+- **FR-025**: System MUST suggest monitoring and logging configurations for AI model performance
 
-#### Performance and Reliability
-- **FR-026**: System MUST respond to MCP queries within 500ms for standard requests
-- **FR-027**: System MUST handle concurrent connections from multiple AI tools and development environments
-- **FR-028**: System MUST implement caching strategies to maintain performance under load
-- **FR-029**: System MUST provide graceful degradation when design system data is temporarily unavailable
-- **FR-030**: System MUST maintain audit logs of all MCP interactions for debugging and analytics
+#### Cultural and Regional Platform Adaptation
+- **FR-026**: System MUST provide region-specific platform configuration recommendations for African markets
+- **FR-027**: System MUST suggest localization patterns for multi-language support (i18next integration)
+- **FR-028**: System MUST recommend mobile money integration patterns for different African regions
+- **FR-029**: System MUST provide regulatory compliance guidance for agricultural data in different countries
+- **FR-030**: System MUST suggest cultural adaptation patterns for complete platform deployment
 
 ### Key Entities
 
-#### MCP Server Configuration
-- **Purpose**: Core server configuration and connection management
-- **Attributes**: Server version, supported protocols, authentication methods, rate limits
-- **Agricultural Context**: Agricultural domain knowledge bases, regional data sources
+#### Platform Architecture Metadata
+- **Purpose**: Complete platform architecture documentation and service specifications
+- **Attributes**: Service definitions, API schemas, database models, deployment configurations
+- **Agricultural Context**: Context-specific services, agricultural data models, farming workflow integrations
 
-#### Design System Metadata
-- **Purpose**: Structured information about design system components and tokens
-- **Attributes**: Component definitions, design token values, usage guidelines, version history
-- **Agricultural Context**: Agricultural use case mappings, seasonal variations, cultural adaptations
+#### Microservices Configuration
+- **Purpose**: Individual service configuration and inter-service communication patterns
+- **Attributes**: Service endpoints, authentication schemes, data contracts, health check configurations
+- **Agricultural Context**: Agricultural context services, AI model APIs, spatial data processing services
 
-#### Context Intelligence Engine
-- **Purpose**: AI-powered analysis of agricultural contexts and user requirements
-- **Attributes**: Context parsing rules, recommendation algorithms, cultural knowledge base
-- **Agricultural Context**: Crop databases, livestock management patterns, farming practice libraries
+#### Database Schema Intelligence
+- **Purpose**: Complete database schema information with agricultural data models
+- **Attributes**: Table structures, relationships, indexes, PostGIS spatial configurations, migration patterns
+- **Agricultural Context**: Farm data models, crop/livestock schemas, geospatial field boundaries, weather data structures
 
-#### Cultural Adaptation Service
-- **Purpose**: Region-specific design and content adaptations
-- **Attributes**: Regional guidelines, language mappings, cultural color meanings, iconography
-- **Agricultural Context**: Regional farming practices, local crop varieties, cultural agricultural traditions
+#### AI Service Catalog
+- **Purpose**: Available AI/ML services and model integration patterns
+- **Attributes**: Model endpoints, input/output schemas, performance characteristics, deployment requirements
+- **Agricultural Context**: Crop disease detection, yield prediction, weather forecasting, market analysis models
 
-#### Component Recommendation Engine
-- **Purpose**: Intelligent component and pattern suggestions based on context
-- **Attributes**: Recommendation algorithms, usage analytics, pattern matching rules
-- **Agricultural Context**: Agricultural workflow patterns, seasonal UI adaptations, user type preferences
-
-#### Documentation Generator
-- **Purpose**: Dynamic generation of contextual documentation and examples
-- **Attributes**: Template systems, code generation rules, example databases
-- **Agricultural Context**: Agricultural scenario templates, region-specific examples, cultural case studies
+#### Development Workflow Patterns
+- **Purpose**: Complete development, testing, and deployment workflow recommendations
+- **Attributes**: CI/CD patterns, testing strategies, deployment configurations, monitoring setups
+- **Agricultural Context**: Agricultural data validation, context integration testing, regional deployment patterns
 
 ## Success Metrics & Impact Measurement
 
