@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import { Button, Badge, Card, CardContent } from '../ui';
 
 const HeroSection: React.FC = () => {
   return (
@@ -10,10 +11,10 @@ const HeroSection: React.FC = () => {
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="text-center">
           {/* Badge */}
-          <div className="inline-flex items-center px-4 py-2 rounded-full bg-green-100 text-green-800 text-sm font-medium mb-8 animate-fade-in-up">
+          <Badge variant="primary" className="mb-8 animate-fade-in-up text-sm px-4 py-2">
             <span className="animate-pulse-green mr-2">🚀</span>
             Transforming African Agriculture
-          </div>
+          </Badge>
 
           {/* Main Heading */}
           <h1 className="text-hero text-gray-900 mb-6 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
@@ -30,12 +31,12 @@ const HeroSection: React.FC = () => {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
-            <Link href="/register" className="btn-primary text-lg px-8 py-4">
-              Start Free Trial
-            </Link>
-            <Link href="#features" className="btn-secondary text-lg px-8 py-4">
-              Explore Features
-            </Link>
+            <Button size="lg" className="px-8 py-4" asChild>
+              <Link href="/register">Start Free Trial</Link>
+            </Button>
+            <Button variant="secondary" size="lg" className="px-8 py-4" asChild>
+              <Link href="#features">Explore Features</Link>
+            </Button>
           </div>
 
           {/* Trust Indicators */}
@@ -53,47 +54,55 @@ const HeroSection: React.FC = () => {
         {/* Hero Image/Dashboard Preview */}
         <div className="mt-16 animate-fade-in-up" style={{ animationDelay: '1s' }}>
           <div className="relative max-w-4xl mx-auto">
-            <div className="bg-white rounded-xl shadow-2xl p-8 border border-gray-200">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* Weather Widget */}
-                <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="font-semibold text-gray-900">Weather</h3>
-                    <span className="text-2xl">☀️</span>
-                  </div>
-                  <div className="text-2xl font-bold text-blue-600">28°C</div>
-                  <div className="text-sm text-gray-600">Sunny, Antananarivo</div>
-                </div>
+            <Card variant="elevated" className="p-8">
+              <CardContent className="p-0">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {/* Weather Widget */}
+                  <Card variant="gradient" className="bg-gradient-to-br from-blue-50 to-blue-100">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <h3 className="font-semibold text-gray-900">Weather</h3>
+                        <span className="text-2xl">☀️</span>
+                      </div>
+                      <div className="text-2xl font-bold text-blue-600">28°C</div>
+                      <div className="text-sm text-gray-600">Sunny, Antananarivo</div>
+                    </CardContent>
+                  </Card>
 
-                {/* Market Prices */}
-                <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="font-semibold text-gray-900">Market Prices</h3>
-                    <span className="text-2xl">📈</span>
-                  </div>
-                  <div className="text-lg font-bold text-green-600">+12%</div>
-                  <div className="text-sm text-gray-600">Rice prices this week</div>
-                </div>
+                  {/* Market Prices */}
+                  <Card variant="gradient" className="bg-gradient-to-br from-green-50 to-green-100">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <h3 className="font-semibold text-gray-900">Market Prices</h3>
+                        <span className="text-2xl">📈</span>
+                      </div>
+                      <div className="text-lg font-bold text-green-600">+12%</div>
+                      <div className="text-sm text-gray-600">Rice prices this week</div>
+                    </CardContent>
+                  </Card>
 
-                {/* Supply Chain */}
-                <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="font-semibold text-gray-900">Supply Chain</h3>
-                    <span className="text-2xl">🚛</span>
-                  </div>
-                  <div className="text-lg font-bold text-purple-600">98%</div>
-                  <div className="text-sm text-gray-600">Delivery efficiency</div>
+                  {/* Supply Chain */}
+                  <Card variant="gradient" className="bg-gradient-to-br from-purple-50 to-purple-100">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <h3 className="font-semibold text-gray-900">Supply Chain</h3>
+                        <span className="text-2xl">🚛</span>
+                      </div>
+                      <div className="text-lg font-bold text-purple-600">98%</div>
+                      <div className="text-sm text-gray-600">Delivery efficiency</div>
+                    </CardContent>
+                  </Card>
                 </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
 
             {/* Floating Elements */}
-            <div className="absolute -top-4 -right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium animate-bounce-slow">
+            <Badge variant="success" className="absolute -top-4 -right-4 animate-bounce-slow text-sm px-3 py-1">
               Live Data
-            </div>
-            <div className="absolute -bottom-4 -left-4 bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-medium animate-bounce-slow" style={{ animationDelay: '1s' }}>
+            </Badge>
+            <Badge variant="info" className="absolute -bottom-4 -left-4 animate-bounce-slow text-sm px-3 py-1" style={{ animationDelay: '1s' }}>
               AI-Powered
-            </div>
+            </Badge>
           </div>
         </div>
       </div>

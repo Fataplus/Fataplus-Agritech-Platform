@@ -10,8 +10,11 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install
+# Install dependencies including devDependencies for build
+RUN npm install --include=dev
+
+# Explicitly install autoprefixer to ensure it's available
+RUN npm install autoprefixer
 
 # Copy source code
 COPY . .

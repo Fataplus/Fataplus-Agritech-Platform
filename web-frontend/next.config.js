@@ -60,21 +60,21 @@ const nextConfig = {
     ];
   },
 
-  // Redirects and rewrites
-  async rewrites() {
-    return [
-      // API proxy for development
-      {
-        source: '/api/:path*',
-        destination: 'http://web-backend:8000/api/:path*',
-      },
-      // AI services proxy for development
-      {
-        source: '/ai/:path*',
-        destination: 'http://ai-services:8001/:path*',
-      },
-    ];
-  },
+  // Redirects and rewrites (disabled for local development)
+  // async rewrites() {
+  //   return [
+  //     // API proxy for development
+  //     {
+  //       source: '/api/:path*',
+  //       destination: 'http://web-backend:8000/api/:path*',
+  //     },
+  //     // AI services proxy for development
+  //     {
+  //       source: '/ai/:path*',
+  //       destination: 'http://ai-services:8001/:path*',
+  //     },
+  //   ];
+  // },
 };
 
 module.exports = nextConfig;

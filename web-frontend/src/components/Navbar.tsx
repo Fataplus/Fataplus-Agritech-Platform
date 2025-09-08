@@ -1,20 +1,32 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { Button } from './ui';
+import { useAuth } from '../contexts/AuthContext';
 
 const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, isAuthenticated, logout } = useAuth();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
-  const navItems = [
-    { name: 'Home', href: '#home' },
-    { name: 'Features', href: '#features' },
-    { name: 'Solutions', href: '#solutions' },
-    { name: 'About', href: '#about' },
-    { name: 'Contact', href: '#contact' },
+  const publicNavItems = [
+    { name: 'Home', href: '/' },
+    { name: 'Features', href: '/features' },
+    { name: 'Solutions', href: '/solutions' },
+    { name: 'Pricing', href: '/pricing' },
+    { name: 'Testimonials', href: '/testimonials' },
   ];
+
+  const authenticatedNavItems = [
+    { name: 'Dashboard', href: '/dashboard' },
+    { name: 'Weather', href: '/weather' },
+    { name: 'Market', href: '/market' },
+    { name: 'Community', href: '/community' },
+  ];
+
+  const navItems = isAuthenticated ? authenticatedNavItems : publicNavItems;
 
   return (
     <nav className="bg-white shadow-lg sticky top-0 z-50">
@@ -32,24 +44,37 @@ const Navbar: React.FC = () => {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
             {navItems.map((item) => (
-              <a
+              <Link
                 key={item.name}
                 href={item.href}
-                className="text-gray-700 hover:text-green-600 px-3 py-2 text-sm font-medium transition-colors duration-200"
+                className="text-gray-700 hover:text-primary-600 px-3 py-2 text-sm font-medium transition-colors duration-200"
               >
                 {item.name}
-              </a>
+              </Link>
             ))}
           </div>
 
           {/* Desktop CTA Buttons */}
           <div className="hidden md:flex items-center space-x-4">
-            <Link href="/login" className="text-gray-700 hover:text-green-600 px-3 py-2 text-sm font-medium transition-colors duration-200">
-              Sign In
-            </Link>
-            <Link href="/register" className="btn-primary text-sm">
-              Get Started
-            </Link>
+            {isAuthenticated ? (
+              <>
+                <div className="flex items-center space-x-2 text-sm">
+                  <span>Welcome, {user?.name?.split(' ')[0]}</span>
+                </div>
+                <Button variant="outline" size="sm" onClick={logout}>
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button variant="ghost" size="sm" asChild>
+                  <Link href="/login">Sign In</Link>
+                </Button>
+                <Button size="sm" asChild>
+                  <Link href="/register">Get Started</Link>
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -79,25 +104,36 @@ const Navbar: React.FC = () => {
         <div className="md:hidden">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t border-gray-200">
             {navItems.map((item) => (
-              <a
+              <Link
                 key={item.name}
                 href={item.href}
-                className="text-gray-700 hover:text-green-600 block px-3 py-2 text-base font-medium transition-colors duration-200"
+                className="text-gray-700 hover:text-primary-600 block px-3 py-2 text-base font-medium transition-colors duration-200"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {item.name}
-              </a>
+              </Link>
             ))}
           </div>
           <div className="pt-4 pb-3 border-t border-gray-200">
-            <div className="flex items-center px-5 space-x-4">
-              <Link href="/login" className="text-gray-700 hover:text-green-600 px-3 py-2 text-base font-medium transition-colors duration-200">
-                Sign In
-              </Link>
-              <Link href="/register" className="btn-primary text-sm">
-                Get Started
-              </Link>
-            </div>
+            {isAuthenticated ? (
+              <div className="px-5 space-y-3">
+                <div className="flex items-center space-x-2 text-sm">
+                  <span>Welcome, {user?.name?.split(' ')[0]}</span>
+                </div>
+                <Button variant="outline" size="sm" fullWidth onClick={logout}>
+                  Logout
+                </Button>
+              </div>
+            ) : (
+              <div className="flex items-center px-5 space-x-4">
+                <Button variant="ghost" size="sm" fullWidth asChild>
+                  <Link href="/login">Sign In</Link>
+                </Button>
+                <Button size="sm" fullWidth asChild>
+                  <Link href="/register">Get Started</Link>
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       )}

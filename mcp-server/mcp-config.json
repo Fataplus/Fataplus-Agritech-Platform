@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "fataplus": {
+      "command": "node",
+      "args": ["dist/index.js"],
+      "env": {
+        "FATAPLUS_API_URL": "http://localhost:8000",
+        "FATAPLUS_API_KEY": "your-api-key-here",
+        "LOG_LEVEL": "info"
+      }
+    }
+  }
+}

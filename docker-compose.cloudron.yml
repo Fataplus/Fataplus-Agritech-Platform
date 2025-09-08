@@ -137,7 +137,7 @@ services:
       # Application
       - ENVIRONMENT=production
     ports:
-      - "${CLOUDRON_AI_PORT}:8001"
+      - "${AI_PORT}:8001"
     depends_on:
       postgres:
         condition: service_healthy

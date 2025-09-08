@@ -37,6 +37,7 @@ Fataplus is a multi-context SaaS platform designed specifically for African agri
 - **Backend**: FastAPI, Python 3.11, PostgreSQL, Redis
 - **Mobile**: React Native, Expo
 - **AI/ML**: TensorFlow, PyTorch, scikit-learn
+- **AI Integration**: Model Context Protocol (MCP) Server
 - **Infrastructure**: Docker, Kubernetes, Terraform, AWS/GCP/Azure
 - **Monitoring**: Prometheus, Grafana, ELK Stack
 
@@ -90,6 +91,7 @@ fataplus/
 │   │   ├── contracts/       # OpenAPI specifications
 │   │   ├── roadmap.md       # Strategic roadmap
 │   │   └── dev-todo.md      # Development todo list
+├── mcp-server/              # Model Context Protocol server for AI integration
 ├── web-frontend/            # Next.js web application
 ├── web-backend/             # FastAPI backend services
 ├── mobile-app/              # React Native mobile app
@@ -154,9 +156,77 @@ cd web-backend && pytest
 # AI Services
 cd ai-services && pytest
 
+# MCP Server
+cd mcp-server && npm test
+
 # Mobile App
 cd mobile-app && npm test
 ```
+
+## 🤖 AI Integration (MCP Server)
+
+Fataplus includes a Model Context Protocol (MCP) server that enables AI assistants and language models to interact with the platform's agricultural data and services.
+
+### Features
+
+- **Weather Data Access**: Real-time weather information for farming decisions
+- **Livestock Management**: Access to livestock health and inventory data
+- **Market Intelligence**: Current agricultural market prices and trends
+- **Farm Analytics**: Performance metrics and insights for farm management
+- **Gamification Data**: User engagement and achievement tracking
+- **Task Management**: Create and manage farm operation reminders
+
+### Quick Start with MCP
+
+1. **Start the MCP Server**:
+   ```bash
+   cd mcp-server
+   ./setup.sh
+   npm start
+   ```
+
+2. **Configure Claude Desktop** (or other MCP client):
+   ```json
+   {
+     "mcpServers": {
+       "fataplus": {
+         "command": "node",
+         "args": ["/path/to/fataplus/mcp-server/dist/index.js"],
+         "env": {
+           "FATAPLUS_API_URL": "http://localhost:8000",
+           "FATAPLUS_API_KEY": "your-api-key"
+         }
+       }
+     }
+   }
+   ```
+
+3. **Example Queries**:
+   - "What's the weather forecast for Antananarivo next week?"
+   - "Show me current rice prices in Madagascar"
+   - "How is farm FP001 performing this month?"
+   - "Create a reminder to fertilize the rice fields"
+
+### MCP Server Architecture
+
+The MCP server provides both **tools** (for executing actions) and **resources** (for accessing data):
+
+- **Tools**: `get_weather_data`, `get_livestock_info`, `get_market_prices`, `create_task_reminder`
+- **Resources**: `fataplus://weather/current`, `fataplus://market/prices`, `fataplus://farms/analytics`
+
+### Docker Integration
+
+The MCP server is included in the main Docker Compose setup:
+
+```bash
+# Start all services including MCP server
+docker-compose up -d
+
+# Start only MCP server
+docker-compose up mcp-server
+```
+
+Access at: `http://localhost:3001`
 
 ## 📚 Documentation
 
