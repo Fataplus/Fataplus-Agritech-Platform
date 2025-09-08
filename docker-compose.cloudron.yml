@@ -1,0 +1,162 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database (Cloudron addon)
+  postgres:
+    image: postgis/postgis:15-3.4
+    container_name: fataplus-postgres
+    environment:
+      POSTGRES_DB: fataplus
+      POSTGRES_USER: fataplus
+      POSTGRES_PASSWORD: ${CLOUDRON_POSTGRESQL_PASSWORD}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infrastructure/cloudron/postgres-init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "${CLOUDRON_POSTGRESQL_PORT}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fataplus -d fataplus"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - fataplus-network
+    restart: unless-stopped
+
+  # Redis Cache (Cloudron addon)
+  redis:
+    image: redis:7-alpine
+    container_name: fataplus-redis
+    command: redis-server --appendonly yes --requirepass ${CLOUDRON_REDIS_PASSWORD}
+    volumes:
+      - redis_data:/data
+    ports:
+      - "${CLOUDRON_REDIS_PORT}:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    networks:
+      - fataplus-network
+    restart: unless-stopped
+
+  # MinIO Object Storage (Cloudron addon)
+  minio:
+    image: minio/minio:latest
+    container_name: fataplus-minio
+    environment:
+      MINIO_ROOT_USER: ${CLOUDRON_MINIO_ACCESS_KEY}
+      MINIO_ROOT_PASSWORD: ${CLOUDRON_MINIO_SECRET_KEY}
+    volumes:
+      - minio_data:/data
+    ports:
+      - "${CLOUDRON_MINIO_PORT}:9000"
+      - "${CLOUDRON_MINIO_CONSOLE_PORT}:9001"
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    networks:
+      - fataplus-network
+    restart: unless-stopped
+
+  # Web Backend (FastAPI)
+  web-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.cloudron
+      target: backend
+    container_name: fataplus-web-backend
+    environment:
+      # Database
+      - DATABASE_URL=postgresql://fataplus:${CLOUDRON_POSTGRESQL_PASSWORD}@postgres:5432/fataplus
+      # Redis
+      - REDIS_URL=redis://:${CLOUDRON_REDIS_PASSWORD}@redis:6379
+      # MinIO
+      - MINIO_ENDPOINT=minio:9000
+      - MINIO_ROOT_USER=${CLOUDRON_MINIO_ACCESS_KEY}
+      - MINIO_ROOT_PASSWORD=${CLOUDRON_MINIO_SECRET_KEY}
+      # Application
+      - ENVIRONMENT=production
+      - NODE_ENV=production
+      # LDAP (Cloudron)
+      - LDAP_ENABLED=${LDAP_ENABLED:-true}
+      - LDAP_SERVER=${CLOUDRON_LDAP_SERVER}
+      - LDAP_PORT=${CLOUDRON_LDAP_PORT}
+      - LDAP_USE_SSL=${CLOUDRON_LDAP_SSL:-false}
+      - LDAP_BASE_DN=${CLOUDRON_LDAP_DN}
+      - LDAP_BIND_DN=${CLOUDRON_LDAP_BIND_DN}
+      - LDAP_BIND_PASSWORD=${CLOUDRON_LDAP_BIND_PASSWORD}
+      - LDAP_USER_SEARCH_FILTER=(uid={username})
+      - LDAP_USER_DISPLAY_NAME_ATTRIBUTE=cn
+      - LDAP_USER_EMAIL_ATTRIBUTE=mail
+      # JWT
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - JWT_ACCESS_TOKEN_EXPIRE_MINUTES=${JWT_ACCESS_TOKEN_EXPIRE_MINUTES:-30}
+      - JWT_REFRESH_TOKEN_EXPIRE_DAYS=${JWT_REFRESH_TOKEN_EXPIRE_DAYS:-7}
+      # External APIs
+      - OPENWEATHER_API_KEY=${OPENWEATHER_API_KEY}
+      - STRIPE_PUBLIC_KEY=${STRIPE_PUBLIC_KEY}
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - SENDGRID_API_KEY=${SENDGRID_API_KEY}
+      - AIRTEL_API_KEY=${AIRTEL_API_KEY}
+      - AIRTEL_API_SECRET=${AIRTEL_API_SECRET}
+    ports:
+      - "${CLOUDRON_WEB_PORT}:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    networks:
+      - fataplus-network
+    restart: unless-stopped
+
+  # AI Services
+  ai-services:
+    build:
+      context: .
+      dockerfile: Dockerfile.cloudron
+      target: ai-services
+    container_name: fataplus-ai-services
+    environment:
+      # Database
+      - DATABASE_URL=postgresql://fataplus:${CLOUDRON_POSTGRESQL_PASSWORD}@postgres:5432/fataplus
+      # Redis
+      - REDIS_URL=redis://:${CLOUDRON_REDIS_PASSWORD}@redis:6379
+      # MinIO
+      - MINIO_ENDPOINT=minio:9000
+      - MINIO_ROOT_USER=${CLOUDRON_MINIO_ACCESS_KEY}
+      - MINIO_ROOT_PASSWORD=${CLOUDRON_MINIO_SECRET_KEY}
+      # Application
+      - ENVIRONMENT=production
+    ports:
+      - "${CLOUDRON_AI_PORT}:8001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    networks:
+      - fataplus-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  minio_data:
+    driver: local
+
+networks:
+  fataplus-network:
+    driver: bridge

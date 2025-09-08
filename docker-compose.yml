@@ -97,6 +97,28 @@ services:
       - MINIO_ROOT_PASSWORD=fataplus_secret_key
       - AI_SERVICES_URL=http://ai-services:8001
       - ENVIRONMENT=development
+      # LDAP Configuration (Cloudron)
+      - LDAP_ENABLED=false
+      - LDAP_SERVER=localhost
+      - LDAP_PORT=389
+      - LDAP_USE_SSL=false
+      - LDAP_BASE_DN=dc=cloudron,dc=local
+      - LDAP_BIND_DN=
+      - LDAP_BIND_PASSWORD=
+      - LDAP_USER_SEARCH_FILTER=(uid={username})
+      - LDAP_USER_DISPLAY_NAME_ATTRIBUTE=cn
+      - LDAP_USER_EMAIL_ATTRIBUTE=mail
+      # JWT Configuration
+      - JWT_SECRET_KEY=your-secret-key-change-in-production
+      - JWT_ACCESS_TOKEN_EXPIRE_MINUTES=30
+      - JWT_REFRESH_TOKEN_EXPIRE_DAYS=7
+      # External API Keys
+      - OPENWEATHER_API_KEY=
+      - STRIPE_PUBLIC_KEY=
+      - STRIPE_SECRET_KEY=
+      - SENDGRID_API_KEY=
+      - AIRTEL_API_KEY=
+      - AIRTEL_API_SECRET=
     ports:
       - "8000:8000"
     volumes:

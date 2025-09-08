@@ -16,6 +16,7 @@ from .security import (
     verify_password,
     Token
 )
+from .ldap_auth import authenticate_with_ldap, is_ldap_enabled
 from ..models.database import get_db
 from ..models.user import User
 from ..models.organization import Organization
@@ -71,8 +72,17 @@ async def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db)
 ) -> Any:
-    """Login endpoint to get access token"""
-    user = authenticate_user(db, form_data.username, form_data.password)
+    """Login endpoint to get access token - supports both LDAP and local authentication"""
+    user = None
+
+    # Try LDAP authentication first if enabled
+    if is_ldap_enabled():
+        user = await authenticate_with_ldap(form_data.username, form_data.password, db)
+
+    # If LDAP failed or disabled, try local authentication
+    if not user:
+        user = authenticate_user(db, form_data.username, form_data.password)
+
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -96,7 +106,8 @@ async def login_for_access_token(
             "sub": user.username,
             "user_id": str(user.id),
             "organization_id": str(user.organization_id),
-            "role": user.role
+            "role": user.role,
+            "auth_method": "ldap" if is_ldap_enabled() and user.password_hash == get_password_hash("ldap_user") else "local"
         },
         expires_delta=access_token_expires
     )

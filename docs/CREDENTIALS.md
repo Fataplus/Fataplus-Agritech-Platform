@@ -199,6 +199,35 @@ CUSTOM_SSL_KEY_PATH=/etc/ssl/private/fataplus.key
 
 ---
 
+## LDAP Authentication (Cloudron)
+
+```bash
+# LDAP Configuration for Cloudron
+LDAP_ENABLED=true
+LDAP_SERVER=localhost
+LDAP_PORT=389
+LDAP_USE_SSL=false
+LDAP_BASE_DN=dc=cloudron,dc=local
+LDAP_BIND_DN=cn=admin,dc=cloudron,dc=local
+LDAP_BIND_PASSWORD=cloudron_ldap_password_2025
+LDAP_USER_SEARCH_FILTER=(uid={username})
+LDAP_USER_DN_ATTRIBUTE=dn
+LDAP_USER_DISPLAY_NAME_ATTRIBUTE=cn
+LDAP_USER_EMAIL_ATTRIBUTE=mail
+
+# LDAP URLs
+LDAP_ADMIN_URL=https://my.fata.plus/api/v1/ldap
+LDAP_USERS_URL=https://my.fata.plus/api/v1/ldap/users
+LDAP_GROUPS_URL=https://my.fata.plus/api/v1/ldap/groups
+
+# Cloudron LDAP Backup
+LDAP_BACKUP_ENABLED=true
+LDAP_BACKUP_SCHEDULE="0 2 * * *"  # Daily at 2 AM
+LDAP_BACKUP_RETENTION=30  # days
+```
+
+---
+
 ## External API Keys
 
 ### Weather API (OpenWeatherMap)
@@ -522,6 +551,50 @@ AUDIT_LOG_RETENTION=10_years
 
 ---
 
+## Cloudron Deployment
+
+```bash
+# Cloudron Environment Variables
+CLOUDRON_POSTGRESQL_HOST=postgresql
+CLOUDRON_POSTGRESQL_PORT=5432
+CLOUDRON_POSTGRESQL_DATABASE=fataplus
+CLOUDRON_POSTGRESQL_USERNAME=fataplus
+CLOUDRON_POSTGRESQL_PASSWORD=cloudron_postgres_password_2025
+CLOUDRON_POSTGRESQL_URL=postgresql://fataplus:password@postgresql:5432/fataplus
+
+# Redis Configuration
+CLOUDRON_REDIS_HOST=redis
+CLOUDRON_REDIS_PORT=6379
+CLOUDRON_REDIS_PASSWORD=cloudron_redis_password_2025
+CLOUDRON_REDIS_URL=redis://:password@redis:6379
+
+# MinIO Configuration
+CLOUDRON_MINIO_HOST=minio
+CLOUDRON_MINIO_PORT=9000
+CLOUDRON_MINIO_CONSOLE_PORT=9001
+CLOUDRON_MINIO_ACCESS_KEY=fataplus_minio_access_key
+CLOUDRON_MINIO_SECRET_KEY=fataplus_minio_secret_key
+
+# LDAP Configuration (Cloudron)
+CLOUDRON_LDAP_SERVER=ldap
+CLOUDRON_LDAP_PORT=389
+CLOUDRON_LDAP_SSL=false
+CLOUDRON_LDAP_DN=dc=cloudron,dc=local
+CLOUDRON_LDAP_BIND_DN=cn=admin,dc=cloudron,dc=local
+CLOUDRON_LDAP_BIND_PASSWORD=cloudron_ldap_bind_password
+
+# Application Ports
+CLOUDRON_WEB_PORT=8000
+CLOUDRON_AI_PORT=8001
+
+# Deployment URLs
+CLOUDRON_APP_DOMAIN=https://fataplus.my.fata.plus
+CLOUDRON_API_URL=https://fataplus.my.fata.plus/api
+CLOUDRON_ADMIN_URL=https://my.fata.plus
+```
+
+---
+
 ## Change Log
 
 | Date | Version | Changes | Author |
@@ -529,6 +602,7 @@ AUDIT_LOG_RETENTION=10_years
 | 2025-01-27 | 1.0.0 | Initial credentials documentation | DevOps Team |
 | 2025-01-XX | 1.1.0 | Add production credentials | DevOps Team |
 | 2025-01-XX | 1.2.0 | Add emergency access procedures | Security Team |
+| 2025-01-XX | 1.3.0 | Add Cloudron deployment credentials | DevOps Team |
 
 ## Distribution
 
