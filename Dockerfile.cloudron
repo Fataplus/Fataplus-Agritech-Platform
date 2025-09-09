@@ -1,8 +1,8 @@
 # Cloudron Dockerfile for Fataplus AgriTech Platform
 FROM node:18-alpine
 
-# Install bash (required for Cloudron compatibility)
-RUN apk add --no-cache bash wget
+# Install bash and other dependencies (required for Cloudron compatibility)
+RUN apk add --no-cache bash wget curl
 
 # Create app directory
 WORKDIR /app
@@ -27,21 +27,3 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
 
 # Start the application
 CMD ["node", "local-server.js"]
-
-# Copy AI services source code
-COPY ai-services/ ./ai-services/
-
-# Create non-root user
-RUN useradd --create-home --shell /bin/bash app && \
-    chown -R app:app /app
-USER app
-
-# Expose port
-EXPOSE 8001
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8001/health || exit 1
-
-# Start the application
-CMD ["python", "-m", "uvicorn", "ai-services.core.main:app", "--host", "0.0.0.0", "--port", "8001"]

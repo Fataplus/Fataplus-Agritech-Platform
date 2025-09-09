@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Enable standalone output for Docker deployment
-  output: 'standalone',
+  // Enable static export for Cloudflare Pages deployment
+  output: 'export',
 
   // Environment variables
   env: {
@@ -12,7 +12,7 @@ const nextConfig = {
   // Image optimization settings
   images: {
     domains: ['localhost'],
-    unoptimized: process.env.NODE_ENV === 'development',
+    unoptimized: true, // Required for static export
   },
 
   // Experimental features for better performance
@@ -60,7 +60,7 @@ const nextConfig = {
     ];
   },
 
-  // Redirects and rewrites (disabled for local development)
+  // Redirects and rewrites (disabled for static export)
   // async rewrites() {
   //   return [
   //     // API proxy for development
