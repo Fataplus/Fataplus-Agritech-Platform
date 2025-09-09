@@ -1,0 +1,229 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database with PostGIS
+  postgres:
+    image: postgis/postgis:15-3.4
+    container_name: fataplus-postgres-local
+    environment:
+      POSTGRES_DB: fataplus_dev
+      POSTGRES_USER: fataplus_dev
+      POSTGRES_PASSWORD: dev_password_change_me
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infrastructure/docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fataplus_dev -d fataplus_dev"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - fataplus-network
+
+  # Redis Cache & Session Store
+  redis:
+    image: redis:7-alpine
+    container_name: fataplus-redis-local
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    networks:
+      - fataplus-network
+
+  # MinIO Object Storage
+  minio:
+    image: minio/minio:latest
+    container_name: fataplus-minio-local
+    environment:
+      MINIO_ROOT_USER: dev_access_key_change_me
+      MINIO_ROOT_PASSWORD: dev_secret_key_change_me
+    volumes:
+      - minio_data:/data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    networks:
+      - fataplus-network
+
+  # Web Frontend (Next.js) - Admin Dashboard
+  web-frontend:
+    build:
+      context: ./web-frontend
+      dockerfile: Dockerfile
+    container_name: fataplus-web-frontend-local
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://web-backend-local:8000
+      - NEXT_PUBLIC_AI_API_URL=http://ai-services-local:8001
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./web-frontend:/app
+      - /app/node_modules
+    depends_on:
+      web-backend-local:
+        condition: service_started
+      ai-services-local:
+        condition: service_started
+    networks:
+      - fataplus-network
+    command: npm run dev
+
+  # Web Backend (FastAPI)
+  web-backend-local:
+    build:
+      context: ./web-backend
+      dockerfile: Dockerfile
+    container_name: fataplus-web-backend-local
+    environment:
+      - DATABASE_URL=postgresql://fataplus_dev:dev_password_change_me@postgres:5432/fataplus_dev
+      - REDIS_URL=redis://redis:6379
+      - MINIO_ENDPOINT=minio:9000
+      - MINIO_ROOT_USER=dev_access_key_change_me
+      - MINIO_ROOT_PASSWORD=dev_secret_key_change_me
+      - AI_SERVICES_URL=http://ai-services-local:8001
+      - MOTIA_SERVICE_URL=http://motia-service-local:8001
+      - ENVIRONMENT=development
+      # JWT Configuration
+      - JWT_SECRET_KEY=development_jwt_secret_replace_with_random_hex_32
+      - JWT_ACCESS_TOKEN_EXPIRE_MINUTES=30
+      - JWT_REFRESH_TOKEN_EXPIRE_DAYS=7
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./web-backend:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    networks:
+      - fataplus-network
+    command: sh -c "cd /app/src && python -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
+
+  # AI Services (Python/ML)
+  ai-services-local:
+    build:
+      context: ./ai-services
+      dockerfile: Dockerfile
+    container_name: fataplus-ai-services-local
+    environment:
+      - DATABASE_URL=postgresql://fataplus_dev:dev_password_change_me@postgres:5432/fataplus_dev
+      - REDIS_URL=redis://redis:6379
+      - MINIO_ENDPOINT=minio:9000
+      - MINIO_ROOT_USER=dev_access_key_change_me
+      - MINIO_ROOT_PASSWORD=dev_secret_key_change_me
+      - ENVIRONMENT=development
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./ai-services:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    networks:
+      - fataplus-network
+
+  # SmolLM2 AI Service
+  smollm2-service:
+    build:
+      context: ./ai-services/smollm2
+      dockerfile: Dockerfile
+    container_name: fataplus-smollm2-local
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=fataplus_dev
+      - DB_USER=fataplus_dev
+      - DB_PASSWORD=dev_password_change_me
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    ports:
+      - "8002:8002"
+    volumes:
+      - ./ai-services/smollm2:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - fataplus-network
+
+  # Motia Service
+  motia-service-local:
+    build:
+      context: ./motia-service
+      dockerfile: Dockerfile
+    container_name: fataplus-motia-local
+    environment:
+      - DATABASE_URL=postgresql://fataplus_dev:dev_password_change_me@postgres:5432/fataplus_dev
+      - REDIS_URL=redis://redis:6379
+      - MOTIA_PORT=8001
+      - MAIN_BACKEND_URL=http://web-backend-local:8000
+    ports:
+      - "8003:8001"
+    volumes:
+      - ./motia-service:/app
+      - /app/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - fataplus-network
+
+  # MCP Server (Model Context Protocol)
+  mcp-server-local:
+    build:
+      context: ./mcp-server
+      dockerfile: Dockerfile
+    container_name: fataplus-mcp-server-local
+    environment:
+      - FATAPLUS_API_URL=http://web-backend-local:8000
+      - MCP_SERVER_PORT=3001
+      - MCP_SERVER_HOST=0.0.0.0
+      - LOG_LEVEL=info
+      - NODE_ENV=development
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./mcp-server:/app
+      - /app/node_modules
+    depends_on:
+      web-backend-local:
+        condition: service_started
+    networks:
+      - fataplus-network
+
+volumes:
+  postgres_data:
+  redis_data:
+  minio_data:
+
+networks:
+  fataplus-network:
+    driver: bridge

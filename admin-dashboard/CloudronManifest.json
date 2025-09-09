@@ -1,0 +1,60 @@
+{
+  "id": "io.fataplus.admin",
+  "title": "Fataplus Administration Dashboard",
+  "author": "Fataplus Team",
+  "description": "Administration dashboard for managing Fataplus platform, users, AI services, and context",
+  "tagline": "Platform Administration",
+  "version": "2.0.0",
+  "healthCheckPath": "/",
+  "httpPort": 3002,
+  "manifestVersion": 2,
+  "website": "https://platform.fata.plus",
+  "contactEmail": "admin@fata.plus",
+  "icon": "icon.png",
+  "tags": ["admin", "dashboard", "management", "agritech"],
+  "mediaLinks": [],
+  "changelog": {
+    "2.0.0": "Complete administration dashboard with user management, AI monitoring, and server controls",
+    "1.0.0": "Initial admin dashboard release"
+  },
+  "addons": {
+    "postgresql": {
+      "mandatory": true,
+      "description": "Database for admin user sessions and audit logs"
+    }
+  },
+  "tcpPorts": {
+    "ADMIN_PORT": {
+      "title": "Admin Dashboard Port",
+      "description": "Port for administration interface",
+      "defaultValue": 3002,
+      "containerPort": 3002
+    }
+  },
+  "memoryLimit": 2048,
+  "cpuLimit": "1000m",
+  "config": {
+    "API_URL": {
+      "type": "string",
+      "required": true,
+      "defaultValue": "http://localhost:8000",
+      "description": "URL of the main Fataplus API"
+    },
+    "SMOLLM2_URL": {
+      "type": "string",
+      "required": true,
+      "defaultValue": "http://localhost:8002",
+      "description": "URL of the SmolLM2 AI service"
+    },
+    "ADMIN_EMAIL": {
+      "type": "string",
+      "required": true,
+      "description": "Administrator email address"
+    },
+    "JWT_SECRET": {
+      "type": "string",
+      "required": true,
+      "description": "Secret key for JWT tokens"
+    }
+  }
+}

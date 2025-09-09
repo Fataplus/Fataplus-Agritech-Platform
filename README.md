@@ -4,7 +4,7 @@
 
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Version](https://img.shields.io/badge/Version-1.0.0--prod-green.svg)]()
-[![Build Status](https://img.shields.io/badge/Build-Production%20Ready-brightgreen.svg)]()
+[[![Build Status](https://img.shields.io/badge/Build-Production%20Ready-brightgreen.svg)]()
 [![Deployment](https://img.shields.io/badge/Deployment-Cloudron%20Ready-blue.svg)]()
 
 ## 🌟 Vision
@@ -82,10 +82,25 @@ cd web-frontend && npm install && npm run dev
 cd web-backend && pip install -r requirements.txt && python main.py
 ```
 
+#### 3. Start Full Local Development Environment (All Services)
+```bash
+# Start complete platform with all services (PostgreSQL, Redis, MinIO, AI services, etc.)
+./start-local-dev.sh
+
+# Or manually with Docker Compose
+docker-compose -f docker-compose.full-local.yml up -d
+```
+
 #### 4. Access the application
 - **Web App**: http://localhost:3000
 - **API Documentation**: http://localhost:8000/docs
+- **AI Services**: http://localhost:8001
+- **SmolLM2 Service**: http://localhost:8002
+- **Motia Service**: http://localhost:8003
+- **MCP Server**: http://localhost:3001
 - **Mobile App**: Follow mobile setup instructions
+
+See [LOCAL_DEVELOPMENT.md](./LOCAL_DEVELOPMENT.md) for detailed instructions on the full local development environment.
 
 ### Production Deployment
 
@@ -166,9 +181,16 @@ fataplus/
 ├── web-backend/             # FastAPI backend services
 ├── mobile-app/              # React Native mobile app
 ├── ai-services/             # AI/ML microservices
+│   ├── smollm2/             # SmolLM2 agricultural AI service
+│   └── ...                  # Other AI services
+├── motia-service/           # Motia agricultural intelligence service
 ├── infrastructure/          # Infrastructure as code
 ├── tools/                   # Development tools and scripts
-└── docs/                    # Additional documentation
+├── docs/                    # Additional documentation
+├── docker-compose.full-local.yml  # Full local development environment
+├── start-local-dev.sh       # Script to start local development environment
+├── stop-local-dev.sh        # Script to stop local development environment
+└── LOCAL_DEVELOPMENT.md     # Documentation for local development
 ```
 
 ## 🔧 Development

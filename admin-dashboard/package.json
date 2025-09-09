@@ -1,0 +1,36 @@
+{
+  "name": "fataplus-admin-dashboard",
+  "version": "2.0.0",
+  "description": "Fataplus Administration Dashboard for platform.fata.plus",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3002",
+    "build": "next build",
+    "start": "next start -p 3002",
+    "lint": "next lint",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "next": "14.0.4",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "@tanstack/react-query": "^5.17.15",
+    "@heroicons/react": "^2.0.18",
+    "tailwindcss": "^3.3.6",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.32",
+    "axios": "^1.6.2",
+    "recharts": "^2.8.0",
+    "lucide-react": "^0.294.0",
+    "clsx": "^2.0.0",
+    "date-fns": "^3.0.6"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.5",
+    "@types/react": "^18.2.45",
+    "@types/react-dom": "^18.2.18",
+    "typescript": "^5.3.3",
+    "eslint": "^8.55.0",
+    "eslint-config-next": "^14.0.4"
+  }
+}

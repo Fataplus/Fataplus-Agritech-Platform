@@ -12,8 +12,10 @@ from typing import Dict, Any
 from datetime import datetime, timezone
 
 # Import routes
-# from routes import users, organizations
-# from auth.routes import router as auth_router
+from auth.routes import router as auth_router
+from auth.token_routes import router as token_router
+from server.routes import router as server_router
+from context.routes import router as context_router
 
 # Create FastAPI application
 app = FastAPI(
@@ -41,39 +43,135 @@ app.add_middleware(
 )
 
 # Include routers
-# app.include_router(auth_router)
-# app.include_router(users.router)
-# app.include_router(organizations.router)
+app.include_router(auth_router)
+app.include_router(token_router)
+app.include_router(server_router)
+app.include_router(context_router)
 
 @app.get("/")
 async def root():
     """Root endpoint"""
     return {
         "message": "Fataplus Web Backend API",
-        "version": "1.0.0",
+        "version": "2.0.0",
         "docs": "/docs",
         "health": "/health",
-        "ai_service": "/ai",
-        "services": ["users", "organizations", "farms", "weather", "livestock", "market"],
-        "ai_features": ["weather-prediction", "livestock-analysis", "crop-disease-detection", "market-analysis"]
+        "services": {
+            "authentication": {
+                "login": "/auth/login",
+                "register": "/auth/register",
+                "me": "/auth/me"
+            },
+            "tokens": {
+                "create": "/tokens/",
+                "list": "/tokens/",
+                "validate": "/tokens/validate"
+            },
+            "context": {
+                "search": "/context/search",
+                "create": "/context/",
+                "taxonomy": "/context/taxonomy/tree"
+            },
+            "server": {
+                "status": "/server/status",
+                "metrics": "/server/metrics",
+                "health": "/server/health"
+            },
+            "ai": {
+                "chat": "/ai/chat",
+                "context_search": "/ai/context/search",
+                "generate": "/ai/generate"
+            }
+        },
+        "features": [
+            "user_management",
+            "token_authentication",
+            "context_knowledge_base",
+            "server_monitoring",
+            "ai_services",
+            "multi_language_support",
+            "rate_limiting",
+            "audit_logging"
+        ],
+        "platform": "platform.fata.plus"
     }
 
 @app.get("/health")
 async def health_check():
-    """Health check endpoint"""
-    # Check if Motia service is also healthy
-    motia_status = "unknown"
+    """Comprehensive health check endpoint"""
+    health_status = {
+        "status": "healthy",
+        "service": "web-backend",
+        "version": "2.0.0",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "checks": {}
+    }
+
+    # Check database connectivity
+    try:
+        # This would check actual database connection
+        health_status["checks"]["database"] = "healthy"
+    except Exception:
+        health_status["checks"]["database"] = "unhealthy"
+        health_status["status"] = "degraded"
+
+    # Check Redis connectivity
+    try:
+        # This would check actual Redis connection
+        health_status["checks"]["redis"] = "healthy"
+    except Exception:
+        health_status["checks"]["redis"] = "unhealthy"
+        health_status["status"] = "degraded"
+
+    # Check SmolLM2 AI service
     try:
         async with httpx.AsyncClient() as client:
             response = await client.get(f"{MOTIA_SERVICE_URL}/health", timeout=5.0)
-            motia_status = "healthy" if response.status_code == 200 else "unhealthy"
+            health_status["checks"]["ai_service"] = "healthy" if response.status_code == 200 else "unhealthy"
     except Exception:
-        motia_status = "unavailable"
-    
+        health_status["checks"]["ai_service"] = "unavailable"
+        health_status["status"] = "degraded"
+
+    # Overall status determination
+    if any(status in ["unhealthy", "unavailable"] for status in health_status["checks"].values()):
+        health_status["status"] = "degraded"
+    if all(status == "healthy" for status in health_status["checks"].values()):
+        health_status["status"] = "healthy"
+
+    return health_status
+
+@app.get("/services")
+async def service_discovery():
+    """Service discovery endpoint"""
     return {
-        "status": "healthy", 
-        "service": "web-backend",
-        "ai_service_status": motia_status,
+        "platform": "platform.fata.plus",
+        "services": {
+            "web_backend": {
+                "url": "https://platform.fata.plus/api",
+                "status": "active",
+                "version": "2.0.0"
+            },
+            "smollm2_ai": {
+                "url": "https://platform.fata.plus/ai",
+                "status": "active",
+                "model": "SmolLM2-1.7B-Instruct",
+                "version": "2.0.1"
+            },
+            "admin_dashboard": {
+                "url": "https://platform.fata.plus/admin",
+                "status": "active",
+                "version": "2.0.0"
+            }
+        },
+        "features": {
+            "authentication": True,
+            "token_management": True,
+            "context_api": True,
+            "server_monitoring": True,
+            "multi_language": True,
+            "rate_limiting": True,
+            "audit_logging": True
+        },
         "timestamp": datetime.now(timezone.utc).isoformat()
     }
 

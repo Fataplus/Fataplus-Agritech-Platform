@@ -1,0 +1,40 @@
+{
+  "id": "io.fataplus.smollm2",
+  "title": "Fataplus SmolLM2 AI Service",
+  "author": "Fataplus Team",
+  "description": "SmolLM2 AI service for agricultural context and chatbot functionality",
+  "tagline": "Agricultural AI Assistant",
+  "version": "2.0.1",
+  "healthCheckPath": "/health",
+  "httpPort": 8002,
+  "manifestVersion": 2,
+  "website": "https://platform.fata.plus",
+  "contactEmail": "admin@fata.plus",
+  "icon": "icon.png",
+  "tags": ["ai", "ml", "agritech", "chatbot", "nlp"],
+  "mediaLinks": [],
+  "changelog": {
+    "2.0.1": "Initial SmolLM2 integration with agricultural fine-tuning",
+    "2.0.0": "Major update with enhanced context processing"
+  },
+  "addons": {
+    "postgresql": {
+      "mandatory": true,
+      "description": "Database for user sessions and AI context"
+    },
+    "redis": {
+      "mandatory": true,
+      "description": "Caching layer for AI responses and sessions"
+    }
+  },
+  "tcpPorts": {
+    "AI_SERVICE_PORT": {
+      "title": "AI Service Port",
+      "description": "Port for AI model inference",
+      "defaultValue": 8002,
+      "containerPort": 8002
+    }
+  },
+  "memoryLimit": 4096,
+  "cpuLimit": "2000m"
+}

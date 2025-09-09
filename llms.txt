@@ -1,0 +1,403 @@
+# Fataplus AgriTech Platform - LLMs Documentation
+
+This document provides comprehensive information about the Fataplus AgriTech Platform project for Large Language Models (LLMs) and AI assistants.
+
+## Project Overview
+
+Fataplus is a comprehensive SaaS platform designed specifically for African agriculture, combining modern technology with deep understanding of rural farming challenges. The platform addresses critical needs in weather intelligence, livestock management, e-commerce, education, and financial services for agricultural communities.
+
+### Core Mission
+Building the future of African Agriculture through technology that works in low-connectivity environments with multi-language support and cultural sensitivity.
+
+## Project Structure
+
+```
+FP-09/
+├── specs/                              # Feature specifications
+│   ├── 001-fataplus-agritech-platform/ # Core platform (143 tasks, 16 weeks)
+│   ├── 002-fataplus-design-system/     # UI/UX framework (23 tasks, 24 weeks)
+│   ├── 003-fataplus-mcp/               # AI integration (24 tasks, 20 weeks)
+│   ├── 004-fataplus-search-analysis/   # Data intelligence (44 tasks, 12 weeks)
+│   ├── 005-fataplus-context-api/       # Extensibility (48 tasks, 12 weeks)
+│   └── 006-agribot-space/              # AI Assistant Frontend (28 tasks, 56 weeks)
+├── web-frontend/                       # Next.js 14 application
+├── web-backend/                        # FastAPI Python backend
+├── ai-services/                        # AI/ML microservices
+├── motia-service/                      # Node.js AI workflow service
+├── mobile-app/                         # React Native application
+├── mcp-server/                         # Model Context Protocol server
+├── infrastructure/                     # Deployment configurations
+│   ├── cloudflare/                     # Cloudflare Workers/Pages config
+│   ├── cloudron/                       # Cloudron deployment files
+│   └── docker/                         # Docker configurations
+└── docs/                              # Documentation
+```
+
+## Technology Stack
+
+### Backend
+- **Framework**: FastAPI (Python 3.11+)
+- **Database**: PostgreSQL 15+ with PostGIS extension
+- **Cache**: Redis 7+
+- **Storage**: MinIO (S3-compatible)
+- **Authentication**: JWT with LDAP integration
+- **API Documentation**: Swagger UI at `/docs`
+
+### Frontend
+- **Framework**: Next.js 14 with React 18
+- **Language**: TypeScript 5.3+
+- **Styling**: Tailwind CSS with custom design system
+- **State Management**: React Context + Zustand
+- **Build Tool**: npm/webpack
+
+### AI Services
+- **Primary**: Python with TensorFlow/PyTorch
+- **Secondary**: Node.js for Motia workflow engine
+- **Models**: Agricultural disease detection, weather prediction, market analysis
+- **Integration**: OpenAI API, Hugging Face transformers
+
+### Infrastructure
+- **Containers**: Docker with multi-stage builds
+- **Orchestration**: Docker Compose, Kubernetes support
+- **Cloud**: Cloudflare (Workers, Pages, R2, D1, KV), Cloudron deployment
+- **CI/CD**: GitHub Actions
+- **Monitoring**: Health checks, structured logging
+
+## Core Features
+
+### 1. Multi-Context Architecture
+The platform uses a modular context system where each feature is a self-contained module:
+- **Weather Context**: AI-powered weather predictions and farming recommendations
+- **Livestock Context**: Animal health monitoring, breeding records, feed management
+- **E-commerce Context**: Agricultural marketplace with mobile money integration
+- **Learning Context**: Educational content with offline-first design
+- **Market Context**: Price intelligence and trade facilitation
+
+### 2. Cultural and Regional Adaptation
+- **Languages**: English, French, Swahili, Malagasy, Arabic, Portuguese
+- **Payment Systems**: M-Pesa, Airtel Money, Orange Money integration
+- **Offline-First**: Works in low-connectivity rural environments
+- **Cultural Sensitivity**: UI/UX adapted for African agricultural practices
+
+### 3. AI-Powered Intelligence
+- **Crop Disease Detection**: Computer vision for plant health analysis
+- **Weather Prediction**: Hyperlocal forecasting for farm planning
+- **Market Analysis**: Price prediction and demand forecasting
+- **Personalized Recommendations**: Context-aware farming advice
+
+### 4. AgriBot.space AI Assistant
+- **Intelligent Chat Interface**: AI assistant with deep agricultural knowledge
+- **Freemium Model**: 1 free topic for guests, 5 for registered users, unlimited premium
+- **Educational Courses**: AI-guided learning pathways with certifications
+- **Expert Consultations**: Human expert access for premium users
+- **Community Platform**: Farmer networking and knowledge sharing
+
+## Development Workflow
+
+### Repository Management
+- **Git Identity**: fenohery.fanomezanirina@gmail.com (fenoh3ry)
+- **Branching Strategy**: Feature branches for each specification
+- **Spec Kit Framework**: GitHub Spec Kit for feature development
+
+### Environment Setup
+```bash
+# Prerequisites
+node --version  # 18+
+python --version  # 3.11+
+docker --version
+
+# Development setup
+git clone <repository>
+cd FP-09
+cp .env.example .env
+
+# Start databases
+docker-compose up postgres redis minio -d
+
+# Install dependencies
+cd web-frontend && npm install
+cd web-backend && pip install -r requirements.txt
+cd motia-service && npm install
+
+# Run development servers
+npm run dev  # Frontend (port 3000)
+python src/main.py  # Backend (port 8000)
+npm run dev  # Motia service (port 8001)
+```
+
+### Deployment Options
+
+#### Cloudron Deployment
+```bash
+# Build and deploy to Cloudron
+docker build -f Dockerfile.cloudron -t fataplus-cloudron .
+cloudron install --location platform.fata.plus
+```
+
+#### Cloudflare Deployment
+```bash
+# Deploy to Cloudflare infrastructure
+./deploy-cloudflare.sh -e production
+# Frontend: Cloudflare Pages
+# Backend: Cloudflare Workers
+# Storage: R2 buckets
+# Cache: KV namespaces
+```
+
+## API Architecture
+
+### Core APIs
+- **Users API**: Authentication, profiles, organizations
+- **Farms API**: Farm management, fields, crops, geospatial data
+- **Contexts API**: Feature discovery, installation, configuration
+- **Weather API**: Forecasts, alerts, historical data
+- **Livestock API**: Animal tracking, health records, breeding
+- **Market API**: Listings, transactions, price intelligence
+- **Learning API**: Courses, progress tracking, certifications
+
+### API Design Principles
+- **RESTful**: Standard HTTP methods and status codes
+- **Pagination**: Cursor-based pagination for large datasets
+- **Filtering**: Query parameters for data filtering
+- **Rate Limiting**: API keys with usage quotas
+- **Versioning**: URL path versioning (/api/v1/)
+- **Documentation**: OpenAPI 3.0 specifications
+
+## Database Schema
+
+### Core Models
+```python
+# User management
+User(id, email, phone, organization_id, role, preferences)
+Organization(id, name, type, settings, subscription_plan)
+
+# Farm management
+Farm(id, name, location, boundary_geom, owner_id, created_at)
+Field(id, farm_id, name, area, crop_type, planting_date)
+Animal(id, farm_id, species, breed, birth_date, health_status)
+
+# Context system
+Context(id, name, version, config, permissions, status)
+ContextData(id, context_id, farm_id, data_type, content)
+
+# Transactions
+Transaction(id, buyer_id, seller_id, amount, payment_method, status)
+Product(id, seller_id, name, category, price, location)
+```
+
+### Geospatial Features
+- **PostGIS Extension**: Advanced geospatial queries
+- **Farm Boundaries**: Polygon geometries for field mapping
+- **Location Services**: GPS coordinates for mobile app
+- **Spatial Indexing**: Optimized queries for location-based features
+
+## Security and Compliance
+
+### Authentication & Authorization
+- **JWT Tokens**: Stateless authentication with refresh tokens
+- **RBAC**: Role-based access control (Admin, Manager, Farmer, Viewer)
+- **LDAP Integration**: Enterprise authentication support
+- **Multi-Factor**: SMS and biometric authentication options
+
+### Data Protection
+- **Encryption**: AES-256 at rest, TLS 1.3 in transit
+- **Privacy**: GDPR compliance, data anonymization
+- **Audit Logging**: All user actions tracked
+- **Data Sovereignty**: Regional data storage compliance
+
+### API Security
+- **Rate Limiting**: 100 requests/minute per API key
+- **CORS**: Configured for specific domains
+- **Input Validation**: Pydantic models for all inputs
+- **SQL Injection**: Parameterized queries, ORM usage
+
+## Performance and Scalability
+
+### Optimization Strategies
+- **Database**: Indexed queries, connection pooling
+- **Caching**: Redis for sessions, API responses
+- **CDN**: Cloudflare for global content delivery
+- **Images**: WebP format, lazy loading, compression
+- **Mobile**: Offline-first with service workers
+
+### Monitoring and Observability
+- **Health Checks**: `/health` endpoints for all services
+- **Logging**: Structured JSON logs with correlation IDs
+- **Metrics**: Application performance monitoring
+- **Alerts**: Automated incident response
+
+## Testing Strategy
+
+### Test Coverage
+- **Unit Tests**: >80% coverage requirement
+- **Integration Tests**: API contract testing
+- **E2E Tests**: Critical user journeys
+- **Performance Tests**: Load testing for 10k concurrent users
+- **Security Tests**: Automated vulnerability scanning
+
+### Quality Gates
+- **Code Review**: All changes require review
+- **Automated Testing**: CI/CD pipeline validation
+- **Accessibility**: WCAG 2.1 AA compliance
+- **Performance**: Core Web Vitals monitoring
+
+## Development Tasks
+
+### Current Status (310 total tasks)
+- **001-AgriTech Platform**: 143 tasks (16 weeks) - Infrastructure and core features
+- **002-Design System**: 23 tasks (24 weeks) - UI/UX component library
+- **003-MCP Integration**: 24 tasks (20 weeks) - AI tool integration
+- **004-Search Analysis**: 44 tasks (12 weeks) - Data intelligence
+- **005-Context API**: 48 tasks (12 weeks) - Extensibility framework
+- **006-AgriBot Space**: 28 tasks (56 weeks) - AI Agricultural Assistant
+
+### Immediate Priorities
+1. Complete infrastructure setup (T001-T015)
+2. Implement core authentication (T027-T038)
+3. Design database schema (T016-T026)
+4. Start design system foundation (DS-001 to DS-004)
+5. Plan AgriBot.space MVP development (AB-001 to AB-004)
+
+### Critical Dependencies
+- **Infrastructure** → All other components
+- **Authentication** → All user-facing features
+- **Database Models** → API implementations
+- **Design System** → Frontend development
+- **Core APIs** → Context implementations
+
+## Integration Points
+
+### External Services
+- **Weather APIs**: OpenWeatherMap, local meteorological services
+- **Payment Gateways**: M-Pesa, Airtel Money, Stripe
+- **Maps**: Mapbox, Google Maps for location services
+- **AI/ML**: OpenAI API, Hugging Face models
+- **Email**: SendGrid for notifications
+- **SMS**: Twilio for alerts and verification
+
+### Third-Party Integration
+- **OAuth Providers**: Google, Microsoft, Apple
+- **Agricultural Data**: Government databases, research institutions
+- **Market Data**: Commodity exchanges, price aggregators
+- **Learning Content**: Educational partners, extension services
+
+## Cultural Considerations
+
+### User Experience
+- **Language Support**: Right-to-left text for Arabic
+- **Number Formats**: Local currency and measurement units
+- **Date Formats**: Regional calendar preferences
+- **Cultural Icons**: Locally relevant imagery and symbols
+
+### Agricultural Practices
+- **Crop Varieties**: Regional crop databases
+- **Farming Seasons**: Local planting and harvest calendars
+- **Traditional Knowledge**: Integration with indigenous practices
+- **Extension Services**: Collaboration with local agricultural officers
+
+## Contributing Guidelines
+
+### Code Standards
+- **TypeScript**: Strict mode enabled, no `any` types
+- **Python**: PEP 8 compliance, type hints required
+- **Documentation**: All public APIs documented
+- **Testing**: New features require test coverage
+
+### Git Workflow
+```bash
+# Feature development
+git checkout -b 001-feature-name
+git commit -m "feat: add user authentication"
+git push origin 001-feature-name
+# Create pull request for review
+```
+
+### Review Process
+- **Code Review**: Required before merge
+- **Testing**: All tests must pass
+- **Documentation**: Update relevant docs
+- **Security**: Security review for sensitive changes
+
+## Support and Resources
+
+### Documentation
+- **API Docs**: Available at `/docs` endpoint
+- **User Guides**: In-app help and tutorials
+- **Developer Docs**: Technical implementation guides
+- **Deployment Guides**: Platform-specific instructions
+
+### Community
+- **GitHub Issues**: Bug reports and feature requests
+- **Discussions**: Technical questions and proposals
+- **Wiki**: Collaborative documentation
+- **Changelog**: Release notes and updates
+
+### Contact Information
+- **Project Lead**: fenoh3ry
+- **Repository**: Current workspace
+- **Domain**: fata.plus (production deployment)
+- **Support**: Technical support through GitHub issues
+
+## Roadmap and Future Development
+
+### Short-term (3 months)
+- Complete core platform infrastructure
+- Launch basic weather and livestock contexts
+- Deploy design system foundation
+- Implement mobile app MVP
+
+### Medium-term (6 months)
+- Add e-commerce and learning contexts
+- Deploy to multiple African regions
+- Implement advanced AI features
+- Launch API marketplace
+
+### Long-term (12 months)
+- Scale to 100k+ active users
+- Expand to 10+ African countries
+- Integrate with government systems
+- Build partner ecosystem
+
+## AgriBot.space - AI Agricultural Assistant
+
+### Overview
+AgriBot.space (006-agribot-space) is a standalone Next.js frontend application that serves as an AI-powered agricultural assistant. It integrates with the Fataplus ecosystem through the MCP (Model Context Protocol) to provide intelligent, context-aware guidance for farmers.
+
+### Key Features
+- **Freemium Model**: 1 free topic for guests, 5 for registered users, unlimited for premium ($29.99/month)
+- **Pay-per-Topic**: $5 USD for 5 additional topics
+- **AI Chat Interface**: Real-time conversational AI with agricultural expertise
+- **Prompt Library**: Curated agricultural prompts categorized by topic and difficulty
+- **Educational Courses**: AI-guided learning pathways with certifications
+- **Expert Consultations**: Human expert access for premium users
+- **Community Platform**: Farmer networking and knowledge sharing
+
+### Technical Architecture
+- **Frontend**: Next.js 14 with TypeScript and Tailwind CSS
+- **Authentication**: Supabase Auth with social logins
+- **Database**: Supabase PostgreSQL for user data and content
+- **AI Integration**: Fataplus MCP server for context-aware responses
+- **Payments**: Stripe for subscriptions and pay-per-topic
+- **Analytics**: PostHog for user behavior tracking
+- **Deployment**: Cloudflare Pages (agribot.space)
+
+### Business Model
+- **Target Market**: Individual farmers, agricultural professionals, extension workers
+- **Revenue Streams**: Premium subscriptions, topic purchases, course sales, expert consultations
+- **Regional Adaptation**: Localized pricing, mobile money integration, cultural sensitivity
+- **Growth Strategy**: Freemium conversion, viral content sharing, expert partnerships
+
+### Integration with Fataplus
+- **MCP Protocol**: Direct integration for agricultural context queries
+- **Shared Knowledge**: Access to Fataplus platform data and insights
+- **Design Consistency**: Uses Fataplus Design System components
+- **User Linking**: Optional account linking between platforms
+- **Data Flow**: Real-time weather, market, and agricultural data
+
+---
+
+This documentation serves as a comprehensive reference for understanding the Fataplus AgriTech Platform. It's designed to help LLMs and AI assistants provide accurate, contextual assistance with development, deployment, and maintenance tasks.
+
+**Last Updated**: 2025-09-09
+**Version**: 1.0.0
+**Project Status**: Active Development
