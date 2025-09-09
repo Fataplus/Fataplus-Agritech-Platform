@@ -1,95 +1,85 @@
 import { formatDistanceToNow } from 'date-fns'
-
-const activities = [
-  {
-    id: 1,
-    user: 'Marie Dubois',
-    action: 'Created new API key',
-    target: 'Weather API Access',
-    timestamp: new Date(Date.now() - 1000 * 60 * 30), // 30 minutes ago
-    type: 'create'
-  },
-  {
-    id: 2,
-    user: 'Jean Rakoto',
-    action: 'Updated context',
-    target: 'Rice Farming Techniques',
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2 hours ago
-    type: 'update'
-  },
-  {
-    id: 3,
-    user: 'AI Service',
-    action: 'Processed request',
-    target: 'Crop Disease Detection',
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 4), // 4 hours ago
-    type: 'ai'
-  },
-  {
-    id: 4,
-    user: 'Admin',
-    action: 'Deployed update',
-    target: 'Context API v2.1.0',
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 6), // 6 hours ago
-    type: 'deploy'
-  },
-  {
-    id: 5,
-    user: 'Sophie Martin',
-    action: 'Generated report',
-    target: 'Monthly Analytics',
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 8), // 8 hours ago
-    type: 'report'
-  }
-]
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { useTheme } from '@/components/ThemeProvider'
+import { useDashboard } from '@/contexts/DashboardContext'
+import {
+  HiPlus,
+  HiPencil,
+  HiChip,
+  HiPaperAirplane,
+  HiChartBar,
+  HiDocumentText
+} from 'react-icons/hi'
 
 const getActivityIcon = (type: string) => {
   const icons = {
-    create: '➕',
-    update: '✏️',
-    ai: '🤖',
-    deploy: '🚀',
-    report: '📊'
+    create: HiPlus,
+    update: HiPencil,
+    ai: HiChip,
+    deploy: HiPaperAirplane,
+    report: HiChartBar
   }
-  return icons[type as keyof typeof icons] || '📝'
+  return icons[type as keyof typeof icons] || HiDocumentText
+}
+
+const getActivityVariant = (type: string) => {
+  switch (type) {
+    case 'create': return 'default'
+    case 'update': return 'secondary'
+    case 'ai': return 'default'
+    case 'deploy': return 'default'
+    case 'report': return 'secondary'
+    default: return 'outline'
+  }
 }
 
 export default function RecentActivity() {
+  const { activities } = useDashboard()
+  const { theme } = useTheme()
+  
   return (
-    <div className="bg-white rounded-lg shadow">
-      <div className="px-6 py-4 border-b border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900">Recent Activity</h3>
-      </div>
-      <div className="divide-y divide-gray-200">
-        {activities.map((activity) => (
-          <div key={activity.id} className="px-6 py-4 hover:bg-gray-50">
-            <div className="flex items-start space-x-3">
+    <Card>
+      <CardHeader>
+        <CardTitle>Recent Activity</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {activities.map((activity) => {
+          const IconComponent = getActivityIcon(activity.type)
+          return (
+            <div key={activity.id} className="flex items-start space-x-3 rounded-lg p-3 transition-colors hover:bg-muted/50">
               <div className="flex-shrink-0">
-                <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-lg">
-                  {getActivityIcon(activity.type)}
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
+                  <IconComponent className="h-4 w-4 text-primary" />
                 </div>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm text-gray-900">
+              <div className="flex-1 min-w-0 space-y-1">
+                <p className="text-sm">
                   <span className="font-medium">{activity.user}</span>
                   {' '}
-                  <span className="text-gray-600">{activity.action}</span>
+                  <span className={theme === 'dark' ? 'text-muted-foreground' : 'text-gray-600'}>{activity.action}</span>
                   {' '}
-                  <span className="font-medium text-gray-900">{activity.target}</span>
+                  <span className="font-medium">{activity.target}</span>
                 </p>
-                <p className="text-xs text-gray-500 mt-1">
-                  {formatDistanceToNow(activity.timestamp, { addSuffix: true })}
-                </p>
+                <div className="flex items-center justify-between">
+                  <p className={theme === 'dark' ? 'text-muted-foreground' : 'text-gray-500'}>
+                    {formatDistanceToNow(activity.timestamp, { addSuffix: true })}
+                  </p>
+                  <Badge variant={getActivityVariant(activity.type)} className="text-xs">
+                    {activity.type}
+                  </Badge>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
-      <div className="px-6 py-3 border-t border-gray-200 bg-gray-50">
-        <button className="text-sm text-green-600 hover:text-green-700 font-medium">
+          )
+        })}
+      </CardContent>
+      <CardFooter className="bg-muted/50 p-4">
+        <Button variant="ghost" className="w-full justify-start text-primary hover:text-primary">
           View all activity →
-        </button>
-      </div>
-    </div>
+        </Button>
+      </CardFooter>
+    </Card>
   )
 }

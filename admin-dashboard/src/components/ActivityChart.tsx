@@ -1,4 +1,6 @@
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
+import { Card, CardContent } from '@/components/ui/card'
+import { useTheme } from '@/components/ThemeProvider'
 
 const data = [
   { name: 'Jan', users: 1200, apiCalls: 15000 },
@@ -16,58 +18,60 @@ const data = [
 ]
 
 export default function ActivityChart() {
+  const { theme } = useTheme()
+  
+  const tooltipStyle = {
+    backgroundColor: theme === 'dark' ? '#1f2937' : 'white',
+    border: `1px solid ${theme === 'dark' ? '#374151' : '#e5e7eb'}`,
+    borderRadius: '6px',
+    boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+    color: theme === 'dark' ? 'white' : 'black'
+  }
+
   return (
-    <div className="h-64">
-      <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis
-            dataKey="name"
-            axisLine={false}
-            tickLine={false}
-            className="text-xs text-gray-600"
-          />
-          <YAxis
-            axisLine={false}
-            tickLine={false}
-            className="text-xs text-gray-600"
-          />
-          <Tooltip
-            contentStyle={{
-              backgroundColor: 'white',
-              border: '1px solid #e5e7eb',
-              borderRadius: '6px',
-              boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
-            }}
-          />
-          <Line
-            type="monotone"
-            dataKey="users"
-            stroke="#22c55e"
-            strokeWidth={2}
-            dot={{ fill: '#22c55e', strokeWidth: 2, r: 4 }}
-            activeDot={{ r: 6, stroke: '#22c55e', strokeWidth: 2 }}
-          />
-          <Line
-            type="monotone"
-            dataKey="apiCalls"
-            stroke="#3b82f6"
-            strokeWidth={2}
-            dot={{ fill: '#3b82f6', strokeWidth: 2, r: 4 }}
-            activeDot={{ r: 6, stroke: '#3b82f6', strokeWidth: 2 }}
-          />
-        </LineChart>
-      </ResponsiveContainer>
-      <div className="flex items-center justify-center mt-4 space-x-6">
-        <div className="flex items-center">
-          <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
-          <span className="text-sm text-gray-600">Active Users</span>
+    <Card>
+      <CardContent className="p-6">
+        <div className="h-64">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={data}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis
+                dataKey="name"
+                axisLine={false}
+                tickLine={false}
+                className="text-xs"
+              />
+              <YAxis
+                axisLine={false}
+                tickLine={false}
+                className="text-xs"
+              />
+              <Tooltip
+                contentStyle={tooltipStyle}
+              />
+              <Legend />
+              <Line
+                type="monotone"
+                dataKey="users"
+                name="Active Users"
+                stroke="#22c55e"
+                strokeWidth={2}
+                dot={{ fill: '#22c55e', strokeWidth: 2, r: 4 }}
+                activeDot={{ r: 6, stroke: '#22c55e', strokeWidth: 2 }}
+              />
+              <Line
+                type="monotone"
+                dataKey="apiCalls"
+                name="API Calls"
+                stroke="#3b82f6"
+                strokeWidth={2}
+                dot={{ fill: '#3b82f6', strokeWidth: 2, r: 4 }}
+                activeDot={{ r: 6, stroke: '#3b82f6', strokeWidth: 2 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
         </div>
-        <div className="flex items-center">
-          <div className="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
-          <span className="text-sm text-gray-600">API Calls</span>
-        </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   )
 }

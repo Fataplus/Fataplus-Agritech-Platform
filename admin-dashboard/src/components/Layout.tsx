@@ -1,29 +1,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
-import {
-  Bars3Icon,
-  XMarkIcon,
-  HomeIcon,
-  UsersIcon,
-  CpuChipIcon,
-  DatabaseIcon,
-  ServerIcon,
-  ChartBarIcon,
-  CogIcon,
-  BellIcon,
-  UserCircleIcon
-} from '@heroicons/react/24/outline'
-
-const navigation = [
-  { name: 'Dashboard', href: '/', icon: HomeIcon },
-  { name: 'Users', href: '/users', icon: UsersIcon },
-  { name: 'AI Services', href: '/ai-services', icon: CpuChipIcon },
-  { name: 'Context', href: '/context', icon: DatabaseIcon },
-  { name: 'Server', href: '/server', icon: ServerIcon },
-  { name: 'Analytics', href: '/analytics', icon: ChartBarIcon },
-  { name: 'Settings', href: '/settings', icon: CogIcon },
-]
+import { FlowbiteSidebar } from '@/components/flowbite/Sidebar'
+import { FlowbiteNavbar } from '@/components/flowbite/Navbar'
 
 interface LayoutProps {
   children: React.ReactNode
@@ -31,13 +9,13 @@ interface LayoutProps {
 
 export default function Layout({ children }: LayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const router = useRouter()
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Mobile sidebar */}
       <div className={`fixed inset-0 z-50 lg:hidden ${sidebarOpen ? 'block' : 'hidden'}`}>
         <div className="fixed inset-0 bg-black bg-opacity-25" onClick={() => setSidebarOpen(false)} />
+        {/* You can keep the existing mobile sidebar or replace it with a Flowbite version */}
         <div className="fixed left-0 top-0 bottom-0 w-64 bg-white shadow-lg">
           <div className="flex items-center justify-between p-4 border-b">
             <h2 className="text-lg font-semibold text-gray-900">Fataplus Admin</h2>
@@ -45,110 +23,53 @@ export default function Layout({ children }: LayoutProps) {
               onClick={() => setSidebarOpen(false)}
               className="text-gray-400 hover:text-gray-600"
             >
-              <XMarkIcon className="h-6 w-6" />
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
             </button>
           </div>
           <nav className="mt-4">
-            {navigation.map((item) => {
-              const isActive = router.pathname === item.href
-              return (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={`flex items-center px-4 py-3 text-sm font-medium ${
-                    isActive
-                      ? 'bg-green-50 text-green-700 border-r-2 border-green-700'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                  }`}
-                  onClick={() => setSidebarOpen(false)}
-                >
-                  <item.icon className="h-5 w-5 mr-3" />
-                  {item.name}
-                </Link>
-              )
-            })}
+            <Link
+              href="/"
+              className="flex items-center px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+              </svg>
+              Dashboard
+            </Link>
+            <Link
+              href="/users"
+              className="flex items-center px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+              Users
+            </Link>
+            <Link
+              href="/ai-services"
+              className="flex items-center px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+              AI Services
+            </Link>
           </nav>
         </div>
       </div>
 
-      {/* Desktop sidebar */}
-      <div className="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:w-64 lg:block">
-        <div className="flex flex-col h-full bg-white shadow-lg">
-          <div className="flex items-center px-6 py-4 border-b">
-            <div className="flex items-center">
-              <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">FP</span>
-              </div>
-              <div className="ml-3">
-                <h1 className="text-lg font-semibold text-gray-900">Fataplus</h1>
-                <p className="text-xs text-gray-500">Administration</p>
-              </div>
-            </div>
-          </div>
-          <nav className="flex-1 mt-6">
-            {navigation.map((item) => {
-              const isActive = router.pathname === item.href
-              return (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={`flex items-center px-6 py-3 text-sm font-medium ${
-                    isActive
-                      ? 'bg-green-50 text-green-700 border-r-2 border-green-700'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                  }`}
-                >
-                  <item.icon className="h-5 w-5 mr-3" />
-                  {item.name}
-                </Link>
-              )
-            })}
-          </nav>
-          <div className="border-t p-4">
-            <div className="flex items-center">
-              <UserCircleIcon className="h-8 w-8 text-gray-400" />
-              <div className="ml-3">
-                <p className="text-sm font-medium text-gray-900">Admin User</p>
-                <p className="text-xs text-gray-500">admin@fata.plus</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* Desktop sidebar - Flowbite version */}
+      <FlowbiteSidebar />
 
       {/* Main content */}
       <div className="lg:pl-64">
-        {/* Top bar */}
-        <div className="sticky top-0 z-40 bg-white border-b border-gray-200">
-          <div className="flex items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-            <div className="flex items-center">
-              <button
-                onClick={() => setSidebarOpen(true)}
-                className="text-gray-400 hover:text-gray-600 lg:hidden"
-              >
-                <Bars3Icon className="h-6 w-6" />
-              </button>
-              <div className="ml-4 lg:ml-0">
-                <h1 className="text-xl font-semibold text-gray-900">
-                  {navigation.find(item => item.href === router.pathname)?.name || 'Dashboard'}
-                </h1>
-              </div>
-            </div>
-            <div className="flex items-center space-x-4">
-              <button className="text-gray-400 hover:text-gray-600">
-                <BellIcon className="h-6 w-6" />
-              </button>
-              <div className="flex items-center">
-                <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center">
-                  <span className="text-white font-medium text-sm">A</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        {/* Top bar - Flowbite version */}
+        <FlowbiteNavbar onToggleSidebar={() => setSidebarOpen(true)} />
 
         {/* Page content */}
-        <main className="px-4 py-8 sm:px-6 lg:px-8">
+        <main className="pt-16 px-4 py-8 sm:px-6 lg:px-8">
           {children}
         </main>
       </div>
