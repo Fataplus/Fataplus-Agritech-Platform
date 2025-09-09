@@ -2,7 +2,7 @@
 
 ## Overview
 
-This guide provides step-by-step instructions for deploying Fataplus AgriTech Platform to your Cloudron instance at `my.fata.plus`.
+This guide provides step-by-step instructions for deploying Fataplus AgriTech Platform to your Cloudron instance at `yourdomain.com`.
 
 ## Prerequisites
 
@@ -39,7 +39,7 @@ This guide provides step-by-step instructions for deploying Fataplus AgriTech Pl
 
 ```bash
 # Clone or ensure you have the latest code
-git clone https://github.com/Fataplus/Fataplus-Agritech-Platform.git
+git clone https://github.com/YourOrg/YourProject.git
 cd Fataplus-Agritech-Platform
 
 # Create a clean deployment archive
@@ -79,7 +79,7 @@ Ensure these files are included in your deployment:
 ### Upload Application
 
 1. **Access Cloudron Admin Panel**:
-   - Go to `https://my.fata.plus`
+   - Go to `https://yourdomain.com`
    - Login as administrator
 
 2. **Install Custom App**:
@@ -177,7 +177,7 @@ After deployment, check the application logs:
 
 ```bash
 # Test login with LDAP user
-curl -X POST "https://fataplus.my.fata.plus/auth/login" \
+curl -X POST "https://app.yourdomain.com/auth/login" \
   -H "Content-Type: application/x-www-form-urlencoded" \
   -d "username=your-ldap-username&password=your-ldap-password"
 ```
@@ -204,7 +204,7 @@ curl -X POST "https://fataplus.my.fata.plus/auth/login" \
 
 1. **Get SendGrid API Key**: https://sendgrid.com
 2. **Set in Cloudron**: `SENDGRID_API_KEY=your-key-here`
-3. **Configure From Email**: `noreply@my.fata.plus`
+3. **Configure From Email**: `noreply@yourdomain.com`
 
 ### Mobile Money (Airtel Money)
 
@@ -222,7 +222,7 @@ curl -X POST "https://fataplus.my.fata.plus/auth/login" \
 
 ```bash
 # Check application health
-curl https://fataplus.my.fata.plus/health
+curl https://app.yourdomain.com/health
 
 # Expected response:
 {"status":"healthy","service":"web-backend"}
@@ -232,12 +232,12 @@ curl https://fataplus.my.fata.plus/health
 
 ```bash
 # Test LDAP login
-curl -X POST "https://fataplus.my.fata.plus/auth/login" \
+curl -X POST "https://app.yourdomain.com/auth/login" \
   -H "Content-Type: application/x-www-form-urlencoded" \
   -d "username=testuser&password=testpass"
 
 # Test protected endpoint
-curl -X GET "https://fataplus.my.fata.plus/auth/me" \
+curl -X GET "https://app.yourdomain.com/auth/me" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
@@ -245,7 +245,7 @@ curl -X GET "https://fataplus.my.fata.plus/auth/me" \
 
 ```bash
 # Test MinIO connection
-curl https://fataplus.my.fata.plus/api/v1/storage/health
+curl https://app.yourdomain.com/api/v1/storage/health
 ```
 
 ## Step 9: Configure Backup Strategy
@@ -310,7 +310,7 @@ BACKUP_LOCATION=S3           # Offsite backup recommended
 **LDAP Connection Failed**:
 ```bash
 # Check LDAP configuration
-curl https://my.fata.plus/api/v1/ldap/status
+curl https://yourdomain.com/api/v1/ldap/status
 # Verify LDAP addon is running
 ```
 
@@ -332,7 +332,7 @@ curl https://my.fata.plus/api/v1/ldap/status
 
 - 📖 **Documentation**: `/docs/CREDENTIALS.md`
 - 🐛 **Issue Tracking**: GitHub Issues
-- 📧 **Support**: contact@fata.plus
+- 📧 **Support**: contact@yourdomain.com
 - 🌐 **Cloudron Docs**: https://docs.cloudron.io
 
 ## Security Best Practices
@@ -356,7 +356,7 @@ curl https://my.fata.plus/api/v1/ldap/status
 
 ## 🎉 Deployment Complete!
 
-Your Fataplus AgriTech Platform is now successfully deployed on Cloudron at `https://fataplus.my.fata.plus`!
+Your Fataplus AgriTech Platform is now successfully deployed on Cloudron at `https://app.yourdomain.com`!
 
 ### Next Steps:
 1. ✅ Create your first admin user via LDAP

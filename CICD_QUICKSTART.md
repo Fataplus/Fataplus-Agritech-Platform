@@ -1,13 +1,13 @@
 # 🚀 Fataplus CI/CD Quick Setup Guide
 
 ## Overview
-Your Fataplus Agritech Platform now has **automatic CI/CD deployment** to your Cloudron instance at `https://my.fata.plus`. Every push to the `main` branch will automatically deploy to production!
+Your Fataplus Agritech Platform now has **automatic CI/CD deployment** to your Cloudron instance at `https://yourdomain.com`. Every push to the `main` branch will automatically deploy to production!
 
 ## ✅ What's Been Implemented
 
 ### 🔄 Automatic CI/CD Pipeline
 - **Trigger**: Push to `main` branch
-- **Target**: https://my.fata.plus (your Cloudron instance)
+- **Target**: https://yourdomain.com (your Cloudron instance)
 - **Duration**: ~10-15 minutes
 - **Features**: Zero-downtime deployment, health checks, automatic rollback
 
@@ -39,9 +39,9 @@ Add these **Repository Secrets**:
 
 ```bash
 # Cloudron Configuration
-CLOUDRON_HOST=my.fata.plus
+CLOUDRON_HOST=yourdomain.com
 CLOUDRON_APP_ID=your-app-id-from-cloudron
-CLOUDRON_DOMAIN=my.fata.plus
+CLOUDRON_DOMAIN=yourdomain.com
 CLOUDRON_ACCESS_TOKEN=your-cloudron-api-token
 CLOUDRON_USER=root
 CLOUDRON_SSH_PRIVATE_KEY=-----BEGIN RSA PRIVATE KEY-----
@@ -55,13 +55,13 @@ SLACK_WEBHOOK_URL=https://hooks.slack.com/services/...
 ### 2. Get Your Cloudron App ID
 ```bash
 # SSH into your Cloudron server
-ssh root@my.fata.plus
+ssh root@yourdomain.com
 
 # Install Cloudron CLI (if not installed)
 npm install -g cloudron-cli
 
 # Login to Cloudron
-cloudron login my.fata.plus
+cloudron login yourdomain.com
 
 # List your apps to get the App ID
 cloudron list
@@ -73,7 +73,7 @@ cloudron list
 ssh-keygen -t rsa -b 4096 -C "github-actions@fataplus" -f ~/.ssh/cloudron_deploy
 
 # Add public key to Cloudron server
-ssh-copy-id -i ~/.ssh/cloudron_deploy.pub root@my.fata.plus
+ssh-copy-id -i ~/.ssh/cloudron_deploy.pub root@yourdomain.com
 
 # Copy private key content for GitHub secret
 cat ~/.ssh/cloudron_deploy
@@ -81,7 +81,7 @@ cat ~/.ssh/cloudron_deploy
 ```
 
 ### 4. Create Cloudron Access Token
-1. Log in to your Cloudron dashboard: https://my.fata.plus:3000
+1. Log in to your Cloudron dashboard: https://yourdomain.com:3000
 2. Go to Settings → Access Tokens
 3. Create a new token with "App Management" permissions
 4. Copy the token and add it as `CLOUDRON_ACCESS_TOKEN` secret
@@ -115,16 +115,16 @@ CLOUDRON_APP_ID=your-app-id ./deploy-cloudron.sh
 ### Health Checks
 ```bash
 # Run health checks manually
-./health-check.sh --domain my.fata.plus
+./health-check.sh --domain yourdomain.com
 
 # Check specific endpoints
-curl https://my.fata.plus/health
-curl https://my.fata.plus/api/health
-curl https://my.fata.plus/docs
+curl https://yourdomain.com/health
+curl https://yourdomain.com/api/health
+curl https://yourdomain.com/docs
 ```
 
 ### Cloudron Dashboard
-- Access: https://my.fata.plus:3000
+- Access: https://yourdomain.com:3000
 - View app status, logs, and metrics
 - Monitor resource usage
 
@@ -171,7 +171,7 @@ CLOUDRON_APP_ID=abc123 ./deploy-cloudron.sh
 ### `./health-check.sh`
 Comprehensive health validation:
 ```bash
-./health-check.sh --domain my.fata.plus
+./health-check.sh --domain yourdomain.com
 ./health-check.sh --help
 ```
 
@@ -209,12 +209,12 @@ Production readiness validation:
 # Repository → Actions → Failed workflow → View logs
 
 # SSH into Cloudron
-ssh root@my.fata.plus
+ssh root@yourdomain.com
 cloudron status --app your-app-id
 cloudron logs --app your-app-id --follow
 
 # Test endpoints
-curl -v https://my.fata.plus/health
+curl -v https://yourdomain.com/health
 ```
 
 ## 🎉 You're All Set!
@@ -224,7 +224,7 @@ Once configured, your deployment workflow is:
 1. **Develop** → Make changes locally
 2. **Commit** → `git commit -m "your changes"`
 3. **Deploy** → `git push origin main` 🚀
-4. **Monitor** → Watch GitHub Actions and visit https://my.fata.plus
+4. **Monitor** → Watch GitHub Actions and visit https://yourdomain.com
 
 Your Fataplus platform will automatically deploy to production with zero downtime! 
 

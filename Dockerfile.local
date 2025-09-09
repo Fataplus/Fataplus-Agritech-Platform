@@ -1,0 +1,29 @@
+# Dockerfile.local - Local development matching Cloudron deployment
+FROM node:18-alpine
+
+# Install bash (required for Cloudron compatibility)
+RUN apk add --no-cache bash
+
+# Create app directory
+WORKDIR /app
+
+# Copy the server file
+COPY local-server.js .
+
+# Create non-root user (matching Cloudron security model)
+RUN addgroup -g 1001 -S appuser && \
+    adduser -S appuser -u 1001 -G appuser
+
+# Change ownership
+RUN chown -R appuser:appuser /app
+USER appuser
+
+# Expose port
+EXPOSE 3000
+
+# Health check (matching Cloudron health check)
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1
+
+# Start the application
+CMD ["node", "local-server.js"]

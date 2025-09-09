@@ -29,8 +29,8 @@ const Layout: React.FC<LayoutProps> = ({
         <meta property="og:title" content={title} />
         <meta property="og:description" content={description} />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://fata.plus" />
-        <meta property="og:image" content="https://fata.plus/og-image.jpg" />
+        <meta property="og:url" content="https://yourdomain.com" />
+        <meta property="og:image" content="https://yourdomain.com/og-image.jpg" />
 
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />

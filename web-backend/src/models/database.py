@@ -10,15 +10,17 @@ import os
 # Database URL configuration
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
-    "postgresql://fataplus:fataplus_password@localhost:5432/fataplus"
+    "postgresql://dev_user:dev_password_change_me@localhost:5432/fataplus_dev"
 )
 
 # Create SQLAlchemy engine
 engine = create_engine(
     DATABASE_URL,
-    echo=True,  # Set to False in production
+    echo=os.getenv("DATABASE_ECHO", "false").lower() == "true",  # Configurable logging
     pool_pre_ping=True,
     pool_recycle=300,
+    pool_size=int(os.getenv("DATABASE_POOL_SIZE", "5")),
+    max_overflow=int(os.getenv("DATABASE_MAX_OVERFLOW", "10")),
 )
 
 # Create SessionLocal class

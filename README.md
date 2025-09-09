@@ -86,7 +86,7 @@ cd web-backend && pip install -r requirements.txt && python main.py
 #### 🚀 Automatic CI/CD Deployment
 Push to `main` branch automatically deploys to production:
 ```bash
-git push origin main  # Triggers automatic deployment to https://my.fata.plus
+git push origin main  # Triggers automatic deployment to https://yourdomain.com
 ```
 
 The CI/CD pipeline:
@@ -204,7 +204,7 @@ cd mobile-app && npm test
 ./validate-production.sh
 
 # Health checks
-./health-check.sh --domain my.fata.plus
+./health-check.sh --domain yourdomain.com
 ```
 
 ## 🚀 CI/CD Pipeline
@@ -236,7 +236,7 @@ The platform includes a comprehensive CI/CD pipeline that automatically deploys 
    - Deployment status reporting
 
 #### Deployment Triggers
-- **Automatic**: Push to `main` branch → Deploy to https://my.fata.plus
+- **Automatic**: Push to `main` branch → Deploy to https://yourdomain.com
 - **Manual**: GitHub Actions workflow dispatch
 - **Scheduled**: Daily health checks and dependency updates
 
@@ -251,7 +251,7 @@ The platform includes a comprehensive CI/CD pipeline that automatically deploys 
 git checkout main
 git add .
 git commit -m "feat: trigger production deployment"
-git push origin main  # 🚀 Deploys to https://my.fata.plus
+git push origin main  # 🚀 Deploys to https://yourdomain.com
 ```
 
 ## 🤖 AI Integration (MCP Server)

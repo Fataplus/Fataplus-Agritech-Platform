@@ -149,6 +149,32 @@ services:
       - fataplus-network
     restart: unless-stopped
 
+  # Web Frontend (Next.js)
+  web-frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.cloudron
+      target: frontend
+    container_name: fataplus-web-frontend
+    environment:
+      # API Backend
+      - NEXT_PUBLIC_API_URL=http://web-backend:8000
+      - NEXT_PUBLIC_AI_API_URL=http://ai-services:8001
+      # Application
+      - NODE_ENV=production
+      - ENVIRONMENT=production
+      # External APIs
+      - NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${STRIPE_PUBLIC_KEY}
+      - NEXT_PUBLIC_MAPBOX_TOKEN=${MAPBOX_ACCESS_TOKEN}
+    ports:
+      - "3000:3000"
+    depends_on:
+      - web-backend
+      - ai-services
+    networks:
+      - fataplus-network
+    restart: unless-stopped
+
 volumes:
   postgres_data:
     driver: local

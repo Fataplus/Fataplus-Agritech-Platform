@@ -13,8 +13,8 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
-CLOUDRON_HOST="${CLOUDRON_HOST:-my.fata.plus}"
-CLOUDRON_DOMAIN="${CLOUDRON_DOMAIN:-my.fata.plus}"
+CLOUDRON_HOST="${CLOUDRON_HOST:-yourdomain.com}"
+CLOUDRON_DOMAIN="${CLOUDRON_DOMAIN:-yourdomain.com}"
 CLOUDRON_APP_ID="${CLOUDRON_APP_ID}"
 IMAGE_TAG="${IMAGE_TAG:-ghcr.io/fataplus/fataplus-agritech-platform:latest}"
 DEPLOY_ENV="${DEPLOY_ENV:-production}"
@@ -319,8 +319,8 @@ while [[ $# -gt 0 ]]; do
             echo "  --skip-tests       Skip health checks after deployment"
             echo ""
             echo "Environment Variables:"
-            echo "  CLOUDRON_HOST           Cloudron server hostname (default: my.fata.plus)"
-            echo "  CLOUDRON_DOMAIN         App domain (default: my.fata.plus)"
+            echo "  CLOUDRON_HOST           Cloudron server hostname (default: yourdomain.com)"
+            echo "  CLOUDRON_DOMAIN         App domain (default: yourdomain.com)"
             echo "  CLOUDRON_APP_ID         App ID in Cloudron (required)"
             echo "  CLOUDRON_ACCESS_TOKEN   Cloudron API token (optional)"
             echo "  IMAGE_TAG               Docker image tag (default: latest)"

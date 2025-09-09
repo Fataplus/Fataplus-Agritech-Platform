@@ -132,9 +132,32 @@ Thumbs.db
 # Environment variables
 .env
 .env.local
+.env.development
 .env.development.local
+.env.test
 .env.test.local
+.env.production
 .env.production.local
+
+# Security sensitive files
+secrets.json
+private.key
+*.pem
+*.p12
+*.pfx
+credentials.txt
+api-keys.txt
+
+# SSH keys
+id_rsa*
+id_ed25519*
+*.key
+*.pub
+
+# Database dumps and backups
+*.sql.gz
+*.dump
+*.backup
 
 # Database
 *.db

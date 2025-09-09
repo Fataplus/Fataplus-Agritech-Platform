@@ -179,23 +179,23 @@ CREATE TRIGGER audit_users
     AFTER INSERT OR UPDATE OR DELETE ON shared.users
     FOR EACH ROW EXECUTE FUNCTION audit.audit_trigger_function();
 
--- Create default organization for development
-INSERT INTO shared.organizations (name, description, organization_type)
-VALUES ('Fataplus Development', 'Default organization for development and testing', 'business')
-ON CONFLICT DO NOTHING;
+-- Create default organization for development (optional - remove in production)
+-- INSERT INTO shared.organizations (name, description, organization_type)
+-- VALUES ('Development Organization', 'Default organization for development and testing', 'business')
+-- ON CONFLICT DO NOTHING;
 
--- Create default admin user
-INSERT INTO shared.users (organization_id, username, email, first_name, last_name, role)
-SELECT
-    o.id,
-    'admin',
-    'admin@fataplus.dev',
-    'Admin',
-    'User',
-    'admin'
-FROM shared.organizations o
-WHERE o.name = 'Fataplus Development'
-ON CONFLICT (username) DO NOTHING;
+-- Create default admin user (optional - remove in production)
+-- INSERT INTO shared.users (organization_id, username, email, first_name, last_name, role)
+-- SELECT
+--     o.id,
+--     'admin',
+--     'admin@yourdomain.com',
+--     'Admin',
+--     'User',
+--     'admin'
+-- FROM shared.organizations o
+-- WHERE o.name = 'Development Organization'
+-- ON CONFLICT (username) DO NOTHING;
 
 -- Set up Row Level Security (RLS) policies (if needed)
 -- ALTER TABLE shared.organizations ENABLE ROW LEVEL SECURITY;

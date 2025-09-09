@@ -1,6 +1,6 @@
 # CI/CD Deployment Configuration for Cloudron
 
-This document provides detailed instructions for setting up automated CI/CD deployment to your Cloudron instance at `https://my.fata.plus`.
+This document provides detailed instructions for setting up automated CI/CD deployment to your Cloudron instance at `https://yourdomain.com`.
 
 ## Overview
 
@@ -17,9 +17,9 @@ Configure these secrets in your GitHub repository settings (Settings → Secrets
 
 ### Cloudron Configuration
 ```bash
-CLOUDRON_HOST                 # Your Cloudron server hostname (e.g., my.fata.plus)
+CLOUDRON_HOST                 # Your Cloudron server hostname (e.g., yourdomain.com)
 CLOUDRON_APP_ID              # Your Fataplus app ID in Cloudron
-CLOUDRON_DOMAIN              # Your app domain (my.fata.plus)
+CLOUDRON_DOMAIN              # Your app domain (yourdomain.com)
 CLOUDRON_ACCESS_TOKEN        # Cloudron API access token
 CLOUDRON_USER                # SSH username for Cloudron server
 CLOUDRON_SSH_PRIVATE_KEY     # SSH private key for Cloudron server access
@@ -34,7 +34,7 @@ SLACK_WEBHOOK_URL            # Slack webhook for deployment notifications
 
 ### 1. Generate Cloudron Access Token
 
-1. Log in to your Cloudron dashboard at `https://my.fata.plus`
+1. Log in to your Cloudron dashboard at `https://yourdomain.com`
 2. Go to Settings → Access Tokens
 3. Create a new token with "App Management" permissions
 4. Copy the token and add it as `CLOUDRON_ACCESS_TOKEN` secret
@@ -48,7 +48,7 @@ Generate SSH keys for secure deployment:
 ssh-keygen -t rsa -b 4096 -C "github-actions@fataplus" -f ~/.ssh/cloudron_deploy
 
 # Add public key to Cloudron server
-ssh-copy-id -i ~/.ssh/cloudron_deploy.pub root@my.fata.plus
+ssh-copy-id -i ~/.ssh/cloudron_deploy.pub root@yourdomain.com
 
 # Add private key to GitHub secrets
 cat ~/.ssh/cloudron_deploy | pbcopy  # macOS
@@ -63,7 +63,7 @@ On your Cloudron server, install the Cloudron CLI:
 
 ```bash
 # SSH into your Cloudron server
-ssh root@my.fata.plus
+ssh root@yourdomain.com
 
 # Install Cloudron CLI
 npm install -g cloudron-cli
@@ -78,7 +78,7 @@ Create or configure your Fataplus app in Cloudron:
 
 ```bash
 # Install the app (if not already installed)
-cloudron install --app-store-id io.fataplus.platform --location my.fata.plus
+cloudron install --app-store-id io.fataplus.platform --location yourdomain.com
 
 # Get your app ID
 cloudron list
@@ -93,9 +93,9 @@ Add all required secrets in GitHub:
 ```bash
 # Repository Settings → Secrets and Variables → Actions → New Repository Secret
 
-CLOUDRON_HOST=my.fata.plus
+CLOUDRON_HOST=yourdomain.com
 CLOUDRON_APP_ID=your-app-id-from-cloudron-list
-CLOUDRON_DOMAIN=my.fata.plus
+CLOUDRON_DOMAIN=yourdomain.com
 CLOUDRON_ACCESS_TOKEN=your-cloudron-access-token
 CLOUDRON_USER=root
 CLOUDRON_SSH_PRIVATE_KEY=-----BEGIN RSA PRIVATE KEY-----
@@ -131,19 +131,19 @@ The pipeline performs comprehensive health checks:
 
 ```bash
 # Application health
-curl -f https://my.fata.plus/health
+curl -f https://yourdomain.com/health
 
 # API health  
-curl -f https://my.fata.plus/api/health
+curl -f https://yourdomain.com/api/health
 
 # API documentation
-curl -f https://my.fata.plus/docs
+curl -f https://yourdomain.com/docs
 
 # MCP server health
-curl -f https://my.fata.plus/mcp/health
+curl -f https://yourdomain.com/mcp/health
 
 # Authentication endpoint
-curl -s https://my.fata.plus/auth/login
+curl -s https://yourdomain.com/auth/login
 ```
 
 ## Rollback Procedure
@@ -157,7 +157,7 @@ The pipeline includes basic failure detection and will abort deployment on healt
 
 ```bash
 # SSH into Cloudron server
-ssh root@my.fata.plus
+ssh root@yourdomain.com
 
 # List previous app versions
 cloudron backup list --app your-app-id
@@ -177,14 +177,14 @@ cloudron update --app your-app-id --image previous-image-tag
 # Go to Actions → CI/CD Pipeline → View logs
 
 # Cloudron app logs
-ssh root@my.fata.plus
+ssh root@yourdomain.com
 cloudron logs --app your-app-id --follow
 ```
 
 ### Application Monitoring
-- **Health Endpoint**: `https://my.fata.plus/health`
-- **API Docs**: `https://my.fata.plus/docs`  
-- **Cloudron Dashboard**: `https://my.fata.plus:3000`
+- **Health Endpoint**: `https://yourdomain.com/health`
+- **API Docs**: `https://yourdomain.com/docs`  
+- **Cloudron Dashboard**: `https://yourdomain.com:3000`
 
 ## Security Considerations
 
@@ -233,7 +233,7 @@ cloudron logs --app your-app-id --follow
 # Go to repository → Actions → Failed workflow → View logs
 
 # SSH into Cloudron and check status
-ssh root@my.fata.plus
+ssh root@yourdomain.com
 cloudron status --app your-app-id
 cloudron logs --app your-app-id
 
@@ -242,7 +242,7 @@ docker ps
 docker logs container-name
 
 # Check application health locally
-curl -v https://my.fata.plus/health
+curl -v https://yourdomain.com/health
 ```
 
 ## Environment Variables
@@ -255,12 +255,12 @@ DATABASE_URL=postgresql://...
 REDIS_URL=redis://...
 API_HOST=0.0.0.0
 API_PORT=8000
-NEXT_PUBLIC_API_URL=https://my.fata.plus
-NEXT_PUBLIC_APP_URL=https://my.fata.plus
+NEXT_PUBLIC_API_URL=https://yourdomain.com
+NEXT_PUBLIC_APP_URL=https://yourdomain.com
 
 # From secrets
-CLOUDRON_HOST=my.fata.plus
-CLOUDRON_DOMAIN=my.fata.plus
+CLOUDRON_HOST=yourdomain.com
+CLOUDRON_DOMAIN=yourdomain.com
 ```
 
 ## Performance Optimization

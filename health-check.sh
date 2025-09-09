@@ -6,7 +6,7 @@
 set -e
 
 # Configuration
-DOMAIN="${DOMAIN:-my.fata.plus}"
+DOMAIN="${DOMAIN:-yourdomain.com}"
 PROTOCOL="${PROTOCOL:-https}"
 TIMEOUT="${TIMEOUT:-10}"
 RETRIES="${RETRIES:-3}"
@@ -358,14 +358,14 @@ while [[ $# -gt 0 ]]; do
             echo "Usage: $0 [options]"
             echo ""
             echo "Options:"
-            echo "  --domain, -d DOMAIN     Domain to check (default: my.fata.plus)"
+            echo "  --domain, -d DOMAIN     Domain to check (default: yourdomain.com)"
             echo "  --http                  Use HTTP instead of HTTPS"
             echo "  --timeout, -t SECONDS   Request timeout (default: 10)"
             echo "  --retries, -r COUNT     Number of retries (default: 3)"
             echo "  --help, -h              Show this help message"
             echo ""
             echo "Examples:"
-            echo "  $0                                    # Check my.fata.plus with HTTPS"
+            echo "  $0                                    # Check yourdomain.com with HTTPS"
             echo "  $0 --domain localhost:3000 --http    # Check local development"
             echo "  $0 --timeout 30 --retries 5          # Extended timeout and retries"
             exit 0

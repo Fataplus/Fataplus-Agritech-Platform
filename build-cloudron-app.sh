@@ -313,9 +313,9 @@ generate_submission_info() {
 
 ## Support Information
 - **Developer**: Fataplus Team
-- **Email**: contact@fata.plus
-- **Documentation**: https://docs.fata.plus
-- **Source**: https://github.com/Fataplus/Fataplus-Agritech-Platform
+- **Email**: contact@yourdomain.com
+- **Documentation**: https://docs.yourdomain.com
+- **Source**: https://github.com/YourOrg/YourProject
 
 ## Notes
 $(date): Package ready for Cloudron app store submission
@@ -345,7 +345,7 @@ show_next_steps() {
     echo "cloudron install --image $IMAGE_TAG --location yourdomain.com"
     echo ""
     echo "Documentation: CLOUDRON_APP_DESCRIPTION.md"
-    echo "Support: contact@fata.plus"
+    echo "Support: contact@yourdomain.com"
 }
 
 # Main build process
