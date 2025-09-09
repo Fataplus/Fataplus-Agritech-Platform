@@ -1,0 +1,26 @@
+{
+  "name": "fataplus-motia-service",
+  "version": "1.0.0",
+  "description": "Motia-powered AI agents and workflows for Fataplus AgriTech Platform",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "motia dev",
+    "build": "motia build",
+    "start": "motia start",
+    "deploy": "motia deploy"
+  },
+  "dependencies": {
+    "motia": "latest"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "keywords": [
+    "motia",
+    "ai-agents",
+    "agriculture",
+    "workflows",
+    "fataplus"
+  ]
+}

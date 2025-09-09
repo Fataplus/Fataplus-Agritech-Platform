@@ -28,6 +28,7 @@ redis==5.0.1
 
 # HTTP client
 httpx==0.25.2
+requests==2.31.0
 
 # Background tasks
 celery==5.3.4

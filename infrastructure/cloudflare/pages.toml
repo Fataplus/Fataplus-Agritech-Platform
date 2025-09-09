@@ -1,0 +1,142 @@
+# Cloudflare Pages Configuration for Fataplus Frontend
+
+# Build settings
+[build]
+  command = "npm run build"
+  publish = "out"
+
+# Environment variables for different branches
+[build.environment]
+  NODE_VERSION = "18"
+  NPM_VERSION = "9"
+
+# Production environment (main branch)
+[env.production]
+  NEXT_PUBLIC_API_URL = "https://api.yourdomain.com"
+  NEXT_PUBLIC_AI_API_URL = "https://api.yourdomain.com/ai"
+  NEXT_PUBLIC_ENVIRONMENT = "production"
+  NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY = "pk_live_your_stripe_key"
+  NEXT_PUBLIC_MAPBOX_TOKEN = "your_mapbox_token"
+  NEXT_PUBLIC_SENTRY_DSN = "your_sentry_dsn"
+  NEXT_PUBLIC_ANALYTICS_ID = "your_analytics_id"
+
+# Staging environment (staging branch)
+[env.staging]
+  NEXT_PUBLIC_API_URL = "https://staging-api.yourdomain.com"
+  NEXT_PUBLIC_AI_API_URL = "https://staging-api.yourdomain.com/ai"
+  NEXT_PUBLIC_ENVIRONMENT = "staging"
+  NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY = "pk_test_your_test_stripe_key"
+  NEXT_PUBLIC_MAPBOX_TOKEN = "your_mapbox_token"
+  NEXT_PUBLIC_SENTRY_DSN = "your_sentry_dsn"
+  NEXT_PUBLIC_ANALYTICS_ID = "your_analytics_id"
+
+# Development environment (dev branch)
+[env.dev]
+  NEXT_PUBLIC_API_URL = "https://dev-api.yourdomain.com"
+  NEXT_PUBLIC_AI_API_URL = "https://dev-api.yourdomain.com/ai"
+  NEXT_PUBLIC_ENVIRONMENT = "development"
+  NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY = "pk_test_your_test_stripe_key"
+  NEXT_PUBLIC_MAPBOX_TOKEN = "your_mapbox_token"
+  NEXT_PUBLIC_SENTRY_DSN = "your_sentry_dsn"
+  NEXT_PUBLIC_ANALYTICS_ID = "your_analytics_id"
+
+# Preview environments (all other branches)
+[env.preview]
+  NEXT_PUBLIC_API_URL = "https://dev-api.yourdomain.com"
+  NEXT_PUBLIC_AI_API_URL = "https://dev-api.yourdomain.com/ai"
+  NEXT_PUBLIC_ENVIRONMENT = "preview"
+  NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY = "pk_test_your_test_stripe_key"
+
+# Custom headers for security and performance
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    Content-Security-Policy = """
+      default-src 'self';
+      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://api.mapbox.com;
+      style-src 'self' 'unsafe-inline' https://api.mapbox.com;
+      img-src 'self' data: https: blob:;
+      font-src 'self' https:;
+      connect-src 'self' https://api.yourdomain.com https://api.openweathermap.org https://api.stripe.com https://api.mapbox.com;
+      media-src 'self' https:;
+      object-src 'none';
+      base-uri 'self';
+      form-action 'self';
+      frame-ancestors 'none';
+      upgrade-insecure-requests;
+    """
+
+# Cache control for static assets
+[[headers]]
+  for = "/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/_next/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/favicon.ico"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+
+[[headers]]
+  for = "/manifest.json"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+
+# Redirects for SEO and user experience
+[[redirects]]
+  from = "/home"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/app/*"
+  to = "/dashboard/:splat"
+  status = 301
+
+[[redirects]]
+  from = "/api/*"
+  to = "https://api.yourdomain.com/api/:splat"
+  status = 200
+
+# Custom 404 page
+[[redirects]]
+  from = "/*"
+  to = "/404"
+  status = 404
+
+# Functions for edge processing (Cloudflare Pages Functions)
+[[functions]]
+  pattern = "/api/edge/*"
+  script = "functions/api/edge/[[path]].js"
+
+[[functions]]
+  pattern = "/auth/callback"
+  script = "functions/auth/callback.js"
+
+# Branch deployments
+[build.processing]
+  skip_processing = false
+
+[build.processing.css]
+  bundle = true
+  minify = true
+
+[build.processing.js]
+  bundle = true
+  minify = true
+
+[build.processing.html]
+  pretty_urls = true
+
+[build.processing.images]
+  compress = true

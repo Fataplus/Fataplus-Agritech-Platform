@@ -1,0 +1,273 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database (Cloudflare D1 alternative for development)
+  postgres:
+    image: postgis/postgis:15-3.4
+    container_name: fataplus-postgres-cf
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-fataplus}
+      POSTGRES_USER: ${POSTGRES_USER:-fataplus}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infrastructure/docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-fataplus} -d ${POSTGRES_DB:-fataplus}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - fataplus-cf-network
+    restart: unless-stopped
+
+  # Redis Cache (Alternative to Cloudflare KV for development)
+  redis:
+    image: redis:7-alpine
+    container_name: fataplus-redis-cf
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - redis_data:/data
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    networks:
+      - fataplus-cf-network
+    restart: unless-stopped
+
+  # Web Backend (FastAPI) - Optimized for Cloudflare Workers
+  web-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.cloudflare
+      target: backend
+    container_name: fataplus-web-backend-cf
+    environment:
+      # Database Configuration
+      - DATABASE_URL=${DATABASE_URL:-postgresql://${POSTGRES_USER:-fataplus}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-fataplus}}
+      
+      # Redis Configuration
+      - REDIS_URL=${REDIS_URL:-redis://:${REDIS_PASSWORD}@redis:6379}
+      
+      # Cloudflare R2 Storage Configuration
+      - R2_ENDPOINT=${R2_ENDPOINT}
+      - R2_ACCESS_KEY_ID=${R2_ACCESS_KEY_ID}
+      - R2_SECRET_ACCESS_KEY=${R2_SECRET_ACCESS_KEY}
+      - R2_BUCKET_NAME=${R2_BUCKET_NAME:-fataplus-storage}
+      - R2_PUBLIC_URL=${R2_PUBLIC_URL}
+      
+      # Cloudflare KV Configuration
+      - CF_KV_NAMESPACE_ID=${CF_KV_NAMESPACE_ID}
+      - CF_KV_API_TOKEN=${CF_KV_API_TOKEN}
+      
+      # Cloudflare D1 Configuration
+      - CF_D1_DATABASE_ID=${CF_D1_DATABASE_ID}
+      - CF_D1_API_TOKEN=${CF_D1_API_TOKEN}
+      
+      # Application Configuration
+      - ENVIRONMENT=cloudflare
+      - NODE_ENV=production
+      - CORS_ORIGINS=${CORS_ORIGINS:-https://*.pages.dev,https://*.workers.dev}
+      
+      # Authentication Configuration
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - JWT_ACCESS_TOKEN_EXPIRE_MINUTES=${JWT_ACCESS_TOKEN_EXPIRE_MINUTES:-30}
+      - JWT_REFRESH_TOKEN_EXPIRE_DAYS=${JWT_REFRESH_TOKEN_EXPIRE_DAYS:-7}
+      
+      # External API Configuration
+      - OPENWEATHER_API_KEY=${OPENWEATHER_API_KEY}
+      - STRIPE_PUBLIC_KEY=${STRIPE_PUBLIC_KEY}
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - SENDGRID_API_KEY=${SENDGRID_API_KEY}
+      - AIRTEL_API_KEY=${AIRTEL_API_KEY}
+      - AIRTEL_API_SECRET=${AIRTEL_API_SECRET}
+      
+      # Cloudflare Workers Configuration
+      - CF_WORKER_URL=${CF_WORKER_URL}
+      - CF_PAGES_URL=${CF_PAGES_URL}
+      - CF_ZONE_ID=${CF_ZONE_ID}
+      - CF_API_TOKEN=${CF_API_TOKEN}
+      
+      # CDN and Edge Configuration
+      - CF_CDN_ENABLED=true
+      - CF_CACHE_TTL=${CF_CACHE_TTL:-3600}
+      - CF_EDGE_CACHING=true
+      
+      # Analytics and Monitoring
+      - CF_ANALYTICS_TOKEN=${CF_ANALYTICS_TOKEN}
+      - CF_LOGS_ENABLED=${CF_LOGS_ENABLED:-true}
+      
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - fataplus-cf-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 1024M
+          cpus: '1.0'
+        reservations:
+          memory: 512M
+          cpus: '0.5'
+
+  # AI Services (Python/ML) - Edge-optimized
+  ai-services:
+    build:
+      context: .
+      dockerfile: Dockerfile.cloudflare
+      target: ai-services
+    container_name: fataplus-ai-services-cf
+    environment:
+      # Database Configuration
+      - DATABASE_URL=${DATABASE_URL:-postgresql://${POSTGRES_USER:-fataplus}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-fataplus}}
+      
+      # Redis Configuration
+      - REDIS_URL=${REDIS_URL:-redis://:${REDIS_PASSWORD}@redis:6379}
+      
+      # Cloudflare R2 Storage for ML Models
+      - R2_ENDPOINT=${R2_ENDPOINT}
+      - R2_ACCESS_KEY_ID=${R2_ACCESS_KEY_ID}
+      - R2_SECRET_ACCESS_KEY=${R2_SECRET_ACCESS_KEY}
+      - R2_MODELS_BUCKET=${R2_MODELS_BUCKET:-fataplus-ml-models}
+      
+      # AI/ML Configuration
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - HUGGINGFACE_API_KEY=${HUGGINGFACE_API_KEY}
+      - ML_MODEL_CACHE_DIR=/tmp/models
+      
+      # Cloudflare Workers AI
+      - CF_AI_API_TOKEN=${CF_AI_API_TOKEN}
+      - CF_AI_ACCOUNT_ID=${CF_AI_ACCOUNT_ID}
+      
+      # Application Configuration
+      - ENVIRONMENT=cloudflare
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      
+    ports:
+      - "${AI_PORT:-8001}:8001"
+    volumes:
+      - ai_models_cache:/tmp/models
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - fataplus-cf-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 2048M
+          cpus: '2.0'
+        reservations:
+          memory: 1024M
+          cpus: '1.0'
+
+  # MCP Server (Model Context Protocol) - Cloudflare Workers compatible
+  mcp-server:
+    build:
+      context: ./mcp-server
+      dockerfile: Dockerfile
+    container_name: fataplus-mcp-server-cf
+    environment:
+      # Backend API Configuration
+      - FATAPLUS_API_URL=${FATAPLUS_API_URL:-http://web-backend:8000}
+      - FATAPLUS_API_KEY=${FATAPLUS_API_KEY}
+      
+      # MCP Configuration
+      - MCP_SERVER_PORT=${MCP_PORT:-3001}
+      - MCP_SERVER_HOST=0.0.0.0
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      
+      # Cloudflare Configuration
+      - CF_WORKER_URL=${CF_WORKER_URL}
+      - CF_API_TOKEN=${CF_API_TOKEN}
+      
+      # Application Configuration
+      - NODE_ENV=production
+      - ENVIRONMENT=cloudflare
+      - DEBUG=false
+      
+    ports:
+      - "${MCP_PORT:-3001}:3001"
+    depends_on:
+      - web-backend
+      - ai-services
+    networks:
+      - fataplus-cf-network
+    restart: unless-stopped
+
+  # Nginx Reverse Proxy (Edge cache simulation)
+  nginx-edge:
+    image: nginx:alpine
+    container_name: fataplus-nginx-cf
+    volumes:
+      - ./infrastructure/cloudflare/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./infrastructure/cloudflare/cloudflare-edge.conf:/etc/nginx/conf.d/default.conf:ro
+    ports:
+      - "${EDGE_PORT:-80}:80"
+      - "${EDGE_HTTPS_PORT:-443}:443"
+    depends_on:
+      - web-backend
+      - ai-services
+    networks:
+      - fataplus-cf-network
+    restart: unless-stopped
+    environment:
+      - CF_EDGE_CACHING=true
+      - CF_CACHE_TTL=${CF_CACHE_TTL:-3600}
+
+  # Health Check Service
+  health-monitor:
+    image: alpine:latest
+    container_name: fataplus-health-cf
+    volumes:
+      - ./health-check.sh:/health-check.sh:ro
+    environment:
+      - BACKEND_URL=http://web-backend:8000
+      - AI_URL=http://ai-services:8001
+      - MCP_URL=http://mcp-server:3001
+      - CHECK_INTERVAL=${HEALTH_CHECK_INTERVAL:-30}
+    networks:
+      - fataplus-cf-network
+    restart: unless-stopped
+    command: sh -c "chmod +x /health-check.sh && while true; do /health-check.sh; sleep $${CHECK_INTERVAL:-30}; done"
+
+# Volumes for persistent data
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  ai_models_cache:
+    driver: local
+
+# Network configuration optimized for Cloudflare
+networks:
+  fataplus-cf-network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.0.0/16
+    driver_opts:
+      com.docker.network.bridge.name: fataplus-cf-bridge
+      com.docker.network.bridge.enable_ip_masquerade: 'true'
+      com.docker.network.bridge.enable_icc: 'true'
+      com.docker.network.bridge.host_binding_ipv4: '0.0.0.0'

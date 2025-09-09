@@ -83,6 +83,30 @@ services:
       - fataplus-network
     command: npm run dev
 
+  # AI Service with Motia
+  motia-service:
+    build:
+      context: ./motia-service
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+    environment:
+      - DATABASE_URL=${DATABASE_URL:-postgresql://dev_user:dev_password_change_me@postgres:5432/fataplus_dev}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379}
+      - MOTIA_PORT=8001
+      - MAIN_BACKEND_URL=http://web-backend:8000
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - WEATHER_API_KEY=${WEATHER_API_KEY:-}
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - fataplus-network
+    volumes:
+      - ./motia-service:/app
+      - /app/node_modules
+    command: npm run dev
+
   # Web Backend (FastAPI)
   web-backend:
     build:
@@ -95,7 +119,8 @@ services:
       - MINIO_ENDPOINT=minio:9000
       - MINIO_ROOT_USER=${MINIO_ROOT_USER:-dev_access_key_change_me}
       - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD:-dev_secret_key_change_me}
-      - AI_SERVICES_URL=http://ai-services:8001
+      - AI_SERVICES_URL=http://motia-service:8001
+      - MOTIA_SERVICE_URL=http://motia-service:8001
       - ENVIRONMENT=development
       # LDAP Configuration (Cloudron)
       - LDAP_ENABLED=false
@@ -130,8 +155,11 @@ services:
         condition: service_healthy
       minio:
         condition: service_healthy
+      motia-service:
+        condition: service_started
     networks:
       - fataplus-network
+    command: sh -c "cd /app/src && python -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
 
   # AI Services (Python/ML)
   ai-services:

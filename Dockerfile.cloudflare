@@ -1,0 +1,238 @@
+# Multi-stage Dockerfile for Cloudflare deployment
+# Optimized for edge computing and minimal container size
+
+# =============================================================================
+# Frontend Build Stage (Next.js for Cloudflare Pages)
+# =============================================================================
+FROM node:18-alpine AS frontend-builder
+
+WORKDIR /app
+
+# Install dependencies
+COPY web-frontend/package*.json ./
+RUN npm ci --only=production
+
+# Copy source code
+COPY web-frontend/ ./
+
+# Build frontend for Cloudflare Pages
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+RUN npm run build
+
+# =============================================================================
+# Backend Build Stage (FastAPI for Cloudflare Workers)
+# =============================================================================
+FROM python:3.11-slim AS backend-builder
+
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    curl \
+    libpq-dev \
+    libgdal-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python dependencies
+COPY web-backend/requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy source code
+COPY web-backend/ ./
+
+# =============================================================================
+# AI Services Build Stage (Python ML for Cloudflare Workers AI)
+# =============================================================================
+FROM python:3.11-slim AS ai-builder
+
+WORKDIR /app
+
+# Install system dependencies for ML
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    curl \
+    libgdal-dev \
+    libspatialite-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python ML dependencies
+COPY ai-services/requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy AI services source
+COPY ai-services/ ./
+
+# =============================================================================
+# Frontend Production Stage (for edge deployment)
+# =============================================================================
+FROM node:18-alpine AS frontend
+
+WORKDIR /app
+
+# Create non-root user
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S frontend -u 1001
+
+# Copy built application
+COPY --from=frontend-builder --chown=frontend:nodejs /app/out ./out
+COPY --from=frontend-builder --chown=frontend:nodejs /app/package.json ./
+
+# Install production dependencies only
+RUN npm ci --only=production && npm cache clean --force
+
+# Set environment
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+
+USER frontend
+
+EXPOSE 3000
+
+CMD ["npm", "start"]
+
+# =============================================================================
+# Backend Production Stage (for Workers compatibility)
+# =============================================================================
+FROM python:3.11-slim AS backend
+
+WORKDIR /app
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y \
+    libpq5 \
+    libgdal28 \
+    curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
+
+# Create non-root user
+RUN useradd --create-home --shell /bin/bash backend
+
+# Copy built application
+COPY --from=backend-builder --chown=backend:backend /app ./
+COPY --from=backend-builder --chown=backend:backend /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+COPY --from=backend-builder --chown=backend:backend /usr/local/bin /usr/local/bin
+
+# Set environment
+ENV PYTHONPATH=/app/src
+ENV PYTHONUNBUFFERED=1
+ENV ENVIRONMENT=cloudflare
+
+USER backend
+
+EXPOSE 8000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8000/health || exit 1
+
+CMD ["python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+
+# =============================================================================
+# AI Services Production Stage (for Workers AI compatibility)
+# =============================================================================
+FROM python:3.11-slim AS ai-services
+
+WORKDIR /app
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y \
+    libgdal28 \
+    libspatialite7 \
+    curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
+
+# Create non-root user
+RUN useradd --create-home --shell /bin/bash aiservice
+
+# Copy built application
+COPY --from=ai-builder --chown=aiservice:aiservice /app ./
+COPY --from=ai-builder --chown=aiservice:aiservice /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+COPY --from=ai-builder --chown=aiservice:aiservice /usr/local/bin /usr/local/bin
+
+# Set environment
+ENV PYTHONPATH=/app
+ENV PYTHONUNBUFFERED=1
+ENV ENVIRONMENT=cloudflare
+
+USER aiservice
+
+EXPOSE 8001
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8001/health || exit 1
+
+CMD ["python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8001"]
+
+# =============================================================================
+# Edge Runtime Stage (for local Cloudflare simulation)
+# =============================================================================
+FROM node:18-alpine AS edge-runtime
+
+WORKDIR /app
+
+# Install Wrangler CLI and dependencies
+RUN npm install -g wrangler @cloudflare/workers-types
+
+# Copy Cloudflare configuration
+COPY infrastructure/cloudflare/ ./cloudflare/
+
+# Create edge simulation environment
+RUN mkdir -p /app/workers /app/pages
+
+# Copy worker scripts
+COPY --from=backend /app ./workers/backend/
+COPY --from=ai-services /app ./workers/ai/
+
+# Copy pages build
+COPY --from=frontend /app/out ./pages/
+
+# Edge environment
+ENV NODE_ENV=production
+ENV CF_PAGES_URL=http://localhost:8080
+ENV CF_WORKER_URL=http://localhost:8787
+
+EXPOSE 8080 8787
+
+# Start edge simulation
+CMD ["sh", "-c", "wrangler pages dev pages --port 8080 & wrangler dev workers/backend --port 8787 & wait"]
+
+# =============================================================================
+# Development Stage (for local development with hot reload)
+# =============================================================================
+FROM node:18-alpine AS development
+
+WORKDIR /app
+
+# Install development tools
+RUN npm install -g wrangler @cloudflare/workers-types nodemon concurrently
+
+# Install Python for backend development
+RUN apk add --no-cache python3 py3-pip
+
+# Create development user
+RUN addgroup -g 1001 -S devgroup && \
+    adduser -S devuser -u 1001 -G devgroup
+
+# Copy source code
+COPY --chown=devuser:devgroup . ./
+
+# Install dependencies
+RUN cd web-frontend && npm ci
+RUN cd web-backend && pip install -r requirements.txt
+RUN cd ai-services && pip install -r requirements.txt
+
+USER devuser
+
+# Development environment
+ENV NODE_ENV=development
+ENV PYTHONUNBUFFERED=1
+
+EXPOSE 3000 8000 8001 8080 8787
+
+# Start development servers
+CMD ["sh", "-c", "concurrently \"npm run dev --prefix web-frontend\" \"python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000 --app-dir web-backend/src\" \"python -m uvicorn main:app --reload --host 0.0.0.0 --port 8001 --app-dir ai-services\""]

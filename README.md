@@ -36,6 +36,7 @@ Fataplus is a multi-context SaaS platform designed specifically for African agri
 ### Technology Stack
 - **Frontend**: Next.js 14, React 18, TypeScript 5.3, Tailwind CSS
 - **Backend**: FastAPI, Python 3.11, PostgreSQL, Redis
+- **AI Framework**: Motia for unified APIs, workflows, and AI agents
 - **Mobile**: React Native, Expo
 - **AI/ML**: TensorFlow, PyTorch, scikit-learn
 - **AI Integration**: Model Context Protocol (MCP) Server
@@ -62,8 +63,13 @@ cd fataplus
 
 #### 2. Set up environment variables
 ```bash
+# For local development
 cp .env.example .env
-# Edit .env with your configuration
+
+# For Cloudflare deployment
+cp .env.cloudflare.example .env.cloudflare
+
+# Edit with your configuration
 ```
 
 #### 3. Start development environment
@@ -82,6 +88,32 @@ cd web-backend && pip install -r requirements.txt && python main.py
 - **Mobile App**: Follow mobile setup instructions
 
 ### Production Deployment
+
+#### 🌍 Cloudflare Edge Deployment (NEW!)
+```bash
+# Quick deployment to Cloudflare's global edge network
+cp .env.cloudflare.example .env.cloudflare
+# Edit .env.cloudflare with your Cloudflare credentials
+
+# Deploy to staging
+./deploy-cloudflare.sh -e staging
+
+# Deploy to production
+./deploy-cloudflare.sh -e production
+
+# Manage your Cloudflare deployment
+./cloudflare-manage.sh status
+```
+
+**Cloudflare Features:**
+- 🚀 Global edge deployment with 300+ locations
+- 💾 R2 Storage for files and assets
+- 🗄 D1 Database for relational data
+- ⚡ Workers for serverless API endpoints
+- 🌐 Pages for frontend hosting
+- 📈 Built-in analytics and monitoring
+
+See [CLOUDFLARE_DEPLOYMENT.md](./CLOUDFLARE_DEPLOYMENT.md) for detailed instructions.
 
 #### 🚀 Automatic CI/CD Deployment
 Push to `main` branch automatically deploys to production:

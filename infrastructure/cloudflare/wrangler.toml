@@ -1,0 +1,167 @@
+# Cloudflare Workers configuration for Fataplus Backend API
+name = "fataplus-api"
+main = "src/worker.js"
+compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Account configuration
+account_id = "${CF_ACCOUNT_ID}"
+
+# Environment-specific configurations
+[env.development]
+name = "fataplus-api-dev"
+vars = { 
+  ENVIRONMENT = "development",
+  LOG_LEVEL = "debug",
+  CORS_ORIGINS = "http://localhost:3000,https://*.pages.dev"
+}
+
+[env.staging]
+name = "fataplus-api-staging"
+vars = { 
+  ENVIRONMENT = "staging",
+  LOG_LEVEL = "info",
+  CORS_ORIGINS = "https://staging.yourdomain.com,https://*.pages.dev"
+}
+
+[env.production]
+name = "fataplus-api"
+vars = { 
+  ENVIRONMENT = "production",
+  LOG_LEVEL = "warn",
+  CORS_ORIGINS = "https://yourdomain.com,https://app.yourdomain.com"
+}
+
+# D1 Database bindings
+[[d1_databases]]
+binding = "DB"
+database_name = "fataplus-db"
+database_id = "${CF_D1_DATABASE_ID}"
+
+# KV namespace bindings
+[[kv_namespaces]]
+binding = "CACHE"
+id = "${CF_KV_NAMESPACE_ID}"
+preview_id = "${CF_KV_PREVIEW_ID}"
+
+# R2 bucket bindings
+[[r2_buckets]]
+binding = "STORAGE"
+bucket_name = "fataplus-storage"
+
+[[r2_buckets]]
+binding = "ML_MODELS"
+bucket_name = "fataplus-ml-models"
+
+# Durable Objects for real-time features
+[[durable_objects.bindings]]
+name = "LIVE_CHAT"
+class_name = "LiveChatDurableObject"
+
+[[durable_objects.bindings]]
+name = "NOTIFICATIONS"
+class_name = "NotificationsDurableObject"
+
+# Queue bindings for background processing
+[[queues.consumers]]
+queue = "email-queue"
+max_batch_size = 10
+max_batch_timeout = 30
+
+[[queues.consumers]]
+queue = "analytics-queue"
+max_batch_size = 100
+max_batch_timeout = 60
+
+[[queues.producers]]
+binding = "EMAIL_QUEUE"
+queue = "email-queue"
+
+[[queues.producers]]
+binding = "ANALYTICS_QUEUE"
+queue = "analytics-queue"
+
+# Analytics engine bindings
+[[analytics_engine_datasets]]
+binding = "ANALYTICS"
+
+# Hyperdrive for database acceleration
+[[hyperdrive]]
+binding = "HYPERDRIVE"
+id = "${CF_HYPERDRIVE_ID}"
+
+# AI bindings for Cloudflare Workers AI
+[ai]
+binding = "AI"
+
+# Browser rendering for PDF generation
+[browser]
+binding = "BROWSER"
+
+# Vectorize for vector search
+[[vectorize]]
+binding = "VECTORIZE"
+index_name = "fataplus-search"
+
+# Service bindings for microservices architecture
+[[services]]
+binding = "AI_SERVICE"
+service = "fataplus-ai"
+environment = "${ENVIRONMENT}"
+
+# Custom limits and resource allocation
+[limits]
+cpu_ms = 50000
+memory_mb = 512
+
+# Observability configuration
+[observability]
+enabled = true
+
+# Custom routes for domain mapping
+[[routes]]
+pattern = "api.yourdomain.com/*"
+zone_name = "yourdomain.com"
+
+[[routes]]
+pattern = "staging-api.yourdomain.com/*"
+zone_name = "yourdomain.com"
+custom_domain = true
+
+# Site configuration
+[site]
+bucket = ""
+entry-point = ""
+include = ["**/*"]
+exclude = ["node_modules/**/*", ".git/**/*"]
+
+# Build configuration
+[build]
+command = "npm run build:worker"
+cwd = "web-backend"
+watch_dir = "web-backend/src"
+
+# Migration configuration
+[[migrations]]
+tag = "v1"
+new_classes = ["LiveChatDurableObject", "NotificationsDurableObject"]
+
+# Placement configuration for global distribution
+[placement]
+mode = "smart"
+
+# Logpush configuration
+[logpush]
+enabled = true
+destination = "r2://fataplus-logs"
+fields = ["datetime", "rayId", "status", "edgeResponseBytes", "clientIP"]
+
+# Triggers for scheduled tasks
+[[triggers]]
+crons = ["0 */6 * * *"]  # Health check every 6 hours
+
+[[triggers]]
+crons = ["0 2 * * *"]    # Daily backup at 2 AM
+
+[[triggers]]
+crons = ["0 */1 * * *"]  # Analytics aggregation every hour
