@@ -799,6 +799,75 @@ This regional strategy positions Fataplus as the preferred digital agriculture p
 - **Financial Services**: Mobile money, banking integrations
 - **IoT Devices**: Sensors for farm monitoring
 
+## Offline LLM Integration for Rural Connectivity
+
+### Overview
+To address the unique challenges of limited internet connectivity in rural Madagascar, Fataplus implements an innovative offline LLM (Large Language Model) solution within the mobile application. This system enables farmers to access AI-powered agricultural assistance even without internet connectivity.
+
+### Technical Implementation
+- **React Native RAG Library**: Core framework for offline LLM functionality
+- **ExecuTorch**: On-device model execution for efficient inference
+- **SQLite Vector Store**: Persistent storage for agricultural knowledge base
+- **Peer-to-Peer Sharing**: QR code-based knowledge distribution between users
+
+### Key Features
+
+#### Local LLM Hosting
+- Technicians can host their local LLM instance for sharing with other users
+- QR code generation for easy connection setup
+- Hotspot connectivity for direct device-to-device communication
+
+#### Offline Inference
+- On-device LLM processing using optimized models
+- Context-aware agricultural recommendations without internet
+- Low-latency responses for real-time assistance
+
+#### Knowledge Persistence
+- SQLite-based vector store for offline knowledge retention
+- Chat session logging for traceability and future reference
+- Automatic synchronization when connectivity is restored
+
+#### Peer-to-Peer Distribution
+- QR code scanning for connecting to technician's LLM instance
+- WiFi P2P connectivity for direct data transfer
+- Decentralized knowledge sharing network
+
+### Implementation Details
+
+#### RAG Service Architecture
+The RAG (Retrieval-Augmented Generation) service provides the core functionality:
+- **Model Management**: Loading and unloading of LLM models
+- **Document Storage**: Vector store persistence for agricultural knowledge
+- **Response Generation**: Context-aware AI responses to farmer queries
+- **Hosting Control**: Local LLM instance management and sharing
+
+#### QR Service Integration
+- QR code generation for local LLM connection details
+- Connection information parsing and validation
+- Freshness checking for connection information
+
+#### Network Service Implementation
+- WiFi P2P functionality for direct device communication
+- Hotspot creation and management for technician devices
+- Device discovery and connection establishment
+
+#### Chat Service Functionality
+- Session management for farmer-technician conversations
+- Local message storage using AsyncStorage
+- Message history retrieval and synchronization
+
+### Madagascar-Specific Optimizations
+- **Resource Efficiency**: Optimized for low-end devices common in rural areas
+- **Language Support**: Multilingual capabilities including Malagasy
+- **Battery Optimization**: Power-efficient processing for extended usage
+- **Bandwidth Conservation**: Minimal data transfer requirements
+
+### Impact and Benefits
+- **Accessibility**: AI assistance available in areas with no internet connectivity
+- **Knowledge Transfer**: Direct sharing of expertise from technicians to farmers
+- **Traceability**: Logged conversations for quality assurance and training
+- **Scalability**: Decentralized approach enables widespread adoption
+
 ---
 
 ## Success Metrics

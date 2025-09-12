@@ -1,0 +1,95 @@
+# Cloudflare Workers configuration for Fataplus MCP Server
+name = "fataplus-mcp-server"
+main = "dist/index.js"
+compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Account configuration
+account_id = "${CF_ACCOUNT_ID}"
+
+# Environment-specific configurations
+[env.development]
+name = "fataplus-mcp-dev"
+vars = {
+  ENVIRONMENT = "development",
+  LOG_LEVEL = "debug",
+  CORS_ORIGINS = "http://localhost:3000,https://*.pages.dev"
+}
+
+[env.staging]
+name = "fataplus-mcp-staging"
+vars = {
+  ENVIRONMENT = "staging",
+  LOG_LEVEL = "info",
+  CORS_ORIGINS = "https://staging.yourdomain.com,https://*.pages.dev"
+}
+
+[env.production]
+name = "fataplus-mcp-server"
+vars = {
+  ENVIRONMENT = "production",
+  LOG_LEVEL = "warn",
+  CORS_ORIGINS = "https://yourdomain.com,https://app.yourdomain.com"
+}
+
+# D1 Database bindings for MCP data
+[[d1_databases]]
+binding = "DB"
+database_name = "fataplus-mcp-db"
+database_id = "${CF_D1_DATABASE_ID}"
+
+# KV namespace bindings for MCP caching
+[[kv_namespaces]]
+binding = "CACHE"
+id = "${CF_KV_NAMESPACE_ID}"
+preview_id = "${CF_KV_PREVIEW_ID}"
+
+# R2 bucket bindings for MCP storage
+[[r2_buckets]]
+binding = "STORAGE"
+bucket_name = "fataplus-mcp-storage"
+
+# Analytics engine for MCP usage metrics
+[[analytics_engine_datasets]]
+binding = "ANALYTICS"
+
+# AI bindings for MCP AI processing
+[ai]
+binding = "AI"
+
+# Custom limits for MCP server
+[limits]
+cpu_ms = 30000  # 30 seconds CPU time
+memory_mb = 256  # 256MB memory
+
+# Observability configuration
+[observability]
+enabled = true
+
+# Custom routes for MCP domain
+[[routes]]
+pattern = "mcp.yourdomain.com/*"
+zone_name = "yourdomain.com"
+
+[[routes]]
+pattern = "staging-mcp.yourdomain.com/*"
+zone_name = "yourdomain.com"
+custom_domain = true
+
+# Build configuration
+[build]
+command = "npm run build"
+cwd = "."
+
+# Logpush configuration for MCP logs
+[logpush]
+enabled = true
+destination = "r2://fataplus-mcp-logs"
+fields = ["datetime", "rayId", "status", "edgeResponseBytes", "clientIP", "requestHeaders", "responseHeaders"]
+
+# Triggers for MCP maintenance tasks
+[[triggers]]
+crons = ["0 */6 * * *"]  # Health check every 6 hours
+
+[[triggers]]
+crons = ["0 2 * * *"]    # Daily cleanup at 2 AM

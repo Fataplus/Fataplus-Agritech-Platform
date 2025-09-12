@@ -43,7 +43,14 @@
     "react-native-netinfo": "^11.1.1",
     "react-native-device-info": "^10.11.0",
     "@react-native-community/netinfo": "^11.1.1",
-    "react-native-offline": "^6.0.0"
+    "react-native-offline": "^6.0.0",
+    // Added RAG dependencies for offline LLM functionality
+    "react-native-rag": "^0.1.0",
+    "@react-native-rag/executorch": "^0.1.0",
+    "react-native-executorch": "^0.1.0",
+    "@react-native-rag/op-sqlite": "^0.1.0",
+    "react-native-qrcode-svg": "^6.2.0",
+    "react-native-wifi-p2p": "^4.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

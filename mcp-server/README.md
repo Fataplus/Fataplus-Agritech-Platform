@@ -1,282 +1,351 @@
 # Fataplus MCP Server
 
-A Model Context Protocol (MCP) server that provides AI models with access to the Fataplus agricultural platform's data and services.
+This directory contains the Model Context Protocol (MCP) server for the Fataplus Agricultural Platform, configured for deployment to Cloudflare Workers.
 
 ## Overview
 
-The Fataplus MCP Server enables AI assistants and language models to interact with the Fataplus agricultural platform through a standardized protocol. This allows AI systems to:
+The Fataplus MCP Server provides AI assistants and applications with access to agricultural data and tools through the Model Context Protocol. It exposes weather data, livestock information, market prices, farm analytics, gamification features, and task management capabilities.
 
-- Access real-time weather data for farm planning
-- Retrieve livestock management information
-- Get current market prices for agricultural products
-- Analyze farm performance metrics
-- Access gamification and user engagement data
-- Create task reminders for farm management
+## Architecture
 
-## Features
+### Cloudflare Workers Deployment
+
+The MCP server is deployed as a Cloudflare Worker, providing:
+
+- **Global Edge Distribution**: Sub-millisecond response times worldwide
+- **Automatic Scaling**: Handles traffic spikes automatically
+- **Built-in Security**: DDoS protection and WAF
+- **Zero Cold Starts**: Always-on execution environment
 
 ### Available Tools
 
-1. **get_weather_data** - Get weather data for specific locations and date ranges
-2. **get_livestock_info** - Retrieve livestock information for farms or users
-3. **get_market_prices** - Access current agricultural market prices
-4. **get_farm_analytics** - Analyze farm performance and metrics
-5. **get_gamification_status** - Get user gamification achievements and status
-6. **create_task_reminder** - Create task reminders for farm management
+1. **Weather Data** (`get_weather_data`)
+   - Real-time weather information
+   - Historical weather data
+   - Location-based forecasts
 
-### Available Resources
+2. **Livestock Management** (`get_livestock_info`)
+   - Livestock inventory tracking
+   - Health monitoring data
+   - Farm-specific livestock data
 
-- `fataplus://weather/current` - Real-time weather data
-- `fataplus://market/prices` - Current market prices
-- `fataplus://farms/analytics` - Farm performance analytics
-- `fataplus://gamification/leaderboard` - Gamification leaderboard
+3. **Market Intelligence** (`get_market_prices`)
+   - Current agricultural commodity prices
+   - Regional market data
+   - Historical price trends
 
-## Installation
+4. **Farm Analytics** (`get_farm_analytics`)
+   - Performance metrics
+   - Yield analysis
+   - Cost optimization insights
+
+5. **Gamification** (`get_gamification_status`)
+   - User achievement tracking
+   - Leaderboard data
+   - Reward system status
+
+6. **Task Management** (`create_task_reminder`)
+   - Farm task scheduling
+   - Reminder system
+   - Priority-based task management
+
+## Deployment to Cloudflare
 
 ### Prerequisites
 
-- Node.js 18 or higher
-- Docker and Docker Compose
-- Access to Fataplus backend services
+1. **Cloudflare Account**: Pro plan or higher for advanced features
+2. **Wrangler CLI**: `npm install -g wrangler`
+3. **Authentication**: `wrangler login`
+4. **Node.js**: Version 18+ required
 
-### Setup
+### Environment Configuration
 
-1. **Install dependencies:**
-   ```bash
-   npm install
-   ```
-
-2. **Environment Configuration:**
-   ```bash
-   cp env.example .env
-   ```
-
-   Edit `.env` with your configuration:
-   ```env
-   FATAPLUS_API_URL=http://localhost:8000
-   FATAPLUS_API_KEY=your_api_key_here
-   MCP_SERVER_PORT=3001
-   LOG_LEVEL=info
-   ```
-
-3. **Build the server:**
-   ```bash
-   npm run build
-   ```
-
-4. **Start the server:**
-   ```bash
-   npm start
-   ```
-
-### Docker Setup
-
-The MCP server is included in the main Docker Compose setup:
+Create a `.env.cloudflare` file in the project root with your Cloudflare credentials:
 
 ```bash
-docker-compose up mcp-server
+# Cloudflare Account Configuration
+CF_ACCOUNT_ID=your-cloudflare-account-id
+CF_API_TOKEN=your-cloudflare-api-token
+CF_ZONE_ID=your-cloudflare-zone-id
+
+# Cloudflare R2 Storage
+R2_BUCKET_NAME=fataplus-mcp-storage
+R2_ACCESS_KEY_ID=your-r2-access-key
+R2_SECRET_ACCESS_KEY=your-r2-secret-key
+
+# Cloudflare D1 Database
+CF_D1_DATABASE_NAME=fataplus-mcp-db
+CF_D1_DATABASE_ID=your-d1-database-id
+
+# Cloudflare KV Cache
+CF_KV_NAMESPACE_NAME=fataplus-mcp-cache
+CF_KV_NAMESPACE_ID=your-kv-namespace-id
+
+# API Keys
+OPENWEATHER_API_KEY=your-openweather-api-key
+JWT_SECRET_KEY=your-super-secure-jwt-secret-key
 ```
 
-## Configuration
+### Quick Deployment
 
-### Environment Variables
+#### Option 1: Automated Deployment Script
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `FATAPLUS_API_URL` | URL of the Fataplus backend API | `http://web-backend:8000` |
-| `FATAPLUS_API_KEY` | API key for backend authentication | - |
-| `MCP_SERVER_PORT` | Port for the MCP server | `3001` |
-| `MCP_SERVER_HOST` | Host binding for the server | `0.0.0.0` |
-| `LOG_LEVEL` | Logging level (error, warn, info, debug) | `info` |
-| `LOG_FORMAT` | Log format (json, text) | `json` |
-| `NODE_ENV` | Node environment | `production` |
-| `DEBUG` | Enable debug mode | `false` |
+```bash
+# Deploy to production
+./deploy-mcp-server.sh -e production
 
-## Usage Examples
+# Deploy to staging
+./deploy-mcp-server.sh -e staging
 
-### Connecting to Claude Desktop
+# Deploy to development
+./deploy-mcp-server.sh -e dev
+```
 
-Add the following to your Claude Desktop configuration (`~/Library/Application Support/Claude/claude_desktop_config.json` on macOS):
+#### Option 2: Manual Deployment
+
+```bash
+# Navigate to MCP server directory
+cd mcp-server
+
+# Install dependencies
+npm install
+
+# Build for Cloudflare Workers
+npm run build:worker
+
+# Deploy to Cloudflare
+wrangler deploy --env production
+```
+
+### Cloudflare Resources Setup
+
+Before deployment, ensure these Cloudflare resources are created:
+
+```bash
+# Create R2 bucket for storage
+wrangler r2 bucket create fataplus-mcp-storage
+
+# Create D1 database for data persistence
+wrangler d1 create fataplus-mcp-db
+
+# Create KV namespace for caching
+wrangler kv:namespace create fataplus-mcp-cache
+```
+
+## API Endpoints
+
+After deployment, the MCP server will be available at:
+
+### Production
+- **Base URL**: `https://mcp.yourdomain.com`
+- **Health Check**: `https://mcp.yourdomain.com/health`
+- **Tools**: `https://mcp.yourdomain.com/mcp/tools`
+- **Resources**: `https://mcp.yourdomain.com/mcp/resources`
+
+### Development
+- **Base URL**: `https://fataplus-mcp-dev.your-subdomain.workers.dev`
+- **Health Check**: `https://fataplus-mcp-dev.your-subdomain.workers.dev/health`
+
+## MCP Protocol Usage
+
+### Tool Calls
 
 ```json
+POST /mcp/tools
+Content-Type: application/json
+
 {
-  "mcpServers": {
-    "fataplus": {
-      "command": "node",
-      "args": ["/path/to/fataplus/mcp-server/dist/index.js"],
-      "env": {
-        "FATAPLUS_API_URL": "http://localhost:8000",
-        "FATAPLUS_API_KEY": "your-api-key"
-      }
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "tools/call",
+  "params": {
+    "name": "get_weather_data",
+    "arguments": {
+      "location": "Nairobi, Kenya",
+      "start_date": "2024-01-01",
+      "end_date": "2024-01-07"
     }
   }
 }
 ```
 
-### Using with Other MCP Clients
+### Resource Access
 
-The server communicates via stdio, so it can be used with any MCP-compatible client:
+```json
+POST /mcp/resources
+Content-Type: application/json
 
-```bash
-node dist/index.js
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "resources/read",
+  "params": {
+    "uri": "fataplus://weather/current"
+  }
+}
 ```
 
-### Example Interactions
+## Monitoring and Management
 
-Once connected, you can use natural language to interact with the Fataplus platform:
+### Health Monitoring
 
-**Weather Queries:**
-- "What's the weather like in Antananarivo for the next week?"
-- "Get weather forecast for rice farming areas"
+```bash
+# Check overall health
+curl https://mcp.yourdomain.com/health
 
-**Market Information:**
-- "What are the current prices for maize in Madagascar?"
-- "Show me market trends for vegetables"
+# View real-time logs
+wrangler tail fataplus-mcp-server --env production
 
-**Farm Analytics:**
-- "How is farm FP001 performing this month?"
-- "Get yield analytics for my livestock"
+# Monitor performance
+# Access Cloudflare Analytics dashboard
+```
 
-**Task Management:**
-- "Remind me to check the irrigation system tomorrow"
-- "Create a task to fertilize the rice fields next week"
+### Log Management
 
-## API Integration
+- **Real-time Logs**: Available via Wrangler CLI
+- **Historical Logs**: Stored in R2 bucket `fataplus-mcp-logs`
+- **Structured Format**: JSON with indexed fields
+- **Retention**: 30 days for access logs, 90 days for error logs
 
-The MCP server connects to your existing Fataplus backend services. Make sure these endpoints are available:
+### Performance Optimization
 
-### Required Backend Endpoints
-
-- `GET /api/weather` - Weather data service
-- `GET /api/livestock` - Livestock management
-- `GET /api/market/prices` - Market price data
-- `GET /api/farms/{id}/analytics` - Farm analytics
-- `GET /api/gamification/status` - User gamification
-- `POST /api/tasks/create` - Task creation
-
-### Authentication
-
-If your backend requires authentication, set the `FATAPLUS_API_KEY` environment variable. The server will include this in the `Authorization` header for all requests.
+- **Edge Caching**: Automatic CDN caching for static resources
+- **KV Caching**: Application-level caching for API responses
+- **Database Indexing**: Optimized queries with D1 indexes
+- **Rate Limiting**: Built-in protection against abuse
 
 ## Development
 
-### Running in Development Mode
+### Local Development
 
 ```bash
-npm run dev
-```
+# Install dependencies
+npm install
 
-This uses `tsx` for TypeScript execution with hot reloading.
+# Start development server
+npm run dev
+
+# Start with Wrangler dev server
+npm run dev:worker
+
+# Run tests
+npm test
+
+# Build for production
+npm run build
+```
 
 ### Testing
 
 ```bash
+# Run unit tests
 npm test
+
+# Run with coverage
+npm test -- --coverage
+
+# Integration tests
+npm run test:integration
 ```
-
-### Linting
-
-```bash
-npm run lint
-```
-
-### Building
-
-```bash
-npm run build
-```
-
-## Architecture
-
-### Core Components
-
-1. **Server (`src/index.ts`)** - Main MCP server implementation
-2. **Tools (`src/tools.ts`)** - Tool definitions and handlers
-3. **Types** - TypeScript interfaces and schemas
-
-### Communication Flow
-
-1. MCP Client → MCP Server (via stdio)
-2. MCP Server → Fataplus Backend (via HTTP)
-3. Fataplus Backend → Database/External APIs
-4. Response flows back through the chain
-
-### Error Handling
-
-The server includes comprehensive error handling:
-- Network timeouts and retries
-- Invalid response format handling
-- Authentication error management
-- Graceful degradation for unavailable services
 
 ## Security Considerations
 
-- Store API keys securely using environment variables
-- Use HTTPS for production deployments
-- Implement rate limiting on backend endpoints
-- Validate all input parameters
-- Log access for audit purposes
+### Authentication
+- JWT-based authentication for protected endpoints
+- API key validation for external services
+- Rate limiting to prevent abuse
+
+### Data Protection
+- All data encrypted at rest (R2, D1, KV)
+- TLS 1.3 encryption in transit
+- Secure secret management with Wrangler secrets
+
+### Access Control
+- CORS configuration for allowed origins
+- Origin validation for API requests
+- Resource-level permissions
+
+## Cost Optimization
+
+### Free Tier Limits
+- **Workers**: 100k requests/day
+- **R2**: 10GB storage, 1M operations
+- **D1**: 5M queries/month, 5GB storage
+- **KV**: 100k operations/day
+
+### Optimization Strategies
+1. **Caching**: Implement aggressive caching strategies
+2. **Compression**: Enable automatic Gzip/Brotli compression
+3. **Database Optimization**: Use efficient queries and indexing
+4. **Resource Cleanup**: Regular cleanup of unused resources
 
 ## Troubleshooting
 
 ### Common Issues
 
-1. **Connection Refused**
-   - Ensure Fataplus backend is running
-   - Check `FATAPLUS_API_URL` configuration
-   - Verify network connectivity
+#### Deployment Fails
+```bash
+# Check Wrangler authentication
+wrangler whoami
 
-2. **Authentication Errors**
-   - Confirm `FATAPLUS_API_KEY` is set correctly
-   - Check backend authentication requirements
+# Verify wrangler.toml syntax
+wrangler config
 
-3. **Tool Not Available**
-   - Ensure backend endpoints are implemented
-   - Check server logs for specific errors
-
-### Debug Mode
-
-Enable debug logging:
-
-```env
-LOG_LEVEL=debug
-DEBUG=true
+# Check resource bindings
+wrangler kv:namespace list
+wrangler r2 bucket list
+wrangler d1 list
 ```
 
-### Logs
+#### API Errors
+```bash
+# Check health endpoint
+curl https://mcp.yourdomain.com/health
 
-Server logs are output to stderr. Check your MCP client's logs for debugging information.
+# View error logs
+wrangler tail fataplus-mcp-server --env production
 
-## Contributing
+# Test specific endpoints
+curl https://mcp.yourdomain.com/mcp/tools
+```
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
+#### Performance Issues
+```bash
+# Check resource usage
+wrangler tail --format=pretty
 
-### Adding New Tools
+# Monitor analytics
+# Access Cloudflare dashboard for performance metrics
+```
 
-1. Define the tool in `src/index.ts` (ListToolsRequestSchema handler)
-2. Implement the tool logic in `src/tools.ts`
-3. Add error handling and validation
-4. Update documentation
+## Support and Resources
 
-## License
+### Documentation
+- [Cloudflare Workers Docs](https://developers.cloudflare.com/workers/)
+- [Model Context Protocol](https://modelcontextprotocol.io/)
+- [Wrangler CLI Reference](https://developers.cloudflare.com/workers/wrangler/)
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+### Community
+- [Cloudflare Discord](https://discord.gg/cloudflaredev)
+- [MCP Community](https://github.com/modelcontextprotocol)
 
-## Support
+### Professional Support
+- [Cloudflare Enterprise Support](https://www.cloudflare.com/enterprise/)
+- [Professional Services](https://www.cloudflare.com/professional-services/)
 
-For support and questions:
-- Check the troubleshooting section above
-- Review the Fataplus platform documentation
-- Contact the development team
+---
 
-## Changelog
+## 🚀 Deployment Checklist
 
-### v1.0.0
-- Initial release
-- Basic weather, market, and farm analytics tools
-- MCP protocol compliance
-- Docker integration
+- [ ] Cloudflare account configured
+- [ ] Wrangler CLI installed and authenticated
+- [ ] Environment variables configured
+- [ ] Cloudflare resources created (R2, D1, KV)
+- [ ] Custom domain configured (optional)
+- [ ] SSL certificates provisioned
+- [ ] MCP server deployed
+- [ ] Health checks passing
+- [ ] Monitoring configured
+- [ ] Documentation updated
+
+**Happy deploying! 🎉🌍**

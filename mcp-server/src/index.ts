@@ -14,18 +14,10 @@ class FataplusMCPServer {
 
   constructor() {
     this.tools = new FataplusTools();
-    this.server = new Server(
-      {
-        name: "fataplus-mcp-server",
-        version: "1.0.0",
-      },
-      {
-        capabilities: {
-          tools: {},
-          resources: {},
-        },
-      }
-    );
+    this.server = new Server({
+      name: "fataplus-mcp-server",
+      version: "1.0.0",
+    });
 
     this.setupHandlers();
   }
@@ -182,17 +174,17 @@ class FataplusMCPServer {
       try {
         switch (name) {
           case "get_weather_data":
-            return await this.tools.getWeatherData(args);
+            return await this.tools.getWeatherData(args || {});
           case "get_livestock_info":
-            return await this.tools.getLivestockInfo(args);
+            return await this.tools.getLivestockInfo(args || {});
           case "get_market_prices":
-            return await this.tools.getMarketPrices(args);
+            return await this.tools.getMarketPrices(args || {});
           case "get_farm_analytics":
-            return await this.tools.getFarmAnalytics(args);
+            return await this.tools.getFarmAnalytics(args || {});
           case "get_gamification_status":
-            return await this.tools.getGamificationStatus(args);
+            return await this.tools.getGamificationStatus(args || {});
           case "create_task_reminder":
-            return await this.tools.createTaskReminder(args);
+            return await this.tools.createTaskReminder(args || {});
           default:
             throw new Error(`Unknown tool: ${name}`);
         }

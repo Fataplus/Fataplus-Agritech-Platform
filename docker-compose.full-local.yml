@@ -61,30 +61,6 @@ services:
     networks:
       - fataplus-network
 
-  # Web Frontend (Next.js) - Admin Dashboard
-  web-frontend:
-    build:
-      context: ./web-frontend
-      dockerfile: Dockerfile
-    container_name: fataplus-web-frontend-local
-    environment:
-      - NODE_ENV=development
-      - NEXT_PUBLIC_API_URL=http://web-backend-local:8000
-      - NEXT_PUBLIC_AI_API_URL=http://ai-services-local:8001
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./web-frontend:/app
-      - /app/node_modules
-    depends_on:
-      web-backend-local:
-        condition: service_started
-      ai-services-local:
-        condition: service_started
-    networks:
-      - fataplus-network
-    command: npm run dev
-
   # Web Backend (FastAPI)
   web-backend-local:
     build:

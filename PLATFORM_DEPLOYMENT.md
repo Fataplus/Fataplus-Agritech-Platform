@@ -10,8 +10,7 @@ This guide covers the complete deployment of the Fataplus Platform with SmolLM2 
 platform.fata.plus (Nginx Reverse Proxy)
 ├── /api/* → web-backend:8000 (FastAPI)
 ├── /ai/* → smollm2-ai:8002 (SmolLM2 AI Service)
-├── /admin/* → admin-dashboard:3002 (Admin Dashboard)
-└── /* → admin-dashboard:3002 (Default)
+└── /* → web-frontend:3000 (Default)
 ```
 
 ## Prerequisites
@@ -74,9 +73,9 @@ cd fataplus-platform
 cd ai-services/smollm2
 docker build -t fataplus/smollm2:v2.0.1 .
 
-# Build Admin Dashboard
-cd ../../admin-dashboard
-docker build -t fataplus/admin-dashboard:v2.0.0 .
+# Build Web Frontend
+cd ../../web-frontend
+docker build -t fataplus/web-frontend:v1.0.0 .
 
 # Build Web Backend
 cd ../web-backend
@@ -93,7 +92,7 @@ docker-compose -f docker-compose.platform.yml up -d
 
 # Or deploy individual services
 docker run -d --name smollm2-ai -p 8002:8002 fataplus/smollm2:v2.0.1
-docker run -d --name admin-dashboard -p 3002:3002 fataplus/admin-dashboard:v2.0.0
+docker run -d --name web-frontend -p 3000:3000 fataplus/web-frontend:v1.0.0
 docker run -d --name web-backend -p 8000:8000 fataplus/web-backend:latest
 ```
 
@@ -152,7 +151,7 @@ sudo apt-get update && sudo apt-get install -y nvidia-docker2
 sudo systemctl restart docker
 ```
 
-### Admin Dashboard
+### Web Frontend
 
 #### Environment Variables
 ```bash
@@ -163,11 +162,6 @@ NEXT_PUBLIC_SMOLLM2_URL=https://platform.fata.plus/ai
 # Authentication
 ADMIN_EMAIL=admin@fata.plus
 JWT_SECRET=your_jwt_secret
-
-# Feature Flags
-ENABLE_AUDIT_LOG=true
-ENABLE_NOTIFICATIONS=true
-ENABLE_BACKUP_SYSTEM=true
 ```
 
 ### Web Backend
@@ -232,7 +226,7 @@ docker-compose -f docker-compose.platform.yml logs -f
 
 # Individual service logs
 docker logs smollm2-ai
-docker logs admin-dashboard
+docker logs web-frontend
 docker logs web-backend
 ```
 

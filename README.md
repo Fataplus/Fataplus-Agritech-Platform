@@ -238,7 +238,7 @@ fataplus/
 
 ### Running Tests
 
-```bash
+```
 # Web Frontend
 cd web-frontend && npm test
 
@@ -379,6 +379,8 @@ Access at: `http://localhost:3001`
 - **[Implementation Plan](./specs/001-fataplus-agritech-platform/plan.md)**: Technical architecture and development phases
 - **[API Documentation](./web-backend/docs)**: OpenAPI specifications for all services
 - **[Development Guide](./docs/development.md)**: Setup and contribution guidelines
+- **[Mobile App Offline LLM Guide](./mobile-app/README.md)**: Implementation details for offline AI features
+- **[Madagascar Deployment Strategy](./mobile-app/MADAGASCAR_DEPLOYMENT.md)**: Context-specific deployment approach
 
 ## 🌍 Target Markets
 

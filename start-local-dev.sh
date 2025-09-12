@@ -49,7 +49,7 @@ done
 
 echo ""
 echo "🌐 Access the platform at:"
-echo "   Frontend (Admin Dashboard): http://localhost:3000"
+echo "   Frontend: http://localhost:3000"
 echo "   Backend API: http://localhost:8000"
 echo "   AI Services: http://localhost:8001"
 echo "   SmolLM2 Service: http://localhost:8002"

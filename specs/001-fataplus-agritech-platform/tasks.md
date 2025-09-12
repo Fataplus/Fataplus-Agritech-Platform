@@ -211,6 +211,34 @@
 - [ ] T123 [P] Create chaos engineering tests for resilience
 - [ ] T124 [P] Implement automated deployment pipelines
 
+## Phase 3.7.5: Mobile App RAG Implementation (Week 12)
+**Priority: HIGH - Offline AI capabilities for rural farmers**
+
+### RAG Service Implementation
+- [ ] T151 [P] Integrate React Native RAG library into mobile app
+- [ ] T152 [P] Implement offline LLM inference with ExecuTorch
+- [ ] T153 [P] Add SQLite vector store persistence for knowledge base
+- [ ] T154 [P] Create RAG service for document management and retrieval
+- [ ] T155 [P] Build chat interface for LLM interaction
+
+### Peer-to-Peer Sharing Features
+- [ ] T156 [P] Implement QR code generation for local LLM sharing
+- [ ] T157 [P] Build hotspot connectivity functionality
+- [ ] T158 [P] Create connection interface for users to join technician's LLM
+- [ ] T159 [P] Implement chat session management between connected users
+
+### Chat Traceability and Logging
+- [ ] T160 [P] Add chat logging functionality for conversation history
+- [ ] T161 [P] Implement local storage of chat sessions using AsyncStorage
+- [ ] T162 [P] Create sync mechanism for chat logs when connectivity is available
+- [ ] T163 [P] Build chat history retrieval and display features
+
+### Optimization and Testing
+- [ ] T164 [P] Optimize for low-resource devices common in Madagascar
+- [ ] T165 [P] Test offline functionality in simulated environments
+- [ ] T166 [P] Validate peer-to-peer sharing and connectivity features
+- [ ] T167 [P] Performance testing under various network conditions
+
 ## Phase 3.8: AI Services Integration (Week 14-15)
 **Priority: HIGH - Intelligent features**
 

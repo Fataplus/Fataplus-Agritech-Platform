@@ -369,6 +369,72 @@ CREATE TABLE user_achievements (
 );
 ```
 
+## Mobile App RAG System Entities
+
+### Local LLM Host Entity
+```sql
+CREATE TABLE local_llm_hosts (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES users(id),
+    device_id VARCHAR(255) NOT NULL,
+    host_name VARCHAR(255),
+    ip_address INET,
+    port INTEGER DEFAULT 8080,
+    model_name VARCHAR(255),
+    is_active BOOLEAN DEFAULT TRUE,
+    last_seen TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+```
+
+### Chat Session Entity
+```sql
+CREATE TABLE chat_sessions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    host_id UUID REFERENCES local_llm_hosts(id),
+    technician_id UUID REFERENCES users(id),
+    farmer_id UUID REFERENCES users(id),
+    session_title VARCHAR(255),
+    start_time TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    end_time TIMESTAMP WITH TIME ZONE,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+```
+
+### Chat Message Entity
+```sql
+CREATE TABLE chat_messages (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    session_id UUID REFERENCES chat_sessions(id),
+    sender_id UUID REFERENCES users(id),
+    message_text TEXT NOT NULL,
+    message_type VARCHAR(50) DEFAULT 'text', -- 'text', 'system', 'error'
+    is_offline BOOLEAN DEFAULT FALSE,
+    sent_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    received_at TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+```
+
+### Knowledge Document Entity
+```sql
+CREATE TABLE knowledge_documents (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    host_id UUID REFERENCES local_llm_hosts(id),
+    document_title VARCHAR(255) NOT NULL,
+    document_content TEXT,
+    document_type VARCHAR(100), -- 'pdf', 'text', 'image'
+    embedding_vector VECTOR(384), -- For similarity search
+    tags JSONB DEFAULT '[]',
+    created_by UUID REFERENCES users(id),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+```
+
 ## Data Synchronization & Audit
 
 ### Sync Entity
@@ -435,6 +501,10 @@ CREATE TYPE delivery_status AS ENUM ('pending', 'shipped', 'delivered', 'failed'
 -- Sync Types
 CREATE TYPE sync_operation AS ENUM ('create', 'update', 'delete');
 CREATE TYPE conflict_resolution AS ENUM ('server_wins', 'client_wins', 'manual_merge');
+
+-- Mobile App RAG Types
+CREATE TYPE message_type AS ENUM ('text', 'system', 'error');
+CREATE TYPE document_type AS ENUM ('pdf', 'text', 'image');
 ```
 
 ## Indexes & Performance Optimization
@@ -453,6 +523,15 @@ CREATE INDEX idx_livestock_farm_type ON livestock (farm_id, animal_type);
 CREATE INDEX idx_transactions_buyer_date ON transactions (buyer_id, created_at);
 CREATE INDEX idx_user_progress_course ON user_progress (course_id, progress_percentage);
 
+-- Mobile App RAG indexes
+CREATE INDEX idx_local_llm_hosts_user ON local_llm_hosts (user_id, is_active);
+CREATE INDEX idx_chat_sessions_host ON chat_sessions (host_id, is_active);
+CREATE INDEX idx_chat_sessions_users ON chat_sessions (technician_id, farmer_id);
+CREATE INDEX idx_chat_messages_session ON chat_messages (session_id, sent_at);
+CREATE INDEX idx_chat_messages_sender ON chat_messages (sender_id, sent_at);
+CREATE INDEX idx_knowledge_documents_host ON knowledge_documents (host_id, created_at);
+CREATE INDEX idx_knowledge_documents_tags ON knowledge_documents USING GIN (tags);
+
 -- Organization-based partitioning for multi-tenancy
 -- (Implementation depends on PostgreSQL version and requirements)
 ```
@@ -467,7 +546,7 @@ CREATE INDEX idx_user_progress_course ON user_progress (course_id, progress_perc
 5. **Data Integrity**: Foreign key relationships must be maintained across sync
 
 ### Validation Constraints
-```sql
+```
 -- Example check constraints
 ALTER TABLE crops ADD CONSTRAINT valid_dates
     CHECK (expected_harvest_date > planting_date);

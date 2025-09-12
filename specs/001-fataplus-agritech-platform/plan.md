@@ -209,6 +209,59 @@ Task: "Research mobile money integration patterns for African fintech applicatio
 
 **IMPORTANT**: This phase is executed by the /tasks command, NOT by /plan
 
+## Phase 2.5: Mobile App RAG Implementation Plan
+
+### Overview
+To address the unique challenges of limited internet connectivity in rural Madagascar, Fataplus implements an innovative offline LLM (Large Language Model) solution within the mobile application. This system enables farmers to access AI-powered agricultural assistance even without internet connectivity.
+
+### Implementation Approach
+The mobile app RAG implementation follows a phased approach:
+
+#### Phase 1: Core RAG Integration (Week 12)
+- Integrate React Native RAG library into the mobile app
+- Implement offline LLM inference with ExecuTorch
+- Add SQLite vector store persistence for knowledge base
+- Create RAG service for document management and retrieval
+- Build basic chat interface for LLM interaction
+
+#### Phase 2: Peer-to-Peer Sharing (Week 13)
+- Implement QR code generation for local LLM sharing
+- Build hotspot connectivity functionality
+- Create connection interface for users to join technician's LLM
+- Implement chat session management between connected users
+
+#### Phase 3: Chat Traceability (Week 14)
+- Add chat logging functionality for conversation history
+- Implement local storage of chat sessions using AsyncStorage
+- Create sync mechanism for chat logs when connectivity is available
+- Build chat history retrieval and display features
+
+#### Phase 4: Optimization and Testing (Week 15)
+- Optimize for low-resource devices common in Madagascar
+- Test offline functionality in simulated environments
+- Validate peer-to-peer sharing and connectivity features
+- Performance testing under various network conditions
+
+### Technical Components
+1. **RAG Service**: Core service managing LLM operations and vector store
+2. **QR Service**: QR code generation and parsing for peer-to-peer connections
+3. **Network Service**: WiFi P2P connectivity and hotspot management
+4. **Chat Service**: Session management and message persistence
+5. **UI Components**: Interface for local LLM interaction and connection management
+
+### Dependencies
+- React Native RAG library
+- ExecuTorch for on-device inference
+- SQLite for vector store persistence
+- QR code generation libraries
+- WiFi P2P connectivity libraries
+
+### Success Metrics
+- Farmers can access AI assistance offline
+- Peer-to-peer sharing works reliably
+- Chat sessions are properly logged and traceable
+- App performs well on low-resource devices
+
 ## Complexity Tracking
 
 | Violation | Why Needed | Simpler Alternative Rejected Because |
@@ -216,6 +269,8 @@ Task: "Research mobile money integration patterns for African fintech applicatio
 | 4 projects instead of max 3 | Microservices architecture required for AI services isolation | Monolithic approach would couple AI dependencies with main application |
 | Repository pattern | Complex agricultural domain requires data access abstraction | Direct DB queries would create tight coupling and make testing difficult |
 | Multi-language support | African market requires support for 10+ languages | Single language would limit market reach and user adoption |
+| Offline-first architecture | Rural African connectivity challenges | Online-only approach would exclude primary target users |
+| Peer-to-peer sharing | Limited infrastructure in rural areas | Centralized approach would require reliable internet connectivity |
 
 ## Progress Tracking
 
@@ -233,12 +288,14 @@ Task: "Research mobile money integration patterns for African fintech applicatio
 - [x] Phase 10: CI/CD failures resolved (PR #1)
 - [ ] Phase 11: Core infrastructure setup (Week 2)
 - [ ] Phase 12: MVP deployment (Week 6)
+- [ ] Phase 13: Mobile App RAG Implementation (Week 12-15)
 
 **Gate Status**:
 - [x] Initial Constitution Check: PASS (with documented complexity justifications)
 - [x] Post-Design Constitution Check: PASS (4-project architecture justified)
 - [x] All NEEDS CLARIFICATION resolved: COMPLETE (research.md addresses all unknowns)
-- [x] Complexity deviations documented: COMPLETE (repository pattern, 4 projects, multi-language)
+- [x] Complexity deviations documented: COMPLETE (repository pattern, 4 projects, multi-language, offline-first)
+- [x] Mobile App RAG Implementation Plan: COMPLETE (new complexity justified for rural African context)
 
 ---
 

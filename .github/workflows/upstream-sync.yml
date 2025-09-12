@@ -1,0 +1,124 @@
+name: Upstream Sync
+
+on:
+  schedule:
+    # Run daily at 3 AM UTC
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+    inputs:
+      upstream_repo:
+        description: 'Upstream repository (owner/repo)'
+        required: true
+        default: 'Fataplus/Fataplus-Agritech-Platform'
+      upstream_branch:
+        description: 'Upstream branch to sync from'
+        required: true
+        default: 'main'
+      target_branch:
+        description: 'Target branch to sync to'
+        required: true
+        default: 'main'
+
+env:
+  UPSTREAM_REPO: ${{ github.event.inputs.upstream_repo || 'Fataplus/Fataplus-Agritech-Platform' }}
+  UPSTREAM_BRANCH: ${{ github.event.inputs.upstream_branch || 'main' }}
+  TARGET_BRANCH: ${{ github.event.inputs.target_branch || 'main' }}
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0 # Fetch all history for all branches and tags
+
+      - name: Set up Git
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git config --local pull.rebase false
+
+      - name: Add upstream remote
+        run: |
+          git remote add upstream https://github.com/${{ env.UPSTREAM_REPO }}.git
+          git fetch upstream
+
+      - name: Check for changes
+        id: check_changes
+        run: |
+          # Check if there are any differences between upstream and local branches
+          git checkout ${{ env.TARGET_BRANCH }}
+          git pull origin ${{ env.TARGET_BRANCH }}
+          
+          # Get the latest commit hashes
+          UPSTREAM_COMMIT=$(git rev-parse upstream/${{ env.UPSTREAM_BRANCH }})
+          LOCAL_COMMIT=$(git rev-parse ${{ env.TARGET_BRANCH }})
+          
+          echo "Upstream commit: $UPSTREAM_COMMIT"
+          echo "Local commit: $LOCAL_COMMIT"
+          
+          # Check if upstream has new commits
+          if git merge-base --is-ancestor $LOCAL_COMMIT $UPSTREAM_COMMIT; then
+            echo "changes_available=true" >> $GITHUB_OUTPUT
+            echo "Upstream has new changes"
+          else
+            echo "changes_available=false" >> $GITHUB_OUTPUT
+            echo "No new changes in upstream"
+          fi
+
+      - name: Sync with upstream
+        if: steps.check_changes.outputs.changes_available == 'true'
+        run: |
+          # Attempt to merge upstream changes
+          git merge upstream/${{ env.UPSTREAM_BRANCH }} --no-edit || {
+            echo "Merge conflicts detected"
+            echo "conflicts=true" >> $GITHUB_ENV
+            # List conflicted files
+            git diff --name-only --diff-filter=U > conflicts.txt || true
+          }
+
+      - name: Create Pull Request
+        if: steps.check_changes.outputs.changes_available == 'true'
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: |
+            chore: Sync with upstream
+            
+            Sync changes from upstream repository ${{ env.UPSTREAM_REPO }}:${{ env.UPSTREAM_BRANCH }}
+          title: 'chore: Sync with upstream ${{ env.UPSTREAM_REPO }}:${{ env.UPSTREAM_BRANCH }}'
+          body: |
+            ## 🔄 Upstream Sync
+            
+            This PR syncs changes from upstream repository [${{ env.UPSTREAM_REPO }}](https://github.com/${{ env.UPSTREAM_REPO }}).
+            
+            ### What's Included
+            - Changes from upstream ${{ env.UPSTREAM_REPO }}:${{ env.UPSTREAM_BRANCH }}
+            - Latest commits and improvements
+            
+            ### Merge Instructions
+            - Review changes carefully before merging
+            - Resolve any conflicts if present
+            - Test functionality after merge
+            
+            ### Conflict Resolution
+            ${{ env.conflicts && '⚠️ **Merge conflicts detected!** Please resolve conflicts before merging.' || '✅ No conflicts detected.' }}
+            
+            ${{ env.conflicts && 'Conflicted files:' }}
+            ${{ env.conflicts && '<details><summary>Click to see conflicted files</summary>' }}
+            ${{ env.conflicts && '$(cat conflicts.txt)' }}
+            ${{ env.conflicts && '</details>' }}
+          branch: upstream-sync/${{ env.TARGET_BRANCH }}
+          delete-branch: true
+          labels: |
+            upstream-sync
+            automated
+            chore
+
+      - name: Report No Changes
+        if: steps.check_changes.outputs.changes_available == 'false'
+        run: |
+          echo "✅ No new changes found in upstream repository"
+          echo "Repository is already up to date with ${{ env.UPSTREAM_REPO }}:${{ env.UPSTREAM_BRANCH }}"

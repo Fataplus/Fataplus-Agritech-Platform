@@ -69,8 +69,8 @@ platform.fata.plus (Nginx Reverse Proxy)
 │   └── Server Monitoring
 ├── /ai/* → smollm2-ai:8002 (SmolLM2 AI Service)
 │   └── Agricultural AI Assistant
-└── /admin/* → admin-dashboard:3002 (Admin Dashboard)
-    └── Platform Administration
+└── /* → web-frontend:3000 (Web Frontend)
+    └── Platform Interface
 ```
 
 ---

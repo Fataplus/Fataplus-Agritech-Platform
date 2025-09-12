@@ -228,6 +228,118 @@
 
 ---
 
+## 📋 Week 5: Mobile App RAG Implementation (Day 29-35)
+
+### Day 29-30: Core RAG Integration
+- [ ] **T151** Integrate React Native RAG library into mobile app
+  - Add react-native-rag dependency to mobile-app package.json
+  - Configure ExecuTorch integration for on-device inference
+  - Set up SQLite vector store persistence
+  - Create RAG service for document management and retrieval
+
+- [ ] **T152** Implement offline LLM inference with ExecuTorch
+  - Load LLM models for agricultural use cases
+  - Implement tokenization and text processing
+  - Create response generation functionality
+  - Optimize for low-resource devices
+
+### Day 31-32: Peer-to-Peer Sharing
+- [ ] **T156** Implement QR code generation for local LLM sharing
+  - Create QR service for connection information
+  - Implement QR code rendering in UI
+  - Add connection information parsing and validation
+  - Set up connection freshness checking
+
+- [ ] **T157** Build hotspot connectivity functionality
+  - Implement WiFi P2P connectivity
+  - Create hotspot creation and management
+  - Build device discovery features
+  - Set up secure connection establishment
+
+### Day 33-34: Chat Traceability
+- [ ] **T160** Add chat logging functionality for conversation history
+  - Implement chat service for session management
+  - Create local message storage using AsyncStorage
+  - Add message history retrieval
+  - Set up chat synchronization mechanisms
+
+- [ ] **T161** Implement local storage of chat sessions
+  - Create chat persistence layer
+  - Implement session management
+  - Add message encryption for privacy
+  - Set up data backup and recovery
+
+### Day 35: UI Integration and Testing
+- [ ] **T155** Build chat interface for LLM interaction
+  - Create LocalLLMView component
+  - Implement message display and input
+  - Add connection status indicators
+  - Create technician hosting interface
+
+- [ ] **T158** Create connection interface for users to join technician's LLM
+  - Implement QR code scanning functionality
+  - Build connection establishment UI
+  - Add connection status monitoring
+  - Create error handling and recovery
+
+---
+
+## 📋 Week 6: Mobile App RAG Optimization & Testing (Day 36-42)
+
+### Day 36-37: Advanced Features
+- [ ] **T153** Add SQLite vector store persistence for knowledge base
+  - Implement document storage and retrieval
+  - Create knowledge base management
+  - Add document search and filtering
+  - Set up knowledge base synchronization
+
+- [ ] **T159** Implement chat session management between connected users
+  - Create multi-user chat sessions
+  - Implement real-time message delivery
+  - Add message status indicators
+  - Set up session cleanup and maintenance
+
+### Day 38-39: Offline Functionality
+- [ ] **T162** Create sync mechanism for chat logs when connectivity is available
+  - Implement offline/online state detection
+  - Create sync queue for pending messages
+  - Add conflict resolution for sync conflicts
+  - Set up automatic sync scheduling
+
+- [ ] **T163** Build chat history retrieval and display features
+  - Implement chat history loading
+  - Create chat search and filtering
+  - Add chat export functionality
+  - Set up chat data management
+
+### Day 40-41: Performance Optimization
+- [ ] **T164** Optimize for low-resource devices common in Madagascar
+  - Implement memory usage optimization
+  - Create battery consumption reduction
+  - Add network usage minimization
+  - Set up performance monitoring
+
+- [ ] **T165** Test offline functionality in simulated environments
+  - Create offline testing scenarios
+  - Implement network condition simulation
+  - Add performance benchmarking
+  - Set up automated testing
+
+### Day 42: Final Testing and Validation
+- [ ] **T166** Validate peer-to-peer sharing and connectivity features
+  - Test QR code generation and scanning
+  - Validate hotspot connectivity
+  - Test connection establishment and maintenance
+  - Verify security and privacy measures
+
+- [ ] **T167** Performance testing under various network conditions
+  - Test under low-bandwidth conditions
+  - Validate performance on low-end devices
+  - Test battery consumption optimization
+  - Verify user experience quality
+
+---
+
 ## 🎯 Week 5-6: MVP Development (Weather + Market)
 
 ### Weather Context MVP
