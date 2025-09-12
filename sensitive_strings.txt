@@ -1,0 +1,58 @@
+# Passwords and credentials
+dev_password_change_me
+dev_access_key_change_me
+dev_secret_key_change_me
+development_jwt_secret_replace_with_random_hex_32
+your-secure-database-password-change-this
+generate_secure_password_here
+generate_jwt_secret_with_openssl_rand_hex_32
+generate_secret_key_with_openssl_rand_hex_32
+
+# Cloudflare credentials
+your-cloudflare-account-id
+your-cloudflare-api-token
+your-cloudflare-zone-id
+your-r2-access-key-id
+your-r2-secret-access-key
+your-d1-database-id
+your-kv-namespace-id
+your-super-secure-jwt-secret-key-at-least-32-characters-long
+
+# API Keys
+your-openweather-api-key
+your-stripe-public-key
+your-stripe-secret-key
+your-sendgrid-api-key
+your-airtel-api-key
+your-airtel-api-secret
+your-sms-api-key
+your-sms-api-secret
+your-openai-api-key
+your-huggingface-api-key
+your-mapbox-access-token
+your-mapbox-secret-token
+your-google-maps-api-key
+your-sentry-dsn
+your-sentry-auth-token
+your-analytics-id
+your-backup-encryption-key
+your_ldap_admin_password
+your_mpesa_consumer_key
+your_mpesa_consumer_secret
+your_airtel_client_id
+your_airtel_client_secret
+your_aws_access_key
+your_aws_secret_key
+your_minio_access_key
+your_minio_secret_key
+
+# Generic patterns (be careful with these)
+password=
+secret=
+key=
+token=
+
+# Specific sensitive values found in scan
+8385f06921e10d70126dfd21a180d3e8a5fd5c9cd5502e283b453c2edb63ba69
+CF_API_TOKEN=ENC:U2FsdGVkX18xaNwMX2qeMyz2uaS+/KDibQXX/Dg1PqIIGsBowLH68Ke34oqwxXLb
+JWT_SECRET_KEY=ENC:U2FsdGVkX18rMYOiv/F05hEsN2pEqrrxWqkBGM/maf1qp4AQvQhLBIjWRMCbm2IW
