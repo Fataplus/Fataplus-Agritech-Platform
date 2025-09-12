@@ -112,7 +112,7 @@ tmp/
 temp/
 
 # Editor directories and files
-.vscode/*
+.vscode/
 !.vscode/extensions.json
 .idea
 .DS_Store
@@ -132,11 +132,8 @@ Thumbs.db
 # Environment variables
 .env
 .env.local
-.env.development
 .env.development.local
-.env.test
 .env.test.local
-.env.production
 .env.production.local
 
 # Security sensitive files
@@ -202,6 +199,24 @@ kubeconfig
 # Temporary files
 *.tmp
 *.temp
+
+# Fataplus specific security exclusions
+.secrets.cloudflare
+secrets/
+.env.cloudflare
+.env.local
+.env.production
+.env.*.local
+platform.env
+
+# Cloudflare specific files
+wrangler.toml
+*.wrangler
+
+# Docker Compose override files
+docker-compose.override.yml
+
+# IDE specific files
 .clinerules/byterover-rules.md
 .kilocode/rules/byterover-rules.md
 .roo/rules/byterover-rules.md

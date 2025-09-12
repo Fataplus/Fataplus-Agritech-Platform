@@ -8,7 +8,7 @@ services:
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-fataplus_dev}
       POSTGRES_USER: ${POSTGRES_USER:-fataplus_dev}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dev_password_change_me}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -45,8 +45,8 @@ services:
     image: minio/minio:latest
     container_name: fataplus-minio
     environment:
-      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-dev_access_key_change_me}
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-dev_secret_key_change_me}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
     volumes:
       - minio_data:/data
     ports:
@@ -114,11 +114,11 @@ services:
       dockerfile: Dockerfile
     container_name: fataplus-web-backend
     environment:
-      - DATABASE_URL=postgresql://${POSTGRES_USER:-fataplus_dev}:${POSTGRES_PASSWORD:-dev_password_change_me}@postgres:5432/${POSTGRES_DB:-fataplus_dev}
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-fataplus_dev}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-fataplus_dev}
       - REDIS_URL=redis://redis:6379
       - MINIO_ENDPOINT=minio:9000
-      - MINIO_ROOT_USER=${MINIO_ROOT_USER:-dev_access_key_change_me}
-      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD:-dev_secret_key_change_me}
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
       - AI_SERVICES_URL=http://motia-service:8001
       - MOTIA_SERVICE_URL=http://motia-service:8001
       - ENVIRONMENT=development
@@ -134,7 +134,7 @@ services:
       - LDAP_USER_DISPLAY_NAME_ATTRIBUTE=cn
       - LDAP_USER_EMAIL_ATTRIBUTE=mail
       # JWT Configuration
-      - JWT_SECRET_KEY=${JWT_SECRET_KEY:-development_jwt_secret_replace_with_random_hex_32}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
       - JWT_ACCESS_TOKEN_EXPIRE_MINUTES=30
       - JWT_REFRESH_TOKEN_EXPIRE_DAYS=7
       # External API Keys
@@ -168,11 +168,11 @@ services:
       dockerfile: Dockerfile
     container_name: fataplus-ai-services
     environment:
-      - DATABASE_URL=postgresql://${POSTGRES_USER:-fataplus_dev}:${POSTGRES_PASSWORD:-dev_password_change_me}@postgres:5432/${POSTGRES_DB:-fataplus_dev}
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-fataplus_dev}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-fataplus_dev}
       - REDIS_URL=redis://redis:6379
       - MINIO_ENDPOINT=minio:9000
-      - MINIO_ROOT_USER=${MINIO_ROOT_USER:-dev_access_key_change_me}
-      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD:-dev_secret_key_change_me}
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
       - ENVIRONMENT=development
     ports:
       - "8001:8001"
@@ -196,7 +196,7 @@ services:
     container_name: fataplus-mcp-server
     environment:
       - FATAPLUS_API_URL=http://web-backend:8000
-      - FATAPLUS_API_KEY=
+      - FATAPLUS_API_KEY=${FATAPLUS_API_KEY:-}
       - MCP_SERVER_PORT=3001
       - MCP_SERVER_HOST=0.0.0.0
       - LOG_LEVEL=info

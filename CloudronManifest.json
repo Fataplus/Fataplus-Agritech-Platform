@@ -1,7 +1,7 @@
 {
     "id": "io.fataplus.agritech",
     "title": "Fataplus AgriTech Platform",
-    "author": "Your Organization <contact@yourdomain.com>",
+    "author": "Fataplus Team <contact@fataplus.ai>",
     "description": "Comprehensive SaaS platform for African agriculture featuring weather intelligence, livestock management, e-commerce, LMS, mobile money integration, and AI-powered insights. Designed specifically for rural connectivity challenges with offline-first architecture and multi-language support.",
     "tagline": "Building the future of African Agriculture",
     "version": "1.0.0",
@@ -18,8 +18,8 @@
         "filemanager": {}
     },
     "manifestVersion": 2,
-    "website": "https://yourdomain.com",
-    "contactEmail": "contact@yourdomain.com",
+    "website": "https://github.com/Fataplus/Fataplus-Agritech-Platform",
+    "contactEmail": "contact@fataplus.ai",
     "icon": "file://icon.png",
     "tags": [
         "agritech",
@@ -37,5 +37,5 @@
     ],
     "memoryLimit": 1073741824,
     "minBoxVersion": "7.1.0",
-    "postInstallMessage": "Fataplus AgriTech Platform has been successfully installed!\n\nNext Steps:\n1. Configure LDAP settings in the app configuration\n2. Set up API keys for external services (OpenWeatherMap, Stripe, etc.)\n3. Create your first admin user through the web interface\n4. Access the application at your Cloudron domain\n5. Use the File Manager addon to manage files and configurations\n\nPlatform Features:\n- Weather Intelligence & AI Predictions\n- Livestock Management & Health Tracking\n- Agricultural E-commerce Marketplace\n- Learning Management System\n- Mobile Money Integration (M-Pesa, Airtel Money)\n- Multi-language Support\n- Offline-first Design\n- File Management via Cloudron File Manager Addon\n\nDocumentation: https://docs.yourdomain.com\nSupport: contact@yourdomain.com\nCommunity: https://github.com/YourOrg/YourProject/discussions"
+    "postInstallMessage": "Fataplus AgriTech Platform has been successfully installed!\n\nNext Steps:\n1. Configure LDAP settings in the app configuration\n2. Set up API keys for external services (OpenWeatherMap, Stripe, etc.)\n3. Create your first admin user through the web interface\n4. Access the application at your Cloudron domain\n5. Use the File Manager addon to manage files and configurations\n\nPlatform Features:\n- Weather Intelligence & AI Predictions\n- Livestock Management & Health Tracking\n- Agricultural E-commerce Marketplace\n- Learning Management System\n- Mobile Money Integration (M-Pesa, Airtel Money)\n- Multi-language Support\n- Offline-first Design\n- File Management via Cloudron File Manager Addon\n\nDocumentation: https://github.com/Fataplus/Fataplus-Agritech-Platform\nSupport: contact@fataplus.ai\nCommunity: https://github.com/Fataplus/Fataplus-Agritech-Platform/discussions"
 }
