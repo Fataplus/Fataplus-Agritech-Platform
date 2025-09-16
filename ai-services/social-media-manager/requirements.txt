@@ -1,0 +1,101 @@
+# Social Media Manager AI Agent Dependencies
+
+# Core Framework
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+pydantic==2.5.0
+
+# Social Media Platform APIs
+tweepy==4.14.0
+facebook-sdk==3.1.0
+instagram-basic-display==1.0.0
+linkedin-api==2.2.0
+
+# AI and Content Generation
+openai==1.3.0
+anthropic==0.7.0
+transformers==4.36.2
+torch==2.1.2
+
+# Image and Video Processing
+Pillow==10.1.0
+opencv-python==4.8.1.78
+moviepy==1.0.3
+
+# Data Processing and Analytics
+pandas==2.1.4
+numpy==1.26.2
+scikit-learn==1.3.2
+
+# HTTP and API clients
+httpx==0.25.2
+requests==2.31.0
+aiohttp==3.9.0
+
+# Scheduling and Background Tasks
+celery==5.3.4
+redis==5.0.1
+apscheduler==3.10.4
+
+# Database
+sqlalchemy==2.0.23
+alembic==1.13.0
+psycopg2-binary==2.9.9
+
+# Authentication and Security
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-multipart==0.0.6
+
+# Configuration and Environment
+python-dotenv==1.0.0
+pydantic-settings==2.1.0
+
+# Monitoring and Logging
+prometheus-client==0.19.0
+structlog==23.2.0
+
+# Testing
+pytest==7.4.3
+pytest-asyncio==0.21.1
+pytest-mock==3.12.0
+
+# Development Tools
+black==23.11.0
+isort==5.12.0
+mypy==1.7.1
+flake8==6.1.0
+
+# Social Media Analytics
+social-media-analytics==0.1.0
+textblob==0.17.1
+vaderSentiment==3.3.2
+
+# Content Optimization
+nltk==3.8.1
+spacy==3.7.2
+wordcloud==1.9.2
+
+# Time and Date Handling
+python-dateutil==2.8.2
+pytz==2023.3
+
+# File Handling
+aiofiles==23.2.1
+python-magic==0.4.27
+
+# Web Scraping (for content research)
+beautifulsoup4==4.12.2
+scrapy==2.11.0
+
+# Email and Notifications
+sendgrid==6.10.0
+twilio==8.10.0
+
+# Caching
+diskcache==5.6.3
+memcached==1.59
+
+# Rate Limiting
+slowapi==0.1.9
+limits==3.6.0

@@ -163,6 +163,121 @@ class FataplusMCPServer {
               required: ["user_id", "task"],
             },
           },
+          {
+            name: "generate_social_media_content",
+            description: "Generate AI-powered agricultural content for social media",
+            inputSchema: {
+              type: "object",
+              properties: {
+                topic: {
+                  type: "string",
+                  description: "Content topic (weather, harvest, tips, market, community)",
+                },
+                platform: {
+                  type: "string",
+                  enum: ["twitter", "facebook", "instagram", "linkedin"],
+                  description: "Social media platform",
+                },
+                language: {
+                  type: "string",
+                  description: "Content language (en, fr, sw, mg)",
+                  default: "en",
+                },
+              },
+              required: ["topic", "platform"],
+            },
+          },
+          {
+            name: "schedule_social_media_post",
+            description: "Schedule a social media post",
+            inputSchema: {
+              type: "object",
+              properties: {
+                content: {
+                  type: "string",
+                  description: "Post content",
+                },
+                platforms: {
+                  type: "array",
+                  items: {
+                    type: "string",
+                    enum: ["twitter", "facebook", "instagram", "linkedin"],
+                  },
+                  description: "Platforms to post to",
+                },
+                scheduled_time: {
+                  type: "string",
+                  description: "Scheduled time (ISO 8601 format)",
+                },
+                hashtags: {
+                  type: "array",
+                  items: { type: "string" },
+                  description: "Hashtags to include",
+                },
+                mentions: {
+                  type: "array",
+                  items: { type: "string" },
+                  description: "User mentions",
+                },
+              },
+              required: ["content", "platforms"],
+            },
+          },
+          {
+            name: "get_social_media_analytics",
+            description: "Get social media analytics and performance metrics",
+            inputSchema: {
+              type: "object",
+              properties: {
+                platform: {
+                  type: "string",
+                  enum: ["twitter", "facebook", "instagram", "linkedin"],
+                  description: "Social media platform",
+                },
+                time_period: {
+                  type: "string",
+                  description: "Time period for analysis (7d, 30d, 90d)",
+                  default: "7d",
+                },
+              },
+              required: ["platform"],
+            },
+          },
+          {
+            name: "get_scheduled_posts",
+            description: "Get all scheduled social media posts",
+            inputSchema: {
+              type: "object",
+              properties: {},
+            },
+          },
+          {
+            name: "connect_social_media_account",
+            description: "Connect a social media account",
+            inputSchema: {
+              type: "object",
+              properties: {
+                platform: {
+                  type: "string",
+                  enum: ["twitter", "facebook", "instagram", "linkedin"],
+                  description: "Social media platform",
+                },
+                account_id: {
+                  type: "string",
+                  description: "Account ID",
+                },
+                username: {
+                  type: "string",
+                  description: "Username",
+                },
+                access_token: {
+                  type: "string",
+                  description: "Access token for the account",
+                },
+              },
+              required: ["platform", "account_id", "username", "access_token"],
+            },
+          },
         ],
       };
     });
@@ -185,6 +300,16 @@ class FataplusMCPServer {
             return await this.tools.getGamificationStatus(args || {});
           case "create_task_reminder":
             return await this.tools.createTaskReminder(args || {});
+          case "generate_social_media_content":
+            return await this.tools.generateSocialMediaContent(args || {});
+          case "schedule_social_media_post":
+            return await this.tools.scheduleSocialMediaPost(args || {});
+          case "get_social_media_analytics":
+            return await this.tools.getSocialMediaAnalytics(args || {});
+          case "get_scheduled_posts":
+            return await this.tools.getScheduledPosts(args || {});
+          case "connect_social_media_account":
+            return await this.tools.connectSocialMediaAccount(args || {});
           default:
             throw new Error(`Unknown tool: ${name}`);
         }
@@ -229,6 +354,24 @@ class FataplusMCPServer {
             description: "Top performers in the gamification system",
             mimeType: "application/json",
           },
+          {
+            uri: "fataplus://social-media/content",
+            name: "Social Media Content",
+            description: "Generated agricultural social media content",
+            mimeType: "application/json",
+          },
+          {
+            uri: "fataplus://social-media/analytics",
+            name: "Social Media Analytics",
+            description: "Performance metrics and engagement data",
+            mimeType: "application/json",
+          },
+          {
+            uri: "fataplus://social-media/scheduled",
+            name: "Scheduled Posts",
+            description: "Upcoming social media posts",
+            mimeType: "application/json",
+          },
         ],
       };
     });
@@ -247,6 +390,12 @@ class FataplusMCPServer {
             return await this.tools.getFarmAnalyticsSummary();
           case "fataplus://gamification/leaderboard":
             return await this.tools.getGamificationLeaderboard();
+          case "fataplus://social-media/content":
+            return await this.tools.getSocialMediaContent();
+          case "fataplus://social-media/analytics":
+            return await this.tools.getSocialMediaAnalyticsSummary();
+          case "fataplus://social-media/scheduled":
+            return await this.tools.getScheduledPostsSummary();
           default:
             throw new Error(`Unknown resource: ${uri}`);
         }

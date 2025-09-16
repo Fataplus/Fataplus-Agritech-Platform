@@ -13,6 +13,27 @@ export class FataplusTools {
     this.apiKey = process.env.FATAPLUS_API_KEY;
   }
 
+  private async makeSocialMediaRequest(endpoint: string, params?: any) {
+    try {
+      const socialMediaBaseUrl = process.env.SOCIAL_MEDIA_API_URL || "http://localhost:8002";
+      const config: any = {
+        baseURL: socialMediaBaseUrl,
+        url: endpoint,
+        method: "GET",
+      };
+
+      if (params) {
+        config.params = params;
+      }
+
+      const response = await axios(config);
+      return response.data;
+    } catch (error) {
+      console.error(`Social media API request failed for ${endpoint}:`, error);
+      throw new Error(`Failed to fetch data from social media service ${endpoint}`);
+    }
+  }
+
   private async makeRequest(endpoint: string, params?: any) {
     try {
       const config: any = {
@@ -218,6 +239,151 @@ export class FataplusTools {
       contents: [
         {
           uri: "fataplus://gamification/leaderboard",
+          mimeType: "application/json",
+          text: JSON.stringify(data, null, 2),
+        },
+      ],
+    };
+  }
+
+  // Social Media Manager Tools
+  async generateSocialMediaContent(args: ToolArgs) {
+    const { topic, platform, language = "en" } = args;
+
+    const params: any = {
+      topic: topic || "agriculture",
+      platform: platform || "twitter",
+      language,
+    };
+
+    const data = await this.makeSocialMediaRequest("/content/generate", params);
+
+    return {
+      content: [
+        {
+          type: "text",
+          text: `Generated social media content for ${platform}:\n${data.content}`,
+        },
+      ],
+    };
+  }
+
+  async scheduleSocialMediaPost(args: ToolArgs) {
+    const { content, platforms, scheduled_time, hashtags = [], mentions = [] } = args;
+
+    const postData = {
+      content,
+      platforms: platforms || ["twitter"],
+      scheduled_time,
+      hashtags,
+      mentions,
+      content_type: "text",
+    };
+
+    const data = await this.makeSocialMediaRequest("/posts/schedule", postData);
+
+    return {
+      content: [
+        {
+          type: "text",
+          text: `Post scheduled successfully:\n${JSON.stringify(data, null, 2)}`,
+        },
+      ],
+    };
+  }
+
+  async getSocialMediaAnalytics(args: ToolArgs) {
+    const { platform, time_period = "7d" } = args;
+
+    const params: any = {
+      platform: platform || "twitter",
+      time_period,
+    };
+
+    const data = await this.makeSocialMediaRequest(`/analytics/${platform}`, params);
+
+    return {
+      content: [
+        {
+          type: "text",
+          text: `Social media analytics for ${platform}:\n${JSON.stringify(data.analysis, null, 2)}`,
+        },
+      ],
+    };
+  }
+
+  async getScheduledPosts(args: ToolArgs) {
+    const data = await this.makeSocialMediaRequest("/posts/scheduled");
+
+    return {
+      content: [
+        {
+          type: "text",
+          text: `Scheduled posts:\n${JSON.stringify(data, null, 2)}`,
+        },
+      ],
+    };
+  }
+
+  async connectSocialMediaAccount(args: ToolArgs) {
+    const { platform, account_id, username, access_token } = args;
+
+    const accountData = {
+      platform,
+      account_id,
+      username,
+      access_token,
+      is_active: true,
+    };
+
+    const data = await this.makeSocialMediaRequest("/accounts/connect", accountData);
+
+    return {
+      content: [
+        {
+          type: "text",
+          text: `Account connected successfully:\n${JSON.stringify(data, null, 2)}`,
+        },
+      ],
+    };
+  }
+
+  // Social Media Resource Methods
+  async getSocialMediaContent() {
+    const data = await this.makeSocialMediaRequest("/content/templates");
+
+    return {
+      contents: [
+        {
+          uri: "fataplus://social-media/content",
+          mimeType: "application/json",
+          text: JSON.stringify(data, null, 2),
+        },
+      ],
+    };
+  }
+
+  async getSocialMediaAnalyticsSummary() {
+    const data = await this.makeSocialMediaRequest("/analytics/summary");
+
+    return {
+      contents: [
+        {
+          uri: "fataplus://social-media/analytics",
+          mimeType: "application/json",
+          text: JSON.stringify(data, null, 2),
+        },
+      ],
+    };
+  }
+
+  async getScheduledPostsSummary() {
+    const data = await this.makeSocialMediaRequest("/posts/scheduled");
+
+    return {
+      contents: [
+        {
+          uri: "fataplus://social-media/scheduled",
           mimeType: "application/json",
           text: JSON.stringify(data, null, 2),
         },

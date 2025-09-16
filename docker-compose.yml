@@ -188,6 +188,46 @@ services:
     networks:
       - fataplus-network
 
+  # Social Media Manager AI Agent
+  social-media-manager:
+    build:
+      context: ./ai-services/social-media-manager
+      dockerfile: Dockerfile
+    container_name: fataplus-social-media-manager
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-fataplus_dev}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-fataplus_dev}
+      - REDIS_URL=redis://redis:6379
+      - MINIO_ENDPOINT=minio:9000
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
+      - ENVIRONMENT=development
+      # Social Media API Keys
+      - TWITTER_API_KEY=${TWITTER_API_KEY:-}
+      - TWITTER_API_SECRET=${TWITTER_API_SECRET:-}
+      - TWITTER_ACCESS_TOKEN=${TWITTER_ACCESS_TOKEN:-}
+      - TWITTER_ACCESS_TOKEN_SECRET=${TWITTER_ACCESS_TOKEN_SECRET:-}
+      - FACEBOOK_APP_ID=${FACEBOOK_APP_ID:-}
+      - FACEBOOK_APP_SECRET=${FACEBOOK_APP_SECRET:-}
+      - INSTAGRAM_ACCESS_TOKEN=${INSTAGRAM_ACCESS_TOKEN:-}
+      - LINKEDIN_CLIENT_ID=${LINKEDIN_CLIENT_ID:-}
+      - LINKEDIN_CLIENT_SECRET=${LINKEDIN_CLIENT_SECRET:-}
+      # AI Content Generation
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+    ports:
+      - "8002:8002"
+    volumes:
+      - ./ai-services/social-media-manager:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    networks:
+      - fataplus-network
+
   # MCP Server (Model Context Protocol)
   mcp-server:
     build:
