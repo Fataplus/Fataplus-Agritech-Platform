@@ -1,0 +1,53 @@
+{
+  "name": "fataplus-backend-worker",
+  "version": "1.0.0",
+  "description": "Fataplus Backend API on Cloudflare Workers",
+  "main": "src/worker.js",
+  "type": "module",
+  "scripts": {
+    "build": "echo 'No build step required for basic worker'",
+    "build:worker": "echo 'Worker build complete'",
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "deploy:staging": "wrangler deploy --env staging",
+    "deploy:production": "wrangler deploy --env production",
+    "tail": "wrangler tail",
+    "tail:staging": "wrangler tail --env staging",
+    "tail:production": "wrangler tail --env production",
+    "test": "echo 'Tests not implemented yet'",
+    "lint": "eslint src/ --ext .js",
+    "format": "prettier --write src/"
+  },
+  "dependencies": {
+    "hono": "^3.12.0",
+    "@hono/node-server": "^1.8.0"
+  },
+  "devDependencies": {
+    "wrangler": "^3.0.0",
+    "eslint": "^8.0.0",
+    "prettier": "^3.0.0",
+    "@types/node": "^20.0.0"
+  },
+  "keywords": [
+    "cloudflare",
+    "workers",
+    "edge",
+    "api",
+    "agriculture",
+    "farming",
+    "hono"
+  ],
+  "author": "Fataplus Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Fataplus/Fataplus-Agritech-Platform.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Fataplus/Fataplus-Agritech-Platform/issues"
+  },
+  "homepage": "https://fata.plus"
+}
