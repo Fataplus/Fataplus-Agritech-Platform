@@ -1,0 +1,47 @@
+{
+  "version": 2,
+  "name": "fataplus-frontend",
+  "framework": "nextjs",
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
+  "outputDirectory": ".next",
+  "env": {
+    "NEXT_PUBLIC_API_URL": "https://api.fata.plus",
+    "NEXT_PUBLIC_AI_API_URL": "https://ai.fata.plus"
+  },
+  "build": {
+    "env": {
+      "NEXT_PUBLIC_API_URL": "https://api.fata.plus",
+      "NEXT_PUBLIC_AI_API_URL": "https://ai.fata.plus"
+    }
+  },
+  "functions": {
+    "pages/api/**/*.js": {
+      "runtime": "nodejs20.x"
+    }
+  },
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "origin-when-cross-origin"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        }
+      ]
+    }
+  ]
+}

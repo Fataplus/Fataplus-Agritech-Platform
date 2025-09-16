@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Enable static export for Cloudflare Pages deployment
-  output: 'export',
+  // Remove static export for Vercel deployment - Vercel supports full Next.js features
+  // output: 'export',
 
   // Environment variables
   env: {
@@ -9,10 +9,10 @@ const nextConfig = {
     NEXT_PUBLIC_AI_API_URL: process.env.NEXT_PUBLIC_AI_API_URL || 'http://localhost:8001',
   },
 
-  // Image optimization settings
+  // Image optimization settings for Vercel
   images: {
-    domains: ['localhost'],
-    unoptimized: true, // Required for static export
+    domains: ['localhost', 'tech.fata.plus', 'fata.plus'],
+    // unoptimized: true, // Not needed for Vercel
   },
 
   // Experimental features for better performance
