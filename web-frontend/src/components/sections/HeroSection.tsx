@@ -28,7 +28,7 @@ const HeroSection: React.FC = () => {
         <div className="text-center">
           {/* Main Heading - Inspired by "Your Shortcut To Clarity" - Updated */}
           <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-4 tracking-tight" style={{ fontFamily: 'serif' }}>
-            Your Shortcut To
+            Your Shortcut To{' '}
             <span className="block text-green-800">Agricultural Clarity</span>
           </h1>
 
