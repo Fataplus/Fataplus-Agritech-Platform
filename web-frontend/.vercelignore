@@ -1,0 +1,56 @@
+# Vercel ignore file
+# Files and directories to ignore during Vercel deployment
+
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Production build
+.next/
+out/
+dist/
+
+# Environment variables (use Vercel dashboard instead)
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+
+# PM2 logs
+logs/
+*.log
+ecosystem.config.js
+
+# Testing
+.nyc_output
+coverage/
