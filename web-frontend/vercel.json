@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "name": "fataplus-frontend",
+  "name": "fataplus-frontend-updated",
   "framework": "nextjs",
   "buildCommand": "npm run build",
   "devCommand": "npm run dev",
