@@ -1,19 +1,19 @@
-# Cloudflare Workers configuration for Fataplus MCP Server
-name = "fataplus-mcp-server"
-main = "src/worker.ts"
+# Cloudflare Workers configuration for Fataplus Backend API
+name = "fataplus-api"
+main = "src/worker.js"
 compatibility_date = "2024-01-01"
 compatibility_flags = ["nodejs_compat"]
 
 # Account configuration
 account_id = "f30dd0d409679ae65e841302cc0caa8c"
 
-# Variables d'environnement
+# Environment variables
 [vars]
 ENVIRONMENT = "production"
 LOG_LEVEL = "info"
 CORS_ORIGINS = "https://fataplus.com,https://app.fataplus.com"
 
-# D1 Database bindings (utilisant la base existante)
+# D1 Database bindings (utilisant les bases existantes)
 [[d1_databases]]
 binding = "DB"
 database_name = "fataplus-app"
@@ -23,48 +23,51 @@ database_id = "51ccc3a9-b4ca-4250-812d-65c9eebc4111"
 [[kv_namespaces]]
 binding = "CACHE"
 id = "5411019ff86f410a98f4616ce775d081"
+preview_id = "5411019ff86f410a98f4616ce775d081"
 
 [[kv_namespaces]]
-binding = "MCP_DATA"
-id = "9ce26ca5fe4c446d8146cfa213f9775f"
+binding = "APP_DATA"
+id = "a1ab5e29ebde43e39ce68db5715d78c7"
+preview_id = "d4d9d34331644d1e9ec82521819e38be"
 
 # Analytics engine bindings
 [[analytics_engine_datasets]]
 binding = "ANALYTICS"
 
-# AI bindings for MCP AI processing
+# AI bindings for Cloudflare Workers AI
 [ai]
 binding = "AI"
 
 # Environment-specific configurations
 [env.staging]
-name = "fataplus-mcp-staging"
+name = "fataplus-api-staging"
 
 [env.staging.vars]
 ENVIRONMENT = "staging"
 LOG_LEVEL = "debug"
 CORS_ORIGINS = "https://staging.fataplus.com,https://*.pages.dev"
 
-# Staging bindings
+# Staging D1 Database
 [[env.staging.d1_databases]]
 binding = "DB"
 database_name = "fataplus-app"
 database_id = "51ccc3a9-b4ca-4250-812d-65c9eebc4111"
 
+# Staging KV namespaces
 [[env.staging.kv_namespaces]]
 binding = "CACHE"
 id = "5411019ff86f410a98f4616ce775d081"
+preview_id = "5411019ff86f410a98f4616ce775d081"
 
 [[env.staging.kv_namespaces]]
-binding = "MCP_DATA"
-id = "9ce26ca5fe4c446d8146cfa213f9775f"
+binding = "APP_DATA"
+id = "a1ab5e29ebde43e39ce68db5715d78c7"
+preview_id = "d4d9d34331644d1e9ec82521819e38be"
 
+# Staging Analytics
 [[env.staging.analytics_engine_datasets]]
 binding = "ANALYTICS"
 
+# Staging AI
 [env.staging.ai]
 binding = "AI"
-
-# Observability
-[observability]
-enabled = true

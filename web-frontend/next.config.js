@@ -1,43 +1,39 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Remove static export for Vercel deployment - Vercel supports full Next.js features
-  // output: 'export',
-
-  // Environment variables
+  // Environment variables avec nouvelles URLs
   env: {
-    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000',
-    NEXT_PUBLIC_AI_API_URL: process.env.NEXT_PUBLIC_AI_API_URL || 'http://localhost:8001',
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'https://fataplus-worker.fata-plus.workers.dev',
+    NEXT_PUBLIC_AI_API_URL: process.env.NEXT_PUBLIC_AI_API_URL || 'https://fataplus-worker.fata-plus.workers.dev/ai',
+    NEXT_PUBLIC_MCP_SERVER_URL: process.env.NEXT_PUBLIC_MCP_SERVER_URL || 'https://fataplus-mcp.fata-plus.workers.dev',
   },
 
-  // Image optimization settings for Vercel
+  // Image optimization - ajout du nouveau domaine
   images: {
-    domains: ['localhost', 'tech.fata.plus', 'fata.plus'],
-    // unoptimized: true, // Not needed for Vercel
+    domains: [
+      'localhost', 
+      'fata.plus', 
+      'app.fata.plus',
+      'fataplus-staging.pages.dev',
+      'fataplus-worker.fata-plus.workers.dev'
+    ],
   },
 
-  // Experimental features for better performance
+  // Experimental features pour de meilleures performances
   experimental: {
-    // Enable webpack build worker
     webpackBuildWorker: true,
   },
 
   // TypeScript strict mode
   typescript: {
-    // !! WARN !!
-    // Dangerously allow production builds to successfully complete even if
-    // your project has type errors.
-    // !! WARN !!
     ignoreBuildErrors: false,
   },
 
   // ESLint configuration
   eslint: {
-    // Warning: This allows production builds to successfully complete even if
-    // your project has ESLint errors.
     ignoreDuringBuilds: false,
   },
 
-  // Headers for security and performance
+  // Headers pour la sécurité et la performance
   async headers() {
     return [
       {
@@ -55,26 +51,30 @@ const nextConfig = {
             key: 'Referrer-Policy',
             value: 'origin-when-cross-origin',
           },
+          {
+            key: 'X-Powered-By',
+            value: 'Fataplus AgriTech Platform',
+          },
         ],
       },
     ];
   },
 
-  // Redirects and rewrites (disabled for static export)
-  // async rewrites() {
-  //   return [
-  //     // API proxy for development
-  //     {
-  //       source: '/api/:path*',
-  //       destination: 'http://web-backend:8000/api/:path*',
-  //     },
-  //     // AI services proxy for development
-  //     {
-  //       source: '/ai/:path*',
-  //       destination: 'http://ai-services:8001/:path*',
-  //     },
-  //   ];
-  // },
+  // Configuration pour Cloudflare Pages
+  trailingSlash: false,
+  poweredByHeader: false,
+
+  // Configuration des redirections pour le nouveau domaine
+  async redirects() {
+    return [
+      // Redirection des anciennes URLs si nécessaire
+      {
+        source: '/old-path/:path*',
+        destination: '/new-path/:path*',
+        permanent: true,
+      },
+    ];
+  },
 };
 
 module.exports = nextConfig;

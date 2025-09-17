@@ -1,0 +1,16 @@
+{
+  "name": "fataplus-worker",
+  "version": "1.0.0",
+  "description": "Fataplus AgriTech Platform - Cloudflare Worker",
+  "main": "src/worker.js",
+  "scripts": {
+    "build": "echo 'No build step required'",
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "deploy:staging": "wrangler deploy --env staging",
+    "deploy:production": "wrangler deploy --env production"
+  },
+  "keywords": ["cloudflare", "worker", "agritech", "fataplus"],
+  "author": "Fataplus Team",
+  "license": "MIT"
+}

@@ -1,0 +1,12 @@
+{
+  "ai_enabled": true,
+  "models": {
+    "text": "@cf/meta/llama-3.1-8b-instruct",
+    "embeddings": "@cf/baai/bge-base-en-v1.5"
+  },
+  "features": {
+    "autorag": true,
+    "agricultural_insights": true,
+    "weather_analysis": true
+  }
+}

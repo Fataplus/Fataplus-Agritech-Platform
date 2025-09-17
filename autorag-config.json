@@ -1,0 +1,30 @@
+{
+  "autorag": {
+    "enabled": true,
+    "vectorize_index": "fataplus-autorag",
+    "models": {
+      "text_generation": "@cf/meta/llama-3.1-8b-instruct",
+      "embeddings": "@cf/baai/bge-base-en-v1.5",
+      "fallback_text": "@cf/microsoft/DialoGPT-medium"
+    },
+    "agricultural_categories": [
+      "agronomie",
+      "météo", 
+      "élevage",
+      "marché",
+      "techniques",
+      "sustainability"
+    ],
+    "search_config": {
+      "topK": 5,
+      "threshold": 0.7,
+      "return_metadata": true
+    }
+  },
+  "domain": "app.fata.plus",
+  "deployment": {
+    "worker_url": "https://fataplus-worker.fata-plus.workers.dev",
+    "pages_url": "https://app.fata.plus",
+    "mcp_url": "https://fataplus-mcp.fata-plus.workers.dev"
+  }
+}
