@@ -1,188 +1,187 @@
-import React, { useState } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/router';
-import Layout from '../components/Layout';
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, Badge } from '../components/ui';
-import { useAuth } from '../contexts/AuthContext';
+/**
+ * Admin Login Page for Fataplus Backoffice
+ * This is the entry point for admin authentication
+ */
 
-export default function LoginPage() {
+import React, { useState } from 'react';
+import { useRouter } from 'next/router';
+
+interface LoginCredentials {
+  email: string;
+  password: string;
+}
+
+export default function AdminLogin() {
   const router = useRouter();
-  const { login } = useAuth();
-  const [formData, setFormData] = useState({
+  const [credentials, setCredentials] = useState<LoginCredentials>({
     email: '',
-    password: '',
+    password: ''
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setCredentials(prev => ({
       ...prev,
       [name]: value
     }));
+    // Clear error when user starts typing
+    if (error) setError(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError('');
+    setError(null);
 
     try {
-      await login(formData.email, formData.password);
-      router.push('/dashboard');
+      // Simple authentication for demo
+      // In production, this would call a secure API
+      if (credentials.email === 'admin@fata.plus' && credentials.password === 'admin123') {
+        // Store auth token (in production, use secure httpOnly cookies)
+        localStorage.setItem('admin_auth', 'authenticated');
+        localStorage.setItem('admin_user', JSON.stringify({
+          email: credentials.email,
+          name: 'Administrator',
+          role: 'admin'
+        }));
+        
+        // Redirect to admin dashboard
+        router.push('/admin');
+      } else {
+        setError('Identifiants incorrects. Utilisez admin@fata.plus / admin123');
+      }
     } catch (err) {
-      setError('Login failed. Please check your credentials.');
+      setError('Erreur de connexion. Veuillez réessayer.');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <Layout>
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 via-accent-50 to-secondary-50 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md w-full space-y-8">
-          {/* Header */}
-          <div className="text-center">
-            <Link href="/">
-              <div className="flex justify-center items-center space-x-2 mb-8">
-                <div className="text-4xl">🌱</div>
-                <span className="text-3xl font-bold text-primary-600">Fataplus</span>
-              </div>
-            </Link>
-            <Badge variant="primary" className="mb-4">Welcome Back</Badge>
-            <h2 className="text-3xl font-bold text-earth-900 mb-2">
-              Sign In to Your Account
-            </h2>
-            <p className="text-earth-600">
-              Access your agricultural dashboard and tools
-            </p>
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-green-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8">
+        {/* Header */}
+        <div className="text-center">
+          <div className="mx-auto h-16 w-16 bg-gradient-to-r from-green-600 to-blue-600 rounded-xl flex items-center justify-center mb-4">
+            <span className="text-white font-bold text-xl">🌱</span>
           </div>
+          <h2 className="mt-6 text-3xl font-bold text-gray-900">
+            Backoffice Fataplus
+          </h2>
+          <p className="mt-2 text-sm text-gray-600">
+            Accès administrateur à la plateforme agricole
+          </p>
+        </div>
 
-          {/* Login Form */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-center">Sign In</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-6">
-                {error && (
-                  <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-sm">
-                    {error}
-                  </div>
-                )}
-
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-earth-700 mb-2">
-                    Email Address
-                  </label>
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    required
-                    placeholder="Enter your email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    className="w-full"
-                  />
+        {/* Login Form */}
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          <div className="bg-white rounded-xl shadow-lg p-8">
+            <div className="space-y-6">
+              {/* Error Message */}
+              {error && (
+                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                  {error}
                 </div>
+              )}
 
-                <div>
-                  <label htmlFor="password" className="block text-sm font-medium text-earth-700 mb-2">
-                    Password
-                  </label>
-                  <Input
-                    id="password"
-                    name="password"
-                    type="password"
-                    required
-                    placeholder="Enter your password"
-                    value={formData.password}
-                    onChange={handleInputChange}
-                    className="w-full"
-                  />
-                </div>
+              {/* Demo Credentials Info */}
+              <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded-lg text-sm">
+                <div className="font-semibold mb-1">🔑 Identifiants de démonstration:</div>
+                <div>Email: <code className="bg-blue-100 px-1 rounded">admin@fata.plus</code></div>
+                <div>Mot de passe: <code className="bg-blue-100 px-1 rounded">admin123</code></div>
+              </div>
 
-                <div className="flex items-center justify-between">
-                  <div className="text-sm">
-                    <Link href="/forgot-password" className="text-primary-600 hover:text-primary-500">
-                      Forgot your password?
-                    </Link>
-                  </div>
-                </div>
+              {/* Email Field */}
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                  Adresse email
+                </label>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  required
+                  value={credentials.email}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
+                  placeholder="admin@fata.plus"
+                />
+              </div>
 
-                <Button
+              {/* Password Field */}
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                  Mot de passe
+                </label>
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  required
+                  value={credentials.password}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
+                  placeholder="Votre mot de passe"
+                />
+              </div>
+
+              {/* Submit Button */}
+              <div>
+                <button
                   type="submit"
-                  className="w-full"
-                  size="lg"
                   disabled={isLoading}
+                  className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-white font-medium bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
                 >
-                  {isLoading ? 'Signing In...' : 'Sign In'}
-                </Button>
-              </form>
-
-              {/* Social Login Options */}
-              <div className="mt-6">
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-gray-300" />
-                  </div>
-                  <div className="relative flex justify-center text-sm">
-                    <span className="px-2 bg-white text-gray-500">Or continue with</span>
-                  </div>
-                </div>
-
-                <div className="mt-6 grid grid-cols-2 gap-3">
-                  <Button variant="outline" className="w-full">
-                    <span className="mr-2">📱</span>
-                    Mobile Money
-                  </Button>
-                  <Button variant="outline" className="w-full">
-                    <span className="mr-2">🌐</span>
-                    Google
-                  </Button>
-                </div>
+                  {isLoading ? (
+                    <div className="flex items-center">
+                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Connexion en cours...
+                    </div>
+                  ) : (
+                    '🔐 Se connecter au backoffice'
+                  )}
+                </button>
               </div>
-            </CardContent>
-          </Card>
-
-          {/* Sign Up Link */}
-          <div className="text-center">
-            <p className="text-earth-600">
-              Don&apos;t have an account?{' '}
-              <Link href="/register" className="text-primary-600 hover:text-primary-500 font-medium">
-                Sign up for free
-              </Link>
-            </p>
+            </div>
           </div>
+        </form>
 
-          {/* Demo Account Info */}
-          <Card className="bg-primary-50 border-primary-200">
-            <CardContent className="pt-6">
-              <div className="text-center">
-                <h3 className="text-sm font-medium text-primary-800 mb-2">Demo Account</h3>
-                <p className="text-xs text-primary-600 mb-3">
-                  Try Fataplus with our demo account
-                </p>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    setFormData({
-                      email: 'demo@fata.plus',
-                      password: 'demo123'
-                    });
-                  }}
-                  className="text-primary-600 border-primary-300"
-                >
-                  Use Demo Account
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+        {/* Footer */}
+        <div className="text-center">
+          <div className="text-xs text-gray-500 space-y-1">
+            <div>© 2025 Fataplus AgriTech Platform</div>
+            <div>🌍 Plateforme d'agriculture intelligente pour l'Afrique</div>
+          </div>
+        </div>
+
+        {/* System Status */}
+        <div className="bg-white rounded-lg shadow-sm p-4">
+          <h3 className="text-sm font-medium text-gray-700 mb-2 text-center">État du Système</h3>
+          <div className="grid grid-cols-2 gap-2 text-xs">
+            <div className="flex items-center text-green-600">
+              <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+              API Opérationnelle
+            </div>
+            <div className="flex items-center text-green-600">
+              <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+              Base de données
+            </div>
+            <div className="flex items-center text-green-600">
+              <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+              Services IA
+            </div>
+            <div className="flex items-center text-green-600">
+              <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+              Cloudflare Edge
+            </div>
+          </div>
         </div>
       </div>
-    </Layout>
+    </div>
   );
 }

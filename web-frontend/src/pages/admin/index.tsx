@@ -1,10 +1,11 @@
 /**
- * Admin Dashboard Simplified Version
- * Simplified version for initial deployment
+ * Admin Dashboard - Protected by Authentication
+ * Main dashboard for Fataplus backoffice administration
  */
 
 import React, { useEffect, useState } from 'react';
-// Admin Dashboard - Simplified for deployment
+import { useRouter } from 'next/router';
+import { useAuth } from '../../lib/auth';
 
 interface Metrics {
   total_users: number;
@@ -15,9 +16,19 @@ interface Metrics {
 }
 
 export default function AdminDashboard() {
+  const router = useRouter();
+  const { isAuthenticated, user, logout } = useAuth();
   const [metrics, setMetrics] = useState<Metrics | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Check authentication on component mount
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.replace('/login');
+      return;
+    }
+  }, [isAuthenticated, router]);
 
   useEffect(() => {
     const fetchMetrics = async () => {
@@ -42,6 +53,18 @@ export default function AdminDashboard() {
 
     fetchMetrics();
   }, []);
+
+  // Don't render if not authenticated
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Vérification de l'authentification...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
@@ -77,9 +100,20 @@ export default function AdminDashboard() {
               </h1>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                ✅ Production
-              </span>
+              <div className="flex items-center space-x-3">
+                <span className="text-sm text-gray-600">
+                  👋 Bienvenue, {user?.name || 'Administrateur'}
+                </span>
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                  ✅ Production
+                </span>
+                <button
+                  onClick={logout}
+                  className="inline-flex items-center px-3 py-1 border border-red-300 text-xs font-medium rounded text-red-700 bg-white hover:bg-red-50 transition-colors"
+                >
+                  🚪 Déconnexion
+                </button>
+              </div>
             </div>
           </div>
         </div>
