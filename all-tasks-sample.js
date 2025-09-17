@@ -1,624 +1,9 @@
-/**
- * Fataplus AgriTech Platform - Cloudflare Worker
- * Main API endpoint for the Fataplus application
- */
+// Échantillon représentatif des 338 tâches du projet Fataplus
+// Organisé par spécifications et catégories avec statuts réalistes
 
-export default {
-  async fetch(request, env, ctx) {
-    const url = new URL(request.url);
-    
-    // CORS headers
-    const corsHeaders = {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    };
-
-    // Handle preflight requests
-    if (request.method === 'OPTIONS') {
-      return new Response(null, { headers: corsHeaders });
-    }
-
-    try {
-      // Route handling
-      switch (url.pathname) {
-        case '/':
-          return handleRoot(env);
-        
-        case '/health':
-          return handleHealth(env);
-        
-        case '/api/weather':
-          return handleWeather(request, env);
-        
-        case '/api/crops':
-          return handleCrops(request, env);
-        
-        case '/api/livestock':
-          return handleLivestock(request, env);
-        
-        case '/api/market':
-          return handleMarket(request, env);
-        
-        case '/api/knowledge/add':
-          return handleKnowledgeAdd(request, env);
-        
-        case '/api/knowledge/search':
-          return handleKnowledgeSearch(request, env);
-        
-        case '/api/todos':
-          return handleTodos(request, env);
-        
-        case '/api/todos/add':
-          return handleTodoAdd(request, env);
-        
-        case '/api/todos/update':
-          return handleTodoUpdate(request, env);
-        
-        default:
-          return new Response('Not Found', { 
-            status: 404,
-            headers: corsHeaders 
-          });
-      }
-    } catch (error) {
-      console.error('Worker error:', error);
-      return new Response('Internal Server Error', { 
-        status: 500,
-        headers: corsHeaders 
-      });
-    }
-  },
-};
-
-// Handler functions
-async function handleRoot(env) {
-  const response = {
-    service: 'Fataplus AgriTech API',
-    version: '1.0.0',
-    environment: env.ENVIRONMENT || 'development',
-    timestamp: new Date().toISOString(),
-    endpoints: [
-      '/health - Health check',
-      '/api/weather - Weather predictions',
-      '/api/crops - Crop management',
-      '/api/livestock - Livestock management', 
-      '/api/market - Market analysis',
-      '/api/knowledge/add - Add knowledge to AutoRAG',
-      '/api/knowledge/search - Search knowledge base',
-      '/api/todos - Get all tasks',
-      '/api/todos/add - Add new task',
-      '/api/todos/update - Update task status'
-    ]
-  };
-
-  return new Response(JSON.stringify(response, null, 2), {
-    headers: {
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*'
-    }
-  });
-}
-
-async function handleHealth(env) {
-  const health = {
-    status: 'healthy',
-    timestamp: new Date().toISOString(),
-    services: {
-      database: await checkDatabase(env),
-      cache: await checkCache(env),
-      ai: await checkAI(env)
-    }
-  };
-
-  return new Response(JSON.stringify(health), {
-    headers: {
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*'
-    }
-  });
-}
-
-async function handleWeather(request, env) {
-  // Placeholder pour l'API météo
-  const weather = {
-    location: 'Madagascar',
-    current: {
-      temperature: 25,
-      humidity: 70,
-      condition: 'Partly Cloudy'
-    },
-    forecast: [
-      { day: 'Today', temp: 25, condition: 'Sunny' },
-      { day: 'Tomorrow', temp: 27, condition: 'Rain' }
-    ],
-    recommendations: [
-      'Good conditions for planting rice',
-      'Consider irrigation due to upcoming rain'
-    ]
-  };
-
-  return new Response(JSON.stringify(weather), {
-    headers: {
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*'
-    }
-  });
-}
-
-async function handleCrops(request, env) {
-  // Placeholder pour la gestion des cultures
-  const crops = {
-    crops: [
-      {
-        id: 1,
-        name: 'Rice',
-        status: 'Growing',
-        stage: 'Flowering',
-        health: 'Good',
-        estimated_harvest: '2024-03-15'
-      },
-      {
-        id: 2,
-        name: 'Cassava',
-        status: 'Mature',
-        stage: 'Ready',
-        health: 'Excellent',
-        estimated_harvest: '2024-01-20'
-      }
-    ],
-    recommendations: [
-      'Monitor rice for pests during flowering',
-      'Cassava ready for harvest - optimal conditions'
-    ]
-  };
-
-  return new Response(JSON.stringify(crops), {
-    headers: {
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*'
-    }
-  });
-}
-
-async function handleLivestock(request, env) {
-  // Placeholder pour la gestion du bétail
-  const livestock = {
-    animals: [
-      {
-        id: 1,
-        type: 'Zebu Cattle',
-        count: 15,
-        health: 'Good',
-        vaccination_status: 'Up to date'
-      },
-      {
-        id: 2,
-        type: 'Chickens',
-        count: 50,
-        health: 'Excellent',
-        egg_production: '40 eggs/day'
-      }
-    ],
-    alerts: [
-      'Vaccination due for cattle in 2 weeks'
-    ]
-  };
-
-  return new Response(JSON.stringify(livestock), {
-    headers: {
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*'
-    }
-  });
-}
-
-async function handleMarket(request, env) {
-  // Placeholder pour l'analyse de marché
-  const market = {
-    prices: [
-      {
-        commodity: 'Rice',
-        price: 1200,
-        currency: 'MGA',
-        unit: 'kg',
-        trend: 'up',
-        change: '+5%'
-      },
-      {
-        commodity: 'Cassava',
-        price: 800,
-        currency: 'MGA', 
-        unit: 'kg',
-        trend: 'stable',
-        change: '0%'
-      }
-    ],
-    recommendations: [
-      'Good time to sell rice - prices trending up',
-      'Hold cassava - stable market conditions'
-    ]
-  };
-
-  return new Response(JSON.stringify(market), {
-    headers: {
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*'
-    }
-  });
-}
-
-// Service health checks
-async function checkDatabase(env) {
-  try {
-    if (env.DB) {
-      // Test query to D1 database
-      await env.DB.prepare('SELECT 1').first();
-      return { status: 'healthy', service: 'D1' };
-    }
-    return { status: 'not_configured', service: 'D1' };
-  } catch (error) {
-    return { status: 'error', service: 'D1', error: error.message };
-  }
-}
-
-async function checkCache(env) {
-  try {
-    if (env.CACHE) {
-      // Test KV store
-      await env.CACHE.get('health_check');
-      return { status: 'healthy', service: 'KV' };
-    }
-    return { status: 'not_configured', service: 'KV' };
-  } catch (error) {
-    return { status: 'error', service: 'KV', error: error.message };
-  }
-}
-
-async function checkAI(env) {
-  try {
-    if (env.AI) {
-      return { status: 'healthy', service: 'Workers AI' };
-    }
-    return { status: 'not_configured', service: 'Workers AI' };
-  } catch (error) {
-    return { status: 'error', service: 'Workers AI', error: error.message };
-  }
-}
-
-// Knowledge base functions for AutoRAG
-async function handleKnowledgeAdd(request, env) {
-  if (request.method !== 'POST') {
-    return new Response('Method not allowed', { 
-      status: 405,
-      headers: { 'Access-Control-Allow-Origin': '*' }
-    });
-  }
-
-  try {
-    const knowledge = await request.json();
-    
-    if (!knowledge.id || !knowledge.content) {
-      return new Response(JSON.stringify({ error: 'Missing required fields: id, content' }), {
-        status: 400,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
-        }
-      });
-    }
-
-    // Generate embedding using Cloudflare AI
-    const embedding = await env.AI.run('@cf/baai/bge-base-en-v1.5', {
-      text: knowledge.content
-    });
-
-    if (!embedding || !embedding.data) {
-      throw new Error('Failed to generate embedding');
-    }
-
-    // Ensure embedding data is properly formatted as array of numbers
-    const embeddingVector = Array.isArray(embedding.data[0]) ? embedding.data[0] : embedding.data;
-
-    // Add to Vectorize index
-    await env.VECTORIZE.upsert([{
-      id: knowledge.id,
-      values: embeddingVector,
-      metadata: {
-        title: knowledge.title || '',
-        content: knowledge.content,
-        category: knowledge.category || '',
-        tags: JSON.stringify(knowledge.tags || []),
-        timestamp: new Date().toISOString()
-      }
-    }]);
-
-    return new Response(JSON.stringify({ 
-      success: true, 
-      message: 'Knowledge added to AutoRAG',
-      id: knowledge.id
-    }), {
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      }
-    });
-
-  } catch (error) {
-    console.error('Knowledge add error:', error);
-    return new Response(JSON.stringify({ 
-      error: 'Failed to add knowledge', 
-      details: error.message 
-    }), {
-      status: 500,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      }
-    });
-  }
-}
-
-async function handleKnowledgeSearch(request, env) {
-  if (request.method !== 'POST') {
-    return new Response('Method not allowed', { 
-      status: 405,
-      headers: { 'Access-Control-Allow-Origin': '*' }
-    });
-  }
-
-  try {
-    const { query, limit = 5 } = await request.json();
-    
-    if (!query) {
-      return new Response(JSON.stringify({ error: 'Missing query parameter' }), {
-        status: 400,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
-        }
-      });
-    }
-
-    // Generate embedding for the query
-    const queryEmbedding = await env.AI.run('@cf/baai/bge-base-en-v1.5', {
-      text: query
-    });
-
-    if (!queryEmbedding || !queryEmbedding.data) {
-      throw new Error('Failed to generate query embedding');
-    }
-
-    // Ensure query embedding is properly formatted
-    const queryVector = Array.isArray(queryEmbedding.data[0]) ? queryEmbedding.data[0] : queryEmbedding.data;
-
-    // Search in Vectorize index
-    const results = await env.VECTORIZE.query(queryVector, {
-      topK: limit,
-      returnMetadata: true
-    });
-
-    // Format results
-    const formattedResults = results.matches.map(match => ({
-      id: match.id,
-      score: match.score,
-      title: match.metadata.title,
-      content: match.metadata.content,
-      category: match.metadata.category,
-      tags: JSON.parse(match.metadata.tags || '[]')
-    }));
-
-    return new Response(JSON.stringify({
-      query,
-      results: formattedResults,
-      count: formattedResults.length
-    }), {
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      }
-    });
-
-  } catch (error) {
-    console.error('Knowledge search error:', error);
-    return new Response(JSON.stringify({ 
-      error: 'Failed to search knowledge base', 
-      details: error.message 
-    }), {
-      status: 500,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      }
-    });
-  }
-}
-
-// Todo management functions
-async function handleTodos(request, env) {
-  if (request.method !== 'GET') {
-    return new Response('Method not allowed', { 
-      status: 405,
-      headers: { 'Access-Control-Allow-Origin': '*' }
-    });
-  }
-
-  try {
-    // Get todos from KV store
-    const todosData = await env.APP_DATA.get('project_todos');
-    const todos = todosData ? JSON.parse(todosData) : getDefaultTodos();
-
-    return new Response(JSON.stringify({
-      todos: todos,
-      total: todos.length,
-      completed: todos.filter(t => t.status === 'completed').length,
-      in_progress: todos.filter(t => t.status === 'in_progress').length,
-      pending: todos.filter(t => t.status === 'pending').length
-    }), {
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      }
-    });
-
-  } catch (error) {
-    console.error('Todos fetch error:', error);
-    return new Response(JSON.stringify({ 
-      error: 'Failed to fetch todos', 
-      details: error.message 
-    }), {
-      status: 500,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      }
-    });
-  }
-}
-
-async function handleTodoAdd(request, env) {
-  if (request.method !== 'POST') {
-    return new Response('Method not allowed', { 
-      status: 405,
-      headers: { 'Access-Control-Allow-Origin': '*' }
-    });
-  }
-
-  try {
-    const newTodo = await request.json();
-    
-    if (!newTodo.content || !newTodo.priority) {
-      return new Response(JSON.stringify({ error: 'Missing required fields: content, priority' }), {
-        status: 400,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
-        }
-      });
-    }
-
-    // Get existing todos
-    const todosData = await env.APP_DATA.get('project_todos');
-    const todos = todosData ? JSON.parse(todosData) : getDefaultTodos();
-
-    // Add new todo
-    const todo = {
-      id: newTodo.id || Date.now().toString(),
-      content: newTodo.content,
-      priority: newTodo.priority,
-      status: newTodo.status || 'pending',
-      created: new Date().toISOString(),
-      category: newTodo.category || 'general'
-    };
-
-    todos.push(todo);
-
-    // Save back to KV
-    await env.APP_DATA.put('project_todos', JSON.stringify(todos));
-
-    return new Response(JSON.stringify({ 
-      success: true, 
-      todo: todo,
-      message: 'Todo added successfully'
-    }), {
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      }
-    });
-
-  } catch (error) {
-    console.error('Todo add error:', error);
-    return new Response(JSON.stringify({ 
-      error: 'Failed to add todo', 
-      details: error.message 
-    }), {
-      status: 500,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      }
-    });
-  }
-}
-
-async function handleTodoUpdate(request, env) {
-  if (request.method !== 'PUT') {
-    return new Response('Method not allowed', { 
-      status: 405,
-      headers: { 'Access-Control-Allow-Origin': '*' }
-    });
-  }
-
-  try {
-    const updateData = await request.json();
-    
-    if (!updateData.id) {
-      return new Response(JSON.stringify({ error: 'Missing todo ID' }), {
-        status: 400,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
-        }
-      });
-    }
-
-    // Get existing todos
-    const todosData = await env.APP_DATA.get('project_todos');
-    const todos = todosData ? JSON.parse(todosData) : getDefaultTodos();
-
-    // Find and update todo
-    const todoIndex = todos.findIndex(t => t.id === updateData.id);
-    if (todoIndex === -1) {
-      return new Response(JSON.stringify({ error: 'Todo not found' }), {
-        status: 404,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
-        }
-      });
-    }
-
-    // Update fields
-    if (updateData.status) todos[todoIndex].status = updateData.status;
-    if (updateData.content) todos[todoIndex].content = updateData.content;
-    if (updateData.priority) todos[todoIndex].priority = updateData.priority;
-    if (updateData.category) todos[todoIndex].category = updateData.category;
-    todos[todoIndex].updated = new Date().toISOString();
-
-    // Save back to KV
-    await env.APP_DATA.put('project_todos', JSON.stringify(todos));
-
-    return new Response(JSON.stringify({ 
-      success: true, 
-      todo: todos[todoIndex],
-      message: 'Todo updated successfully'
-    }), {
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      }
-    });
-
-  } catch (error) {
-    console.error('Todo update error:', error);
-    return new Response(JSON.stringify({ 
-      error: 'Failed to update todo', 
-      details: error.message 
-    }), {
-      status: 500,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      }
-    });
-  }
-}
-
-// Default todos with project tasks
-function getDefaultTodos() {
+function getAllProjectTasks() {
   return [
-    // === 001-fataplus-agritech-platform - Infrastructure Setup ===
+    // === 001-fataplus-agritech-platform - Infrastructure Setup (15 tâches) ===
     { id: "T001", content: "Set up repository structure with 4 main projects", status: "completed", priority: "high", category: "infrastructure-setup", specification: "001-fataplus-agritech-platform", created: "2025-09-10T00:00:00Z", completed: "2025-09-11T00:00:00Z" },
     { id: "T002", content: "Initialize GitHub repository with protected main branch and feature branch workflow", status: "completed", priority: "high", category: "infrastructure-setup", specification: "001-fataplus-agritech-platform", created: "2025-09-10T00:00:00Z", completed: "2025-09-11T00:00:00Z" },
     { id: "T003", content: "Set up CI/CD pipeline with GitHub Actions for all services", status: "completed", priority: "high", category: "infrastructure-setup", specification: "001-fataplus-agritech-platform", created: "2025-09-10T00:00:00Z", completed: "2025-09-12T00:00:00Z" },
@@ -635,7 +20,7 @@ function getDefaultTodos() {
     { id: "T014", content: "Initialize logging and tracing infrastructure (Winston, OpenTelemetry)", status: "pending", priority: "low", category: "infrastructure-setup", specification: "001-fataplus-agritech-platform", created: "2025-09-10T00:00:00Z" },
     { id: "T015", content: "Configure backup and disaster recovery systems", status: "pending", priority: "medium", category: "infrastructure-setup", specification: "001-fataplus-agritech-platform", created: "2025-09-10T00:00:00Z" },
 
-    // === Authentication & Security ===
+    // === Authentication & Security (12 tâches) ===
     { id: "T027", content: "Design and implement multi-tenant authentication system", status: "pending", priority: "high", category: "authentication-security", specification: "001-fataplus-agritech-platform", created: "2025-09-10T00:00:00Z" },
     { id: "T028", content: "Create JWT-based API authentication with refresh tokens", status: "pending", priority: "high", category: "authentication-security", specification: "001-fataplus-agritech-platform", created: "2025-09-10T00:00:00Z" },
     { id: "T029", content: "Implement role-based access control (RBAC) system", status: "pending", priority: "high", category: "authentication-security", specification: "001-fataplus-agritech-platform", created: "2025-09-10T00:00:00Z" },
@@ -643,42 +28,42 @@ function getDefaultTodos() {
     { id: "T031", content: "Set up OAuth2 integration for external services", status: "pending", priority: "medium", category: "authentication-security", specification: "001-fataplus-agritech-platform", created: "2025-09-10T00:00:00Z" },
     { id: "T032", content: "Implement API rate limiting and abuse protection", status: "pending", priority: "medium", category: "authentication-security", specification: "001-fataplus-agritech-platform", created: "2025-09-10T00:00:00Z" },
 
-    // === Database & Core Models ===
+    // === Database & Core Models (11 tâches) ===
     { id: "T016", content: "Create PostgreSQL schema with all entities from data-model.md", status: "pending", priority: "high", category: "database-core-models", specification: "001-fataplus-agritech-platform", created: "2025-09-10T00:00:00Z" },
     { id: "T017", content: "Implement database migrations with versioning and rollback", status: "pending", priority: "high", category: "database-core-models", specification: "001-fataplus-agritech-platform", created: "2025-09-10T00:00:00Z" },
     { id: "T018", content: "Create organization management models (users, roles, permissions)", status: "pending", priority: "high", category: "database-core-models", specification: "001-fataplus-agritech-platform", created: "2025-09-10T00:00:00Z" },
     { id: "T019", content: "Implement farm and agricultural entity models (crops, livestock, equipment)", status: "pending", priority: "medium", category: "database-core-models", specification: "001-fataplus-agritech-platform", created: "2025-09-10T00:00:00Z" },
     { id: "T020", content: "Build context management models (contexts, instances, configurations)", status: "pending", priority: "medium", category: "database-core-models", specification: "001-fataplus-agritech-platform", created: "2025-09-10T00:00:00Z" },
 
-    // === Core API Development - Users ===
+    // === Core API Development - Users (10 tâches) ===
     { id: "T044", content: "Implement users API routes in web-backend/src/routes/users.py", status: "pending", priority: "high", category: "core-api-development-users", specification: "001-fataplus-agritech-platform", created: "2025-09-10T00:00:00Z" },
     { id: "T045", content: "Implement user CRUD operations with validation", status: "pending", priority: "high", category: "core-api-development-users", specification: "001-fataplus-agritech-platform", created: "2025-09-10T00:00:00Z" },
     { id: "T046", content: "Build role assignment and permission management", status: "pending", priority: "high", category: "core-api-development-users", specification: "001-fataplus-agritech-platform", created: "2025-09-10T00:00:00Z" },
     { id: "T047", content: "Create user service layer with business logic", status: "pending", priority: "medium", category: "core-api-development-users", specification: "001-fataplus-agritech-platform", created: "2025-09-10T00:00:00Z" },
     { id: "T048", content: "Implement user search and filtering capabilities", status: "pending", priority: "medium", category: "core-api-development-users", specification: "001-fataplus-agritech-platform", created: "2025-09-10T00:00:00Z" },
 
-    // === Core API Development - Farms ===
+    // === Core API Development - Farms (13 tâches) ===
     { id: "T057", content: "Implement farms API routes in web-backend/src/routes/farms.py", status: "pending", priority: "high", category: "core-api-development-farms", specification: "001-fataplus-agritech-platform", created: "2025-09-10T00:00:00Z" },
     { id: "T058", content: "Build farm CRUD operations with geospatial support", status: "pending", priority: "high", category: "core-api-development-farms", specification: "001-fataplus-agritech-platform", created: "2025-09-10T00:00:00Z" },
     { id: "T059", content: "Implement crop management with growth tracking", status: "pending", priority: "medium", category: "core-api-development-farms", specification: "001-fataplus-agritech-platform", created: "2025-09-10T00:00:00Z" },
     { id: "T060", content: "Create livestock management with health monitoring", status: "pending", priority: "medium", category: "core-api-development-farms", specification: "001-fataplus-agritech-platform", created: "2025-09-10T00:00:00Z" },
     { id: "T061", content: "Build equipment tracking and maintenance scheduling", status: "pending", priority: "low", category: "core-api-development-farms", specification: "001-fataplus-agritech-platform", created: "2025-09-10T00:00:00Z" },
 
-    // === Frontend Development - Web ===
+    // === Frontend Development - Web (10 tâches) ===
     { id: "T096", content: "Set up Next.js project with TypeScript and Tailwind CSS", status: "completed", priority: "high", category: "frontend-development-web", specification: "001-fataplus-agritech-platform", created: "2025-09-10T00:00:00Z", completed: "2025-09-14T00:00:00Z" },
     { id: "T097", content: "Implement authentication and user management UI", status: "in_progress", priority: "high", category: "frontend-development-web", specification: "001-fataplus-agritech-platform", created: "2025-09-10T00:00:00Z" },
     { id: "T098", content: "Build farm management dashboard", status: "pending", priority: "medium", category: "frontend-development-web", specification: "001-fataplus-agritech-platform", created: "2025-09-10T00:00:00Z" },
     { id: "T099", content: "Create context selection and configuration interface", status: "pending", priority: "medium", category: "frontend-development-web", specification: "001-fataplus-agritech-platform", created: "2025-09-10T00:00:00Z" },
     { id: "T100", content: "Develop responsive design for mobile and desktop", status: "in_progress", priority: "medium", category: "frontend-development-web", specification: "001-fataplus-agritech-platform", created: "2025-09-10T00:00:00Z" },
 
-    // === AI Services Integration ===
+    // === AI Services Integration (9 tâches) ===
     { id: "T125", content: "Set up AI service architecture with microservices", status: "completed", priority: "high", category: "ai-services-integration", specification: "001-fataplus-agritech-platform", created: "2025-09-10T00:00:00Z", completed: "2025-09-17T03:40:00Z" },
     { id: "T126", content: "Implement weather prediction AI models", status: "pending", priority: "medium", category: "ai-services-integration", specification: "001-fataplus-agritech-platform", created: "2025-09-10T00:00:00Z" },
     { id: "T127", content: "Build disease detection using computer vision", status: "pending", priority: "medium", category: "ai-services-integration", specification: "001-fataplus-agritech-platform", created: "2025-09-10T00:00:00Z" },
     { id: "T128", content: "Create market analysis and forecasting models", status: "pending", priority: "medium", category: "ai-services-integration", specification: "001-fataplus-agritech-platform", created: "2025-09-10T00:00:00Z" },
     { id: "T129", content: "Develop personalized recommendation engine", status: "pending", priority: "low", category: "ai-services-integration", specification: "001-fataplus-agritech-platform", created: "2025-09-10T00:00:00Z" },
 
-    // === Mobile App RAG Implementation ===
+    // === Mobile App RAG Implementation (17 tâches) ===
     { id: "T151", content: "Integrate React Native RAG library into mobile app", status: "pending", priority: "medium", category: "mobile-app-rag-implementation", specification: "001-fataplus-agritech-platform", created: "2025-09-10T00:00:00Z" },
     { id: "T152", content: "Implement offline LLM inference with ExecuTorch", status: "pending", priority: "medium", category: "mobile-app-rag-implementation", specification: "001-fataplus-agritech-platform", created: "2025-09-10T00:00:00Z" },
     { id: "T153", content: "Add SQLite vector store persistence for knowledge base", status: "pending", priority: "medium", category: "mobile-app-rag-implementation", specification: "001-fataplus-agritech-platform", created: "2025-09-10T00:00:00Z" },
@@ -689,7 +74,7 @@ function getDefaultTodos() {
     { id: "T086", content: "Integrate with agricultural commodity exchanges", status: "pending", priority: "medium", category: "context-implementations-market", specification: "001-fataplus-agritech-platform", created: "2025-09-10T00:00:00Z" },
     { id: "T087", content: "Build real-time price tracking system", status: "pending", priority: "medium", category: "context-implementations-market", specification: "001-fataplus-agritech-platform", created: "2025-09-10T00:00:00Z" },
 
-    // === 002-fataplus-design-system ===
+    // === 002-fataplus-design-system (23 tâches) ===
     { id: "DS-001", content: "Design System Repository Setup", status: "pending", priority: "high", category: "foundation-setup", specification: "002-fataplus-design-system", created: "2025-09-10T00:00:00Z" },
     { id: "DS-002", content: "Storybook Documentation Setup", status: "pending", priority: "medium", category: "foundation-setup", specification: "002-fataplus-design-system", created: "2025-09-10T00:00:00Z" },
     { id: "DS-003", content: "Testing Framework Setup", status: "pending", priority: "medium", category: "foundation-setup", specification: "002-fataplus-design-system", created: "2025-09-10T00:00:00Z" },
@@ -697,31 +82,31 @@ function getDefaultTodos() {
     { id: "DS-010", content: "Crop Management Components", status: "pending", priority: "medium", category: "agricultural-specialization", specification: "002-fataplus-design-system", created: "2025-09-10T00:00:00Z" },
     { id: "DS-011", content: "Livestock Management Components", status: "pending", priority: "medium", category: "agricultural-specialization", specification: "002-fataplus-design-system", created: "2025-09-10T00:00:00Z" },
 
-    // === 003-fataplus-mcp ===
+    // === 003-fataplus-mcp (24 tâches) ===
     { id: "MCP-001", content: "Fataplus MCP Project Setup", status: "completed", priority: "high", category: "mcp-foundation", specification: "003-fataplus-mcp", created: "2025-09-10T00:00:00Z", completed: "2025-09-17T03:45:00Z" },
     { id: "MCP-002", content: "MCP Authentication and Authorization", status: "completed", priority: "high", category: "mcp-foundation", specification: "003-fataplus-mcp", created: "2025-09-10T00:00:00Z", completed: "2025-09-17T03:46:00Z" },
     { id: "MCP-003", content: "Design System Data Integration", status: "pending", priority: "medium", category: "mcp-foundation", specification: "003-fataplus-mcp", created: "2025-09-10T00:00:00Z" },
     { id: "MCP-004", content: "Core MCP Request Handlers", status: "pending", priority: "high", category: "mcp-foundation", specification: "003-fataplus-mcp", created: "2025-09-10T00:00:00Z" },
     { id: "MCP-005", content: "Agricultural Data Foundation", status: "pending", priority: "medium", category: "agricultural-intelligence", specification: "003-fataplus-mcp", created: "2025-09-10T00:00:00Z" },
 
-    // === 004-fataplus-search-analysis ===
+    // === 004-fataplus-search-analysis (48 tâches) ===
     { id: "T1.1", content: "Project Setup", status: "pending", priority: "high", category: "foundation", specification: "004-fataplus-search-analysis", created: "2025-09-10T00:00:00Z" },
     { id: "T1.2", content: "Search Engine Architecture", status: "pending", priority: "high", category: "foundation", specification: "004-fataplus-search-analysis", created: "2025-09-10T00:00:00Z" },
     { id: "T2.1", content: "Semantic Search", status: "pending", priority: "medium", category: "core-search-features", specification: "004-fataplus-search-analysis", created: "2025-09-10T00:00:00Z" },
     { id: "T2.2", content: "Source Credibility Scoring", status: "pending", priority: "medium", category: "core-search-features", specification: "004-fataplus-search-analysis", created: "2025-09-10T00:00:00Z" },
 
-    // === 005-fataplus-context-api ===
+    // === 005-fataplus-context-api (48 tâches) ===
     { id: "T1.1-API", content: "Repository Setup", status: "pending", priority: "high", category: "foundation", specification: "005-fataplus-context-api", created: "2025-09-10T00:00:00Z" },
     { id: "T1.2-API", content: "API Architecture Design", status: "pending", priority: "high", category: "foundation", specification: "005-fataplus-context-api", created: "2025-09-10T00:00:00Z" },
     { id: "T2.1-API", content: "Basic CRUD Operations", status: "pending", priority: "medium", category: "core-api-development", specification: "005-fataplus-context-api", created: "2025-09-10T00:00:00Z" },
 
-    // === 006-agribot-space ===
+    // === 006-agribot-space (28 tâches) ===
     { id: "AB-001", content: "AgriBot.space Next.js Project Setup", status: "pending", priority: "high", category: "foundation-setup", specification: "006-agribot-space", created: "2025-09-10T00:00:00Z" },
     { id: "AB-002", content: "Keycloak Authentication Integration", status: "pending", priority: "high", category: "foundation-setup", specification: "006-agribot-space", created: "2025-09-10T00:00:00Z" },
     { id: "AB-003", content: "Real-time Chat Interface Development", status: "pending", priority: "medium", category: "foundation-setup", specification: "006-agribot-space", created: "2025-09-10T00:00:00Z" },
     { id: "AB-004", content: "MCP Client Implementation", status: "pending", priority: "medium", category: "foundation-setup", specification: "006-agribot-space", created: "2025-09-10T00:00:00Z" },
 
-    // === Déploiement et progression récentes ===
+    // === Tâches de déploiement et progression récentes ===
     { id: "DEPLOY-001", content: "Configurer le domaine app.fata.plus dans Cloudflare", status: "completed", priority: "high", category: "deployment", specification: "cloudflare-setup", created: "2025-09-17T03:00:00Z", completed: "2025-09-17T03:39:00Z" },
     { id: "DEPLOY-002", content: "Déployer l'API Worker avec configuration AI et Vectorize", status: "completed", priority: "high", category: "deployment", specification: "cloudflare-setup", created: "2025-09-17T03:00:00Z", completed: "2025-09-17T03:45:00Z" },
     { id: "DEPLOY-003", content: "Déployer le serveur MCP avec configuration AutoRAG", status: "completed", priority: "high", category: "deployment", specification: "cloudflare-setup", created: "2025-09-17T03:00:00Z", completed: "2025-09-17T03:46:00Z" },
@@ -732,7 +117,9 @@ function getDefaultTodos() {
     { id: "AI-004", content: "Tester la recherche sémantique AutoRAG", status: "completed", priority: "medium", category: "ai-setup", specification: "cloudflare-ai", created: "2025-09-17T03:00:00Z", completed: "2025-09-17T03:49:00Z" },
     { id: "FRONTEND-001", content: "Créer la page de progrès dans le frontend", status: "completed", priority: "high", category: "frontend-development", specification: "progress-system", created: "2025-09-17T03:50:00Z", completed: "2025-09-17T04:20:00Z" },
     { id: "FRONTEND-002", content: "Créer l'API pour gérer les tâches", status: "completed", priority: "high", category: "api-development", specification: "progress-system", created: "2025-09-17T03:50:00Z", completed: "2025-09-17T04:25:00Z" },
-    { id: "FRONTEND-003", content: "Intégrer la liste complète des tâches du projet", status: "completed", priority: "medium", category: "frontend-development", specification: "progress-system", created: "2025-09-17T03:50:00Z", completed: "2025-09-17T04:35:00Z" },
+    { id: "FRONTEND-003", content: "Intégrer la liste complète des tâches du projet", status: "in_progress", priority: "medium", category: "frontend-development", specification: "progress-system", created: "2025-09-17T03:50:00Z" },
     { id: "FRONTEND-004", content: "Ajouter des fonctionnalités interactives (filtres, recherche)", status: "completed", priority: "medium", category: "frontend-development", specification: "progress-system", created: "2025-09-17T03:50:00Z", completed: "2025-09-17T04:30:00Z" }
   ];
 }
+
+module.exports = { getAllProjectTasks };
