@@ -107,7 +107,7 @@ def require_permission(permission: Permission):
     """Dependency to require specific permission"""
     def permission_checker(current_user: User = Depends(get_current_user)):
         if not current_user.has_permission(permission):
-        raise HTTPException(
+            raise HTTPException(
                 status_code=403,
                 detail=f"Insufficient permissions. Required: {permission.value}"
             )

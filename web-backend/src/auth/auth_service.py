@@ -4,7 +4,7 @@ Advanced user management with JWT, RBAC, and security features
 """
 
 import os
-import jwt
+from jose import jwt
 import bcrypt
 import secrets
 from datetime import datetime, timedelta, timezone
