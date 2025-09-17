@@ -69,19 +69,13 @@ interface SystemMetrics {
 
 const app = new Hono<{ Bindings: Env }>();
 
-// CORS middleware
-app.use('/*', (c, next) => {
-  const corsMiddleware = cors({
-    origin: (origin) => {
-      const allowedOrigins = c.env.CORS_ORIGINS.split(',');
-      return allowedOrigins.includes(origin) || origin?.includes('pages.dev') || origin?.includes('workers.dev');
-    },
-    allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowHeaders: ['Content-Type', 'Authorization'],
-    credentials: true,
-  });
-  return corsMiddleware(c, next);
-});
+// CORS middleware - Permissive for admin access
+app.use('/*', cors({
+  origin: '*', // Allow all origins for admin panel
+  allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  credentials: false,
+}));
 
 // Sample data initialization
 const initializeSampleData = async (env: Env) => {

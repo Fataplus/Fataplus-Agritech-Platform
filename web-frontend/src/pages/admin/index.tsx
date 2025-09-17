@@ -33,19 +33,13 @@ export default function AdminDashboard() {
   useEffect(() => {
     const fetchMetrics = async () => {
       try {
-        const apiUrl = process.env.NODE_ENV === 'production' 
-          ? 'https://fataplus-admin-api-production.fenohery.workers.dev'
-          : 'http://localhost:8000';
-          
-        const response = await fetch(`${apiUrl}/admin/metrics`);
-        if (response.ok) {
-          const data = await response.json();
-          setMetrics(data);
-        } else {
-          setError('Erreur lors du chargement des métriques');
-        }
+        // Use smart API client that falls back to mock data
+        const { SmartApiClient } = await import('../../lib/api-fallback');
+        const data = await SmartApiClient.getMetrics();
+        setMetrics(data);
       } catch (err) {
-        setError('Erreur de connexion à l\'API');
+        console.error('Error fetching metrics:', err);
+        setError('Erreur lors du chargement des métriques');
       } finally {
         setLoading(false);
       }
