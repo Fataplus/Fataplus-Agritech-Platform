@@ -63,6 +63,8 @@ const nextConfig = {
   // Configuration pour Cloudflare Pages
   trailingSlash: false,
   poweredByHeader: false,
+  output: 'export',
+  distDir: 'out',
 
   // Configuration des redirections pour le nouveau domaine
   async redirects() {

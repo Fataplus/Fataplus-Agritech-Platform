@@ -17,6 +17,7 @@ const Navbar: React.FC = () => {
     { name: 'Solutions', href: '/solutions' },
     { name: 'Pricing', href: '/pricing' },
     { name: 'Testimonials', href: '/testimonials' },
+    { name: 'Progress', href: '/progress' },
   ];
 
   const authenticatedNavItems = [
@@ -24,6 +25,7 @@ const Navbar: React.FC = () => {
     { name: 'Weather', href: '/weather' },
     { name: 'Market', href: '/market' },
     { name: 'Community', href: '/community' },
+    { name: 'Progress', href: '/progress' },
   ];
 
   const navItems = isAuthenticated ? authenticatedNavItems : publicNavItems;

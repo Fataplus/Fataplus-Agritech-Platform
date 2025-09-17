@@ -68,3 +68,7 @@ binding = "AI"
 # Observability
 [observability]
 enabled = true
+# AutoRAG Configuration pour MCP
+[[vectorize]]
+binding = "VECTORIZE"
+index_name = "fataplus-knowledge-base"

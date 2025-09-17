@@ -71,14 +71,13 @@ binding = "ANALYTICS"
 # Staging AI
 [env.staging.ai]
 binding = "AI"
-binding = "AI"
 
-# AutoRAG Configuration
+# AutoRAG Configuration - Vectorize
 [[vectorize]]
-binding = "VECTORIZE_INDEX"
-index_name = "fataplus-autorag"
+binding = "VECTORIZE"
+index_name = "fataplus-knowledge-base"
 
 # Staging Vectorize
 [[env.staging.vectorize]]
-binding = "VECTORIZE_INDEX"
-index_name = "fataplus-autorag"
+binding = "VECTORIZE"
+index_name = "fataplus-knowledge-base"

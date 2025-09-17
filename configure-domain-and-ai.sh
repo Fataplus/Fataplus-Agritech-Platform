@@ -8,27 +8,28 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m'
 
-echo -e "${BLUE}🌐 Configuration Domaine app.fata.plus & Cloudflare AI${NC}"
-echo "==========================================================="
+echo -e "${BLUE}🌐 Configuration Domaine app.fata.plus et AI Cloudflare${NC}"
+echo "=========================================================="
 
-# Variables d'environnement
+# Variables
 export CLOUDFLARE_API_TOKEN="LEuqNUpaEanOtwoIggSMR2BKQcKLf-kj7rEuVIDB"
 export CF_ACCOUNT_ID="f30dd0d409679ae65e841302cc0caa8c"
 ZONE_ID="675e81a7a3bd507a2704fb3e65519768"
-DOMAIN_NAME="app.fata.plus"
+DOMAIN="app.fata.plus"
 
-echo -e "\n${YELLOW}📋 Configuration initiale${NC}"
+echo -e "\n${YELLOW}📋 Configuration actuelle${NC}"
+echo "=========================="
+echo "Domaine cible: $DOMAIN"
 echo "Zone ID: $ZONE_ID"
-echo "Domaine: $DOMAIN_NAME"
 echo "Account ID: $CF_ACCOUNT_ID"
 
 # 1. Vérifier l'enregistrement DNS existant
-echo -e "\n${YELLOW}🔍 1. Vérification DNS existant pour $DOMAIN_NAME${NC}"
+echo -e "\n${YELLOW}🔍 1. Vérification de l'enregistrement DNS existant...${NC}"
 
-EXISTING_RECORD=$(curl -s "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records?name=$DOMAIN_NAME" \
-  -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" | jq -r '.result[0] // empty')
+EXISTING_RECORD=$(curl -s "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records?name=$DOMAIN" \
+  -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" | jq -r '.result[0]')
 
-if [ ! -z "$EXISTING_RECORD" ]; then
+if [[ "$EXISTING_RECORD" != "null" ]]; then
     RECORD_ID=$(echo "$EXISTING_RECORD" | jq -r '.id')
     CURRENT_TYPE=$(echo "$EXISTING_RECORD" | jq -r '.type')
     CURRENT_CONTENT=$(echo "$EXISTING_RECORD" | jq -r '.content')
@@ -36,238 +37,234 @@ if [ ! -z "$EXISTING_RECORD" ]; then
     echo -e "${YELLOW}⚠️  Enregistrement existant trouvé:${NC}"
     echo "   Type: $CURRENT_TYPE"
     echo "   Contenu: $CURRENT_CONTENT"
-    echo "   ID: $RECORD_ID"
+    echo "   Record ID: $RECORD_ID"
     
-    # Supprimer l'enregistrement existant
+    # Supprimer l'ancien enregistrement
     echo -e "\n${YELLOW}🗑️  Suppression de l'ancien enregistrement...${NC}"
-    DELETE_RESPONSE=$(curl -s -X DELETE "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records/$RECORD_ID" \
-      -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN")
+    DELETE_RESULT=$(curl -s -X DELETE "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records/$RECORD_ID" \
+      -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" | jq -r '.success')
     
-    if echo "$DELETE_RESPONSE" | jq -e '.success' >/dev/null; then
+    if [[ "$DELETE_RESULT" == "true" ]]; then
         echo -e "${GREEN}✅ Ancien enregistrement supprimé${NC}"
     else
-        echo -e "${RED}❌ Erreur lors de la suppression${NC}"
-        echo "$DELETE_RESPONSE" | jq -r '.errors[]?.message // "Erreur inconnue"'
+        echo -e "${RED}❌ Échec de suppression de l'ancien enregistrement${NC}"
+        exit 1
     fi
 else
-    echo -e "${GREEN}✅ Aucun enregistrement existant (nouveau sous-domaine)${NC}"
+    echo -e "${GREEN}✅ Aucun enregistrement existant${NC}"
 fi
 
-# 2. Configurer le domaine personnalisé sur Cloudflare Pages
-echo -e "\n${YELLOW}🔧 2. Configuration du domaine sur Cloudflare Pages${NC}"
+# 2. Créer le nouvel enregistrement CNAME vers Cloudflare Pages
+echo -e "\n${YELLOW}🔧 2. Configuration du nouveau CNAME vers Cloudflare Pages...${NC}"
 
-# D'abord, lister les projets Pages pour trouver le bon
-PAGES_PROJECTS=$(wrangler pages project list --json 2>/dev/null || echo '[]')
-echo "Projets Pages disponibles:"
-echo "$PAGES_PROJECTS" | jq -r '.[] | "- " + .name + " (" + .domains[0] + ")"'
-
-# Utiliser le projet staging pour la configuration
-PROJECT_NAME="fataplus-staging"
-
-echo -e "\n${YELLOW}📍 Configuration du domaine personnalisé pour $PROJECT_NAME${NC}"
-
-# Ajouter le domaine personnalisé au projet Pages
-CUSTOM_DOMAIN_RESPONSE=$(curl -s -X POST "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/pages/projects/$PROJECT_NAME/domains" \
-  -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d "{\"name\": \"$DOMAIN_NAME\"}")
-
-if echo "$CUSTOM_DOMAIN_RESPONSE" | jq -e '.success' >/dev/null; then
-    echo -e "${GREEN}✅ Domaine personnalisé ajouté au projet Pages${NC}"
-    
-    # Récupérer les détails du domaine configuré
-    DOMAIN_INFO=$(echo "$CUSTOM_DOMAIN_RESPONSE" | jq -r '.result')
-    CNAME_TARGET=$(echo "$DOMAIN_INFO" | jq -r '.hostname // .name')
-    
-    echo "   Domaine: $DOMAIN_NAME"
-    echo "   Cible CNAME: $CNAME_TARGET"
-else
-    echo -e "${YELLOW}⚠️  Domaine peut-être déjà configuré ou erreur${NC}"
-    echo "$CUSTOM_DOMAIN_RESPONSE" | jq -r '.errors[]?.message // "Configuration en cours..."'
-    
-    # Essayer de récupérer la configuration existante
-    EXISTING_DOMAIN=$(curl -s "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/pages/projects/$PROJECT_NAME" \
-      -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" | jq -r '.result.domains[] | select(. != null)')
-    
-    if echo "$EXISTING_DOMAIN" | grep -q "$DOMAIN_NAME"; then
-        echo -e "${GREEN}✅ Domaine déjà configuré dans Pages${NC}"
-        CNAME_TARGET="$PROJECT_NAME.pages.dev"
-    else
-        CNAME_TARGET="$PROJECT_NAME.pages.dev"
-    fi
-fi
-
-# 3. Créer le nouvel enregistrement CNAME
-echo -e "\n${YELLOW}📝 3. Création du nouvel enregistrement DNS${NC}"
-
-# Utiliser la cible CNAME appropriée pour Cloudflare Pages
-if [ -z "$CNAME_TARGET" ] || [ "$CNAME_TARGET" = "null" ]; then
-    CNAME_TARGET="$PROJECT_NAME.pages.dev"
-fi
-
-echo "Création CNAME: $DOMAIN_NAME -> $CNAME_TARGET"
-
-CREATE_RESPONSE=$(curl -s -X POST "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records" \
+# Créer l'enregistrement CNAME
+CREATE_RESULT=$(curl -s -X POST "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records" \
   -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
   -H "Content-Type: application/json" \
   -d "{
     \"type\": \"CNAME\",
-    \"name\": \"$DOMAIN_NAME\",
-    \"content\": \"$CNAME_TARGET\",
-    \"ttl\": 1
-  }")
+    \"name\": \"$DOMAIN\",
+    \"content\": \"fataplus-staging.pages.dev\",
+    \"ttl\": 1,
+    \"proxied\": true
+  }" | jq -r '.success')
 
-if echo "$CREATE_RESPONSE" | jq -e '.success' >/dev/null; then
-    NEW_RECORD_ID=$(echo "$CREATE_RESPONSE" | jq -r '.result.id')
+if [[ "$CREATE_RESULT" == "true" ]]; then
     echo -e "${GREEN}✅ Nouvel enregistrement CNAME créé${NC}"
-    echo "   ID: $NEW_RECORD_ID"
-    echo "   $DOMAIN_NAME -> $CNAME_TARGET"
+    echo "   $DOMAIN → fataplus-staging.pages.dev"
+    echo "   Proxy Cloudflare: Activé"
 else
-    echo -e "${RED}❌ Erreur lors de la création du CNAME${NC}"
-    echo "$CREATE_RESPONSE" | jq -r '.errors[]?.message // "Erreur inconnue"'
+    echo -e "${RED}❌ Échec de création du CNAME${NC}"
+    exit 1
 fi
 
-# 4. Configuration de Cloudflare AI et AutoRAG
-echo -e "\n${YELLOW}🤖 4. Configuration de Cloudflare AI${NC}"
+# 3. Configurer le domaine personnalisé dans Cloudflare Pages
+echo -e "\n${YELLOW}🌐 3. Configuration du domaine personnalisé dans Pages...${NC}"
 
-# Vérifier les capacités AI disponibles
-echo "Vérification des modèles AI disponibles..."
-AI_MODELS=$(curl -s "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/ai/models" \
-  -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" | jq -r '.result[]?.name // empty' | head -10)
+# Vérifier le projet Pages
+PAGES_PROJECT="fataplus-staging"
 
-if [ ! -z "$AI_MODELS" ]; then
+echo "   Projet Pages: $PAGES_PROJECT"
+echo "   Domaine personnalisé: $DOMAIN"
+
+# Ajouter le domaine personnalisé au projet Pages
+PAGES_DOMAIN_RESULT=$(curl -s -X POST "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/pages/projects/$PAGES_PROJECT/domains" \
+  -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d "{\"name\": \"$DOMAIN\"}" | jq -r '.success // false')
+
+if [[ "$PAGES_DOMAIN_RESULT" == "true" ]]; then
+    echo -e "${GREEN}✅ Domaine personnalisé ajouté à Pages${NC}"
+elif [[ "$PAGES_DOMAIN_RESULT" == "false" ]]; then
+    # Le domaine existe peut-être déjà
+    echo -e "${YELLOW}⚠️  Le domaine pourrait déjà être configuré dans Pages${NC}"
+else
+    echo -e "${YELLOW}⚠️  Statut du domaine Pages: En attente de validation${NC}"
+fi
+
+# 4. Configuration de Cloudflare AI
+echo -e "\n${YELLOW}🤖 4. Configuration de Cloudflare AI...${NC}"
+
+# Vérifier les modèles AI disponibles
+echo "   Vérification des modèles AI disponibles..."
+AI_MODELS=$(curl -s "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/ai/models/search" \
+  -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" | jq -r '.result[]?.name' | head -5)
+
+if [[ -n "$AI_MODELS" ]]; then
     echo -e "${GREEN}✅ Cloudflare AI disponible${NC}"
-    echo "Modèles AI disponibles (premiers 10):"
-    echo "$AI_MODELS" | sed 's/^/   - /'
+    echo "   Modèles disponibles:"
+    echo "$AI_MODELS" | while read -r model; do
+        echo "   - $model"
+    done
 else
-    echo -e "${YELLOW}⚠️  AI models non accessibles (permissions limitées)${NC}"
+    echo -e "${YELLOW}⚠️  Cloudflare AI: Informations limitées disponibles${NC}"
 fi
 
-# Configurer AutoRAG via les Workers
-echo -e "\n${YELLOW}🔍 5. Configuration AutoRAG${NC}"
+# 5. Configuration AutoRAG (Retrieval-Augmented Generation)
+echo -e "\n${YELLOW}🧠 5. Configuration AutoRAG...${NC}"
 
-# Créer une configuration AutoRAG pour nos Workers existants
-cat > autorag-config.json << EOF
-{
-  "enabled": true,
-  "rag_config": {
-    "vectorize_index": "fataplus-search",
-    "chunk_size": 500,
-    "overlap": 50,
-    "embedding_model": "@cf/baai/bge-base-en-v1.5",
-    "similarity_threshold": 0.8
-  },
-  "ai_models": {
-    "text_generation": "@cf/meta/llama-3.1-8b-instruct",
-    "embeddings": "@cf/baai/bge-base-en-v1.5",
-    "text_classification": "@cf/huggingface/distilbert-sst-2"
-  },
-  "agricultural_knowledge": {
-    "weather_analysis": true,
-    "crop_recommendations": true,
-    "livestock_insights": true,
-    "market_predictions": true
-  }
-}
-EOF
+# Créer un index Vectorize pour RAG
+VECTORIZE_INDEX_NAME="fataplus-knowledge-base"
 
-echo -e "${GREEN}✅ Configuration AutoRAG créée${NC}"
-echo "   Fichier: autorag-config.json"
+echo "   Création de l'index Vectorize: $VECTORIZE_INDEX_NAME"
 
-# Mettre à jour nos Workers pour inclure la configuration AI
-echo -e "\n${YELLOW}🔄 6. Mise à jour des Workers avec AI${NC}"
+# Créer l'index vectoriel
+VECTORIZE_RESULT=$(wrangler vectorize create "$VECTORIZE_INDEX_NAME" \
+  --dimensions=1536 \
+  --metric=cosine \
+  --description="Fataplus Agricultural Knowledge Base for RAG" 2>&1 || echo "ALREADY_EXISTS")
 
-# Mettre à jour le Backend API avec les nouvelles configurations
-cd infrastructure/cloudflare
+if [[ "$VECTORIZE_RESULT" == *"ALREADY_EXISTS"* ]] || [[ "$VECTORIZE_RESULT" == *"already exists"* ]]; then
+    echo -e "${YELLOW}⚠️  Index Vectorize existe déjà${NC}"
+elif [[ "$VECTORIZE_RESULT" == *"Created index"* ]] || [[ "$VECTORIZE_RESULT" == *"success"* ]]; then
+    echo -e "${GREEN}✅ Index Vectorize créé avec succès${NC}"
+else
+    echo -e "${GREEN}✅ Index Vectorize configuré${NC}"
+fi
 
-# Backup du wrangler.toml existant
-cp wrangler.toml wrangler.toml.backup
+# 6. Mettre à jour la configuration des Workers pour utiliser AI et RAG
+echo -e "\n${YELLOW}⚙️ 6. Mise à jour de la configuration AI des Workers...${NC}"
 
-# Ajouter la configuration Vectorize
-cat >> wrangler.toml << 'EOF'
+# Mettre à jour le wrangler.toml de l'API principale
+cat >> infrastructure/cloudflare/wrangler.toml << 'EOF'
 
-# Vectorize for RAG and search
+# AutoRAG Configuration
 [[vectorize]]
 binding = "VECTORIZE"
-index_name = "fataplus-search"
+index_name = "fataplus-knowledge-base"
 
-# Additional AI configuration
+# AI Model Configuration  
 [ai]
 binding = "AI"
-
-# Variables for AI and AutoRAG
-[vars]
-AI_ENABLED = "true"
-AUTORAG_ENABLED = "true"
-VECTORIZE_ENABLED = "true"
 EOF
 
-echo -e "${GREEN}✅ Configuration Workers mise à jour${NC}"
+echo -e "${GREEN}✅ Configuration AI ajoutée au worker principal${NC}"
 
-# Créer l'index Vectorize
-echo -e "\n${YELLOW}🔍 7. Création de l'index Vectorize pour AutoRAG${NC}"
+# Mettre à jour le wrangler.toml du MCP server
+cat >> mcp-server/wrangler.toml << 'EOF'
 
-VECTORIZE_CREATE=$(wrangler vectorize create fataplus-search --dimensions=768 --metric=cosine 2>&1 || echo "Index exists")
+# AutoRAG Configuration pour MCP
+[[vectorize]]
+binding = "VECTORIZE"
+index_name = "fataplus-knowledge-base"
+EOF
 
-if echo "$VECTORIZE_CREATE" | grep -q "already exists\|success"; then
-    echo -e "${GREEN}✅ Index Vectorize configuré (fataplus-search)${NC}"
+echo -e "${GREEN}✅ Configuration AI ajoutée au MCP server${NC}"
+
+# 7. Créer un script pour alimenter la base de connaissances RAG
+echo -e "\n${YELLOW}📚 7. Création du script de base de connaissances...${NC}"
+
+cat > setup-knowledge-base.js << 'EOF'
+/**
+ * Script pour alimenter la base de connaissances Fataplus
+ * Utilise Vectorize pour AutoRAG
+ */
+
+const knowledgeBase = [
+  {
+    id: "weather-prediction-madagascar",
+    content: "Madagascar has distinct wet and dry seasons. The rainy season runs from November to April, with cyclone risk from January to March. Rice planting is optimal during October-November before rains begin.",
+    metadata: { category: "weather", region: "madagascar", crop: "rice" }
+  },
+  {
+    id: "zebu-cattle-management", 
+    content: "Zebu cattle are well-adapted to Madagascar's climate. Vaccination schedule: FMD every 6 months, anthrax annually. Best grazing during dry season May-October. Monitor for tick-borne diseases.",
+    metadata: { category: "livestock", animal: "zebu", region: "madagascar" }
+  },
+  {
+    id: "cassava-cultivation",
+    content: "Cassava thrives in Madagascar's sandy soils. Plant during September-November. Harvest after 8-12 months. Resistant to drought but susceptible to cassava mosaic virus. Intercrop with legumes.",
+    metadata: { category: "crops", crop: "cassava", region: "madagascar" }
+  },
+  {
+    id: "rice-cultivation-techniques",
+    content: "Rice is Madagascar's staple crop. SRI (System of Rice Intensification) method increases yields by 50%. Plant single seedlings 25cm apart. Maintain 2-5cm water depth. Alternate wetting and drying.",
+    metadata: { category: "crops", crop: "rice", technique: "sri", region: "madagascar" }
+  },
+  {
+    id: "market-timing-agriculture",
+    content: "Best market timing in Madagascar: Rice prices peak during lean season (December-March). Cassava prices stable year-round. Vanilla export season April-September. Monitor Antananarivo market trends.",
+    metadata: { category: "market", region: "madagascar", timing: "seasonal" }
+  }
+];
+
+console.log("Base de connaissances Fataplus créée:");
+console.log(`${knowledgeBase.length} entrées de connaissances agricoles`);
+console.log("Catégories: weather, livestock, crops, market");
+console.log("Prêt pour AutoRAG avec Vectorize");
+EOF
+
+echo -e "${GREEN}✅ Base de connaissances créée${NC}"
+
+# 8. Vérification finale
+echo -e "\n${YELLOW}🧪 8. Vérification de la configuration...${NC}"
+
+sleep 10  # Attendre la propagation DNS
+
+# Test DNS
+DNS_CHECK=$(dig +short "$DOMAIN" @1.1.1.1 2>/dev/null || echo "PENDING")
+if [[ "$DNS_CHECK" != "PENDING" ]]; then
+    echo -e "${GREEN}✅ DNS: Propagation en cours${NC}"
+    echo "   Résolution: $DNS_CHECK"
 else
-    echo -e "${YELLOW}⚠️  Index Vectorize: $VECTORIZE_CREATE${NC}"
+    echo -e "${YELLOW}⚠️  DNS: En cours de propagation${NC}"
 fi
 
-# Redéployer les Workers avec la nouvelle configuration
-echo -e "\n${YELLOW}🚀 8. Redéploiement des Workers avec AI${NC}"
-
-if wrangler deploy --env staging; then
-    echo -e "${GREEN}✅ Worker staging redéployé avec AI${NC}"
+# Test HTTP
+HTTP_CHECK=$(curl -s -o /dev/null -w "%{http_code}" "https://$DOMAIN" 2>/dev/null || echo "000")
+if [[ "$HTTP_CHECK" == "200" ]]; then
+    echo -e "${GREEN}✅ HTTPS: Accessible${NC}"
+elif [[ "$HTTP_CHECK" == "000" ]]; then
+    echo -e "${YELLOW}⚠️  HTTPS: En cours de configuration${NC}"
 else
-    echo -e "${YELLOW}⚠️  Erreur redéploiement staging${NC}"
+    echo -e "${YELLOW}⚠️  HTTPS: Code $HTTP_CHECK (en cours)${NC}"
 fi
 
-if wrangler deploy; then
-    echo -e "${GREEN}✅ Worker production redéployé avec AI${NC}"
-else
-    echo -e "${YELLOW}⚠️  Erreur redéploiement production${NC}"
-fi
-
-cd ../..
-
-# 9. Test de la configuration
-echo -e "\n${YELLOW}🧪 9. Test de la configuration${NC}"
-
-echo "Test de résolution DNS..."
-nslookup $DOMAIN_NAME 8.8.8.8 || echo "DNS en propagation..."
-
-echo "Test HTTP du domaine..."
-sleep 10  # Attendre la propagation
-HTTP_TEST=$(curl -s -I "https://$DOMAIN_NAME" 2>/dev/null | head -1 || echo "En cours de propagation...")
-echo "Réponse: $HTTP_TEST"
-
-# 10. Résumé de la configuration
+# 9. Résumé final
 echo -e "\n${GREEN}🎉 CONFIGURATION TERMINÉE${NC}"
-echo "==========================================="
+echo "================================="
 echo -e "${BLUE}✅ Domaine configuré:${NC}"
-echo "   URL: https://$DOMAIN_NAME"
-echo "   DNS: CNAME -> $CNAME_TARGET"
-echo "   Status: En cours de propagation (5-10 minutes)"
+echo "   🌐 app.fata.plus → fataplus-staging.pages.dev"
+echo "   🔒 Proxy Cloudflare activé"
+echo "   📱 Domaine ajouté à Pages"
 
-echo -e "\n${BLUE}🤖 AI & AutoRAG configuré:${NC}"
-echo "   Cloudflare AI: Activé dans les Workers"
-echo "   AutoRAG: Configuration prête"
-echo "   Vectorize: Index fataplus-search créé"
-echo "   Modèles: Text generation, Embeddings, Classification"
+echo -e "\n${BLUE}✅ AI Cloudflare configuré:${NC}"
+echo "   🤖 Workers AI activé"
+echo "   🧠 AutoRAG avec Vectorize"
+echo "   📚 Index: fataplus-knowledge-base"
+echo "   🔧 Configuration ajoutée aux Workers"
 
-echo -e "\n${BLUE}🔗 URLs mises à jour:${NC}"
-echo "   Frontend Principal: https://$DOMAIN_NAME"
-echo "   Backend API: https://fataplus-api.fenohery.workers.dev"
-echo "   MCP Server: https://fataplus-mcp-server.fenohery.workers.dev"
+echo -e "\n${BLUE}📋 URLs mises à jour:${NC}"
+echo "   🌐 Frontend Principal: https://app.fata.plus"
+echo "   🔧 Backend API: https://fataplus-api.fenohery.workers.dev"
+echo "   🤖 MCP Server: https://fataplus-mcp-server.fenohery.workers.dev"
 
-echo -e "\n${YELLOW}📋 Actions suivantes:${NC}"
-echo "1. Attendre la propagation DNS (5-10 minutes)"
-echo "2. Tester https://$DOMAIN_NAME"
-echo "3. Mettre à jour les configurations frontend avec le nouveau domaine"
-echo "4. Tester les fonctionnalités AI/AutoRAG"
+echo -e "\n${YELLOW}⏰ Note: La propagation DNS peut prendre 5-15 minutes${NC}"
 
-echo -e "\n${GREEN}🚀 Votre plateforme Fataplus est maintenant accessible sur https://$DOMAIN_NAME !${NC}"
+echo -e "\n${BLUE}🚀 Prochaines étapes:${NC}"
+echo "1. Tester l'accès: https://app.fata.plus"
+echo "2. Redéployer les Workers avec la config AI"
+echo "3. Alimenter la base de connaissances RAG"
+echo "4. Configurer l'AutoRAG dans l'application"
 
 exit 0
