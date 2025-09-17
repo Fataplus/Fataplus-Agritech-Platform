@@ -31,7 +31,7 @@ Le serveur MCP Fataplus est **déployé et opérationnel** sur l'infrastructure 
 ### URLs d'accès
 
 #### Production
-- **URL principale** : `https://mcp.fataplus.com` (domaine personnalisé)
+- **URL principale** : `https://mcp.fata.plus` (domaine personnalisé)
 - **URL de secours** : `https://fataplus-mcp-prod.workers.dev`
 
 #### Staging/Test
@@ -72,7 +72,7 @@ Ajoutez cette configuration dans votre fichier `claude_desktop_config.json` :
         "@fataplus/mcp-client"
       ],
       "env": {
-        "FATAPLUS_MCP_URL": "https://mcp.fataplus.com",
+        "FATAPLUS_MCP_URL": "https://mcp.fata.plus",
         "LOG_LEVEL": "info"
       }
     }
@@ -90,7 +90,7 @@ Ajoutez cette configuration dans votre fichier `claude_desktop_config.json` :
         "/path/to/fataplus-mcp-client/dist/index.js"
       ],
       "env": {
-        "FATAPLUS_MCP_URL": "https://mcp.fataplus.com",
+        "FATAPLUS_MCP_URL": "https://mcp.fata.plus",
         "FATAPLUS_API_KEY": "your-api-key-here",
         "LOG_LEVEL": "info"
       }
@@ -111,7 +111,7 @@ Si vous préférez une approche HTTP directe :
       "args": [
         "-y",
         "@modelcontextprotocol/server-http",
-        "https://mcp.fataplus.com"
+        "https://mcp.fata.plus"
       ],
       "env": {
         "MCP_HTTP_TIMEOUT": "30000"
@@ -142,7 +142,7 @@ Si vous préférez une approche HTTP directe :
 
 ### Endpoint de santé
 ```bash
-GET https://mcp.fataplus.com/health
+GET https://mcp.fata.plus/health
 ```
 
 **Réponse** :
@@ -161,19 +161,19 @@ GET https://mcp.fataplus.com/health
 
 ### Endpoint MCP Tools
 ```bash
-POST https://mcp.fataplus.com/mcp/tools
+POST https://mcp.fata.plus/mcp/tools
 Content-Type: application/json
 ```
 
 ### Endpoint MCP Resources
 ```bash
-POST https://mcp.fataplus.com/mcp/resources
+POST https://mcp.fata.plus/mcp/resources
 Content-Type: application/json
 ```
 
 ### Endpoint MCP Prompts (optionnel)
 ```bash
-POST https://mcp.fataplus.com/mcp/prompts
+POST https://mcp.fata.plus/mcp/prompts
 Content-Type: application/json
 ```
 
@@ -394,7 +394,7 @@ Claude utilisera automatiquement l'outil `get_weather_data` pour récupérer les
 Pour les endpoints publics, aucune authentification n'est requise :
 
 ```bash
-curl -X GET https://mcp.fataplus.com/health
+curl -X GET https://mcp.fata.plus/health
 ```
 
 ### Authentification avec clé API
@@ -402,7 +402,7 @@ curl -X GET https://mcp.fataplus.com/health
 Pour les fonctionnalités avancées, utilisez une clé API :
 
 ```bash
-curl -X POST https://mcp.fataplus.com/mcp/tools \
+curl -X POST https://mcp.fata.plus/mcp/tools \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{...}'
@@ -417,7 +417,7 @@ curl -X POST https://mcp.fataplus.com/mcp/tools \
       "command": "npx",
       "args": ["-y", "@fataplus/mcp-client"],
       "env": {
-        "FATAPLUS_MCP_URL": "https://mcp.fataplus.com",
+        "FATAPLUS_MCP_URL": "https://mcp.fata.plus",
         "FATAPLUS_API_KEY": "your-api-key-here"
       }
     }
@@ -442,7 +442,7 @@ curl -X POST https://mcp.fataplus.com/mcp/tools \
 1. Vérifiez l'URL du serveur MCP
 2. Testez la connectivité :
    ```bash
-   curl https://mcp.fataplus.com/health
+   curl https://mcp.fata.plus/health
    ```
 3. Vérifiez votre configuration Claude Desktop
 4. Redémarrez Claude Desktop
@@ -460,7 +460,7 @@ curl -X POST https://mcp.fataplus.com/mcp/tools \
 1. Vérifiez le nom de l'outil dans votre requête
 2. Consultez la liste des outils disponibles :
    ```bash
-   curl -X POST https://mcp.fataplus.com/mcp/tools \
+   curl -X POST https://mcp.fata.plus/mcp/tools \
      -H "Content-Type: application/json" \
      -d '{"jsonrpc": "2.0", "id": 1, "method": "tools/list"}'
    ```
@@ -492,12 +492,12 @@ curl -X POST https://mcp.fataplus.com/mcp/tools \
 
 #### Test de connectivité de base
 ```bash
-curl -v https://mcp.fataplus.com/health
+curl -v https://mcp.fata.plus/health
 ```
 
 #### Test d'un outil MCP
 ```bash
-curl -X POST https://mcp.fataplus.com/mcp/tools \
+curl -X POST https://mcp.fata.plus/mcp/tools \
   -H "Content-Type: application/json" \
   -d '{
     "jsonrpc": "2.0",
@@ -514,7 +514,7 @@ curl -X POST https://mcp.fataplus.com/mcp/tools \
 
 #### Test d'une ressource MCP
 ```bash
-curl -X POST https://mcp.fataplus.com/mcp/resources \
+curl -X POST https://mcp.fata.plus/mcp/resources \
   -H "Content-Type: application/json" \
   -d '{
     "jsonrpc": "2.0",

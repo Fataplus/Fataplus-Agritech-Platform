@@ -1,0 +1,70 @@
+{
+  "dns_records": [
+    {
+      "name": "mcp.fata.plus",
+      "type": "CNAME",
+      "content": "fataplus-mcp-server.workers.dev",
+      "proxied": true,
+      "ttl": 300,
+      "comment": "Fataplus MCP Server - Production",
+      "environment": "production"
+    },
+    {
+      "name": "staging-mcp.fata.plus", 
+      "type": "CNAME",
+      "content": "fataplus-mcp-staging.workers.dev",
+      "proxied": true,
+      "ttl": 300,
+      "comment": "Fataplus MCP Server - Staging",
+      "environment": "staging"
+    },
+    {
+      "name": "dev-mcp.fata.plus",
+      "type": "CNAME", 
+      "content": "fataplus-mcp-dev.workers.dev",
+      "proxied": true,
+      "ttl": 300,
+      "comment": "Fataplus MCP Server - Development",
+      "environment": "development"
+    }
+  ],
+  "custom_domains": [
+    {
+      "domain": "mcp.fata.plus",
+      "worker": "fataplus-mcp-server",
+      "environment": "production"
+    },
+    {
+      "domain": "staging-mcp.fata.plus",
+      "worker": "fataplus-mcp-staging", 
+      "environment": "staging"
+    },
+    {
+      "domain": "dev-mcp.fata.plus",
+      "worker": "fataplus-mcp-dev",
+      "environment": "development"
+    }
+  ],
+  "ssl_settings": {
+    "ssl": "full",
+    "always_use_https": "on",
+    "min_tls_version": "1.2",
+    "tls_1_3": "on",
+    "automatic_https_rewrites": "on",
+    "security_level": "medium"
+  },
+  "performance_settings": {
+    "minify": {
+      "css": "on",
+      "html": "on", 
+      "js": "on"
+    },
+    "brotli": "on",
+    "early_hints": "on"
+  },
+  "security_settings": {
+    "waf": "on",
+    "ddos_protection": "on",
+    "bot_fight_mode": "on"
+  }
+}

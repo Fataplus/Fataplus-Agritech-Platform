@@ -21,7 +21,7 @@ name = "fataplus-mcp-staging"
 vars = {
   ENVIRONMENT = "staging",
   LOG_LEVEL = "info",
-  CORS_ORIGINS = "https://staging.yourdomain.com,https://*.pages.dev"
+  CORS_ORIGINS = "https://staging.fata.plus,https://staging-mcp.fata.plus,https://*.pages.dev"
 }
 
 [env.production]
@@ -29,7 +29,7 @@ name = "fataplus-mcp-server"
 vars = {
   ENVIRONMENT = "production",
   LOG_LEVEL = "warn",
-  CORS_ORIGINS = "https://yourdomain.com,https://app.yourdomain.com"
+  CORS_ORIGINS = "https://fata.plus,https://app.fata.plus,https://mcp.fata.plus"
 }
 
 # D1 Database bindings for MCP data
@@ -68,12 +68,13 @@ enabled = true
 
 # Custom routes for MCP domain
 [[routes]]
-pattern = "mcp.yourdomain.com/*"
-zone_name = "yourdomain.com"
+pattern = "mcp.fata.plus/*"
+zone_name = "fata.plus"
+custom_domain = true
 
 [[routes]]
-pattern = "staging-mcp.yourdomain.com/*"
-zone_name = "yourdomain.com"
+pattern = "staging-mcp.fata.plus/*"
+zone_name = "fata.plus"
 custom_domain = true
 
 # Build configuration
