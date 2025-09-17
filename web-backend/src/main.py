@@ -16,6 +16,7 @@ from auth.routes import router as auth_router
 from auth.token_routes import router as token_router
 from server.routes import router as server_router
 from context.routes import router as context_router
+from admin.routes import router as admin_router
 
 # Create FastAPI application
 app = FastAPI(
@@ -47,6 +48,7 @@ app.include_router(auth_router)
 app.include_router(token_router)
 app.include_router(server_router)
 app.include_router(context_router)
+app.include_router(admin_router)
 
 @app.get("/")
 async def root():
@@ -81,6 +83,13 @@ async def root():
                 "chat": "/ai/chat",
                 "context_search": "/ai/context/search",
                 "generate": "/ai/generate"
+            },
+            "admin": {
+                "dashboard": "/admin/dashboard",
+                "users": "/admin/users",
+                "farms": "/admin/farms",
+                "metrics": "/admin/metrics",
+                "analytics": "/admin/analytics"
             }
         },
         "features": [
@@ -89,6 +98,9 @@ async def root():
             "context_knowledge_base",
             "server_monitoring",
             "ai_services",
+            "admin_backoffice",
+            "real_time_dashboard",
+            "farm_analytics",
             "multi_language_support",
             "rate_limiting",
             "audit_logging"
