@@ -131,64 +131,92 @@ export class FallbackApiClient {
 export class SmartApiClient {
   private static baseUrl = 'https://fataplus-admin-api-production.fenohery.workers.dev';
   
+  private static createTimeoutController(timeoutMs: number) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+    
+    // Clear timeout if request completes normally
+    controller.signal.addEventListener('abort', () => clearTimeout(timeoutId));
+    
+    return controller;
+  }
+  
   static async getMetrics() {
     try {
+      const controller = this.createTimeoutController(8000); // Longer timeout
+      
       const response = await fetch(`${this.baseUrl}/admin/metrics`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
         },
-        // Add timeout
-        signal: AbortSignal.timeout(5000)
+        mode: 'cors',
+        signal: controller.signal
       });
       
       if (response.ok) {
-        return await response.json();
+        const data = await response.json();
+        console.log('✅ API metrics loaded successfully');
+        return data;
       }
-      throw new Error(`HTTP ${response.status}`);
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     } catch (error) {
-      console.log('API unavailable, using fallback data:', error);
-      return FallbackApiClient.getMetrics();
+      console.warn('⚠️ API unavailable, using fallback data:', error);
+      // Return fallback data immediately to avoid additional delays
+      return mockMetrics;
     }
   }
   
   static async getUsers() {
     try {
+      const controller = this.createTimeoutController(8000);
+      
       const response = await fetch(`${this.baseUrl}/admin/users`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
         },
-        signal: AbortSignal.timeout(5000)
+        mode: 'cors',
+        signal: controller.signal
       });
       
       if (response.ok) {
-        return await response.json();
+        const data = await response.json();
+        console.log('✅ API users loaded successfully');
+        return data;
       }
-      throw new Error(`HTTP ${response.status}`);
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     } catch (error) {
-      console.log('API unavailable, using fallback data:', error);
-      return FallbackApiClient.getUsers();
+      console.warn('⚠️ API unavailable, using fallback data:', error);
+      return mockUsers;
     }
   }
   
   static async getFarms() {
     try {
+      const controller = this.createTimeoutController(8000);
+      
       const response = await fetch(`${this.baseUrl}/admin/farms`, {
         method: 'GET', 
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
         },
-        signal: AbortSignal.timeout(5000)
+        mode: 'cors',
+        signal: controller.signal
       });
       
       if (response.ok) {
-        return await response.json();
+        const data = await response.json();
+        console.log('✅ API farms loaded successfully');
+        return data;
       }
-      throw new Error(`HTTP ${response.status}`);
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     } catch (error) {
-      console.log('API unavailable, using fallback data:', error);
-      return FallbackApiClient.getFarms();
+      console.warn('⚠️ API unavailable, using fallback data:', error);
+      return mockFarms;
     }
   }
 }
