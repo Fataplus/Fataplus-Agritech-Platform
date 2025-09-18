@@ -1,0 +1,290 @@
+# Fataplus MCP Server - Universal Docker Compose Configuration
+# Supports development, staging, and production deployments
+# Compatible with multiple deployment environments
+
+version: '3.8'
+
+services:
+  # ==========================================
+  # FATAPLUS MCP SERVER
+  # ==========================================
+  fataplus-mcp-server:
+    build:
+      context: .
+      dockerfile: Dockerfile.mcp-universal
+      target: ${MCP_BUILD_TARGET:-production}
+      args:
+        - NODE_ENV=${NODE_ENV:-production}
+        - BUILD_VERSION=${BUILD_VERSION:-1.0.0}
+    image: fataplus/mcp-server:${MCP_VERSION:-latest}
+    container_name: fataplus-mcp-server
+    restart: unless-stopped
+    
+    # Environment Configuration
+    environment:
+      # Application Settings
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=${MCP_PORT:-3001}
+      - HOST=${MCP_HOST:-0.0.0.0}
+      - MCP_SERVER_NAME=${MCP_SERVER_NAME:-fataplus-mcp}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      
+      # API Keys and Secrets
+      - OPENWEATHER_API_KEY=${OPENWEATHER_API_KEY}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - API_SECRET_KEY=${API_SECRET_KEY}
+      
+      # Backend Integration
+      - FATAPLUS_API_URL=${FATAPLUS_API_URL:-http://fataplus-backend:8000}
+      - FATAPLUS_API_KEY=${FATAPLUS_API_KEY}
+      
+      # Database Configuration
+      - DATABASE_URL=${MCP_DATABASE_URL:-postgresql://postgres:password@mcp-postgres:5432/fataplus_mcp}
+      - REDIS_URL=${MCP_REDIS_URL:-redis://mcp-redis:6379/0}
+      
+      # Cloudflare Configuration (for hybrid deployments)
+      - CF_ACCOUNT_ID=${CF_ACCOUNT_ID}
+      - CF_API_TOKEN=${CF_API_TOKEN}
+      - CF_ZONE_ID=${CF_ZONE_ID}
+      
+      # Performance Tuning
+      - NODE_OPTIONS=--max-old-space-size=512 --enable-source-maps
+      - HEALTH_CHECK_ENDPOINT=/health
+      - HEALTH_CHECK_TIMEOUT=5000
+      
+      # Feature Flags
+      - ENABLE_ANALYTICS=${ENABLE_ANALYTICS:-true}
+      - ENABLE_CACHING=${ENABLE_CACHING:-true}
+      - ENABLE_RATE_LIMITING=${ENABLE_RATE_LIMITING:-true}
+      
+    # Port Mapping
+    ports:
+      - "${MCP_PORT:-3001}:${MCP_PORT:-3001}"
+    
+    # Health Check
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${MCP_PORT:-3001}/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    
+    # Volume Mounts
+    volumes:
+      # Logs persistence
+      - mcp-logs:/app/logs:rw
+      # Temporary files
+      - mcp-tmp:/app/tmp:rw
+      # Configuration files (if needed)
+      - ./mcp-server/mcp-config.json:/app/mcp-config.json:ro
+      # Data persistence
+      - mcp-data:/app/data:rw
+    
+    # Networks
+    networks:
+      - fataplus-mcp-network
+      - fataplus-main-network
+    
+    # Resource Limits
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+        reservations:
+          memory: 256M
+          cpus: '0.1'
+    
+    # Dependencies
+    depends_on:
+      mcp-postgres:
+        condition: service_healthy
+      mcp-redis:
+        condition: service_healthy
+    
+    # Labels for monitoring and management
+    labels:
+      - "com.fataplus.service=mcp-server"
+      - "com.fataplus.environment=${NODE_ENV:-production}"
+      - "com.fataplus.version=${MCP_VERSION:-latest}"
+      - "traefik.enable=true"
+      - "traefik.http.routers.mcp-server.rule=Host(`${MCP_DOMAIN:-mcp.localhost}`)"
+      - "traefik.http.routers.mcp-server.tls=true"
+      - "traefik.http.services.mcp-server.loadbalancer.server.port=${MCP_PORT:-3001}"
+
+  # ==========================================
+  # MCP POSTGRESQL DATABASE
+  # ==========================================
+  mcp-postgres:
+    image: postgres:15-alpine
+    container_name: fataplus-mcp-postgres
+    restart: unless-stopped
+    
+    environment:
+      - POSTGRES_DB=${MCP_POSTGRES_DB:-fataplus_mcp}
+      - POSTGRES_USER=${MCP_POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${MCP_POSTGRES_PASSWORD:-password}
+      - POSTGRES_INITDB_ARGS=--encoding=UTF-8 --lc-collate=C --lc-ctype=C
+    
+    ports:
+      - "${MCP_POSTGRES_PORT:-5432}:5432"
+    
+    volumes:
+      - mcp-postgres-data:/var/lib/postgresql/data:rw
+      - ./mcp-server/sql/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${MCP_POSTGRES_USER:-postgres} -d ${MCP_POSTGRES_DB:-fataplus_mcp}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    
+    networks:
+      - fataplus-mcp-network
+    
+    # Resource Limits
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.3'
+        reservations:
+          memory: 128M
+          cpus: '0.1'
+    
+    labels:
+      - "com.fataplus.service=mcp-database"
+      - "com.fataplus.environment=${NODE_ENV:-production}"
+
+  # ==========================================
+  # MCP REDIS CACHE
+  # ==========================================
+  mcp-redis:
+    image: redis:7-alpine
+    container_name: fataplus-mcp-redis
+    restart: unless-stopped
+    
+    command: redis-server --appendonly yes --maxmemory 128mb --maxmemory-policy allkeys-lru
+    
+    ports:
+      - "${MCP_REDIS_PORT:-6379}:6379"
+    
+    volumes:
+      - mcp-redis-data:/data:rw
+    
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+    
+    networks:
+      - fataplus-mcp-network
+    
+    # Resource Limits
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: '0.2'
+        reservations:
+          memory: 64M
+          cpus: '0.05'
+    
+    labels:
+      - "com.fataplus.service=mcp-cache"
+      - "com.fataplus.environment=${NODE_ENV:-production}"
+
+  # ==========================================
+  # MCP MONITORING (OPTIONAL)
+  # ==========================================
+  mcp-monitoring:
+    image: prom/prometheus:latest
+    container_name: fataplus-mcp-monitoring
+    restart: unless-stopped
+    profiles: ["monitoring"]
+    
+    ports:
+      - "${MCP_PROMETHEUS_PORT:-9090}:9090"
+    
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - mcp-prometheus-data:/prometheus:rw
+    
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    
+    networks:
+      - fataplus-mcp-network
+    
+    labels:
+      - "com.fataplus.service=mcp-monitoring"
+      - "com.fataplus.environment=${NODE_ENV:-production}"
+
+# ==========================================
+# NETWORKS
+# ==========================================
+networks:
+  fataplus-mcp-network:
+    driver: bridge
+    name: fataplus-mcp-network
+    labels:
+      - "com.fataplus.network=mcp"
+  
+  fataplus-main-network:
+    external: true
+    name: fataplus-main-network
+
+# ==========================================
+# VOLUMES
+# ==========================================
+volumes:
+  # MCP Server Data
+  mcp-logs:
+    driver: local
+    labels:
+      - "com.fataplus.volume=mcp-logs"
+  
+  mcp-tmp:
+    driver: local
+    labels:
+      - "com.fataplus.volume=mcp-tmp"
+  
+  mcp-data:
+    driver: local
+    labels:
+      - "com.fataplus.volume=mcp-data"
+  
+  # Database Data
+  mcp-postgres-data:
+    driver: local
+    labels:
+      - "com.fataplus.volume=mcp-postgres"
+  
+  # Cache Data
+  mcp-redis-data:
+    driver: local
+    labels:
+      - "com.fataplus.volume=mcp-redis"
+  
+  # Monitoring Data
+  mcp-prometheus-data:
+    driver: local
+    labels:
+      - "com.fataplus.volume=mcp-prometheus"
+
+# ==========================================
+# METADATA
+# ==========================================
+x-fataplus-mcp:
+  version: "1.0.0"
+  description: "Fataplus MCP Server - Universal Docker Deployment"
+  maintainer: "Fataplus Team <dev@fataplus.com>"
+  documentation: "https://docs.fataplus.com/mcp/"
+  repository: "https://github.com/fataplus/fataplus"

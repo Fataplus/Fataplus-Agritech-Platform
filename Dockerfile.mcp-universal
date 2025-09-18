@@ -1,0 +1,116 @@
+# Fataplus MCP Server - Universal Docker Container
+# Multi-stage build for production-ready MCP server deployment
+# Supports both Cloudflare Workers and standalone server modes
+
+FROM node:20-alpine AS base
+LABEL maintainer="Fataplus Team <dev@fataplus.com>"
+LABEL description="Fataplus MCP Server - Universal Deployment Container"
+LABEL version="1.0.0"
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies
+RUN apk add --no-cache \
+    ca-certificates \
+    curl \
+    jq \
+    bash \
+    && rm -rf /var/cache/apk/*
+
+# Create non-root user for security
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S fataplus -u 1001 -G nodejs
+
+# Stage 1: Dependencies
+FROM base AS deps
+COPY mcp-server/package*.json ./
+RUN npm ci --only=production && npm cache clean --force
+
+# Stage 2: Build
+FROM base AS builder
+COPY mcp-server/package*.json ./
+COPY mcp-server/tsconfig.json ./
+RUN npm ci
+
+# Copy source code
+COPY mcp-server/src ./src/
+
+# Build the application
+RUN npm run build
+
+# Stage 3: Production
+FROM base AS production
+
+# Environment variables with defaults
+ENV NODE_ENV=production
+ENV PORT=3001
+ENV HOST=0.0.0.0
+ENV MCP_SERVER_NAME="fataplus-mcp"
+ENV MCP_VERSION="1.0.0"
+ENV LOG_LEVEL=info
+
+# Health check configuration
+ENV HEALTH_CHECK_ENDPOINT="/health"
+ENV HEALTH_CHECK_TIMEOUT=5000
+ENV HEALTH_CHECK_INTERVAL=30
+
+# Performance optimization
+ENV NODE_OPTIONS="--max-old-space-size=512 --enable-source-maps"
+
+# Copy production dependencies
+COPY --from=deps --chown=fataplus:nodejs /app/node_modules ./node_modules
+
+# Copy built application
+COPY --from=builder --chown=fataplus:nodejs /app/dist ./dist
+
+# Copy configuration files
+COPY --chown=fataplus:nodejs mcp-server/package.json ./
+COPY --chown=fataplus:nodejs mcp-server/mcp-config.json ./
+
+# Create necessary directories
+RUN mkdir -p logs tmp data && \
+    chown -R fataplus:nodejs logs tmp data
+
+# Switch to non-root user
+USER fataplus
+
+# Expose port
+EXPOSE ${PORT}
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+    CMD curl -f http://localhost:${PORT}${HEALTH_CHECK_ENDPOINT} || exit 1
+
+# Graceful shutdown support
+STOPSIGNAL SIGTERM
+
+# Start command with proper signal handling
+CMD ["node", "--enable-source-maps", "dist/index.js"]
+
+# Metadata
+LABEL org.opencontainers.image.title="Fataplus MCP Server"
+LABEL org.opencontainers.image.description="Model Context Protocol server for Fataplus Agricultural Platform"
+LABEL org.opencontainers.image.version="1.0.0"
+LABEL org.opencontainers.image.vendor="Fataplus"
+LABEL org.opencontainers.image.licenses="MIT"
+LABEL org.opencontainers.image.source="https://github.com/fataplus/fataplus"
+
+# Stage 4: Development (optional)
+FROM production AS development
+ENV NODE_ENV=development
+ENV LOG_LEVEL=debug
+USER root
+
+# Install development dependencies
+RUN npm ci --include=dev
+
+# Install additional development tools
+RUN apk add --no-cache git vim nano
+
+# Development health check (more frequent)
+HEALTHCHECK --interval=10s --timeout=5s --start-period=5s --retries=2 \
+    CMD curl -f http://localhost:${PORT}${HEALTH_CHECK_ENDPOINT} || exit 1
+
+USER fataplus
+CMD ["npm", "run", "dev"]
