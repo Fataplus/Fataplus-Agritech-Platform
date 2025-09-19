@@ -1,0 +1,25 @@
+{
+  "name": "fataplus-web-backend",
+  "version": "2.0.0",
+  "description": "Fataplus Web Backend - Cloudflare Workers Deployment",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "deploy:production": "wrangler deploy --env production",
+    "deploy:staging": "wrangler deploy --env staging",
+    "deploy:development": "wrangler deploy --env development"
+  },
+  "keywords": [
+    "fataplus",
+    "agriculture",
+    "api",
+    "cloudflare-workers",
+    "serverless"
+  ],
+  "author": "Fataplus Team",
+  "license": "MIT",
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  }
+}
