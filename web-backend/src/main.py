@@ -18,6 +18,14 @@ from server.routes import router as server_router
 from context.routes import router as context_router
 from admin.routes import router as admin_router
 
+# Import security modules
+from security.cors_security import SecurityMiddleware
+from security.rate_limiting import RateLimitMiddleware
+from security.audit_logging import AuditLogger
+from security.session_management import SessionManager
+from security.jwt_auth import JWTAuthMiddleware
+from security.data_encryption import DataEncryption
+
 # Create FastAPI application
 app = FastAPI(
     title="Fataplus Web Backend",
@@ -30,17 +38,32 @@ app = FastAPI(
 # Configuration
 MOTIA_SERVICE_URL = os.getenv("MOTIA_SERVICE_URL", "http://localhost:8001")
 
+# Initialize security components
+security_middleware = SecurityMiddleware()
+rate_limit_middleware = RateLimitMiddleware()
+audit_logger = AuditLogger()
+session_manager = SessionManager()
+jwt_middleware = JWTAuthMiddleware()
+data_encryption = DataEncryption()
+
+# Security middleware stack
+app.add_middleware(jwt_middleware.__class__)
+app.add_middleware(security_middleware.__class__)
+app.add_middleware(rate_limit_middleware.__class__)
+
 # CORS middleware for frontend communication
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:3000", 
+        "http://localhost:3000",
         "http://localhost:3001",
+        "https://platform.fata.plus",
         MOTIA_SERVICE_URL  # Allow Motia service communication
     ],
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "X-Requested-With", "Accept"],
+    max_age=3600
 )
 
 # Include routers
@@ -49,6 +72,10 @@ app.include_router(token_router)
 app.include_router(server_router)
 app.include_router(context_router)
 app.include_router(admin_router)
+
+# Include security routes
+from security.routes import router as security_router
+app.include_router(security_router)
 
 @app.get("/")
 async def root():
@@ -84,12 +111,25 @@ async def root():
                 "context_search": "/ai/context/search",
                 "generate": "/ai/generate"
             },
+            "security": {
+                "login": "/auth/login",
+                "register": "/auth/register",
+                "password_reset": "/auth/password-reset",
+                "mfa_setup": "/auth/mfa/setup",
+                "biometric_auth": "/auth/biometric",
+                "oauth2_callback": "/auth/oauth2/callback",
+                "session_management": "/security/sessions",
+                "audit_logs": "/security/audit",
+                "rate_limits": "/security/rate-limits"
+            },
             "admin": {
                 "dashboard": "/admin/dashboard",
                 "users": "/admin/users",
                 "farms": "/admin/farms",
                 "metrics": "/admin/metrics",
-                "analytics": "/admin/analytics"
+                "analytics": "/admin/analytics",
+                "security_settings": "/admin/security",
+                "audit_reports": "/admin/audit"
             }
         },
         "features": [
@@ -103,7 +143,18 @@ async def root():
             "farm_analytics",
             "multi_language_support",
             "rate_limiting",
-            "audit_logging"
+            "audit_logging",
+            "multi_tenant_authentication",
+            "jwt_security",
+            "role_based_access_control",
+            "biometric_authentication",
+            "oauth2_integration",
+            "data_encryption",
+            "session_management",
+            "user_registration",
+            "password_reset",
+            "cors_security",
+            "waf_protection"
         ],
         "platform": "platform.fata.plus"
     }
