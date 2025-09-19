@@ -63,26 +63,26 @@ check_dir() {
 }
 
 # Check required files
-check_file "Dockerfile.mcp-universal" "Universal MCP Dockerfile"
-check_file "docker-compose.mcp.yml" "MCP Docker Compose configuration"
-check_file ".env.mcp" "MCP environment configuration"
+check_file "../docker/Dockerfile.mcp-universal" "Universal MCP Dockerfile"
+check_file "../docker/docker-compose.mcp.yml" "MCP Docker Compose configuration"
+check_file "config/.env.mcp" "MCP environment configuration"
 check_file "deploy-mcp-docker.sh" "MCP Docker deployment script"
 check_file "deploy-mcp-server.sh" "MCP Cloudflare deployment script"
 check_file "deploy-mcp-fata-plus.sh" "MCP fata.plus deployment script"
 
 # Check MCP server structure
-check_dir "mcp-server" "MCP server directory"
-check_file "mcp-server/package.json" "MCP server package.json"
-check_file "mcp-server/Dockerfile" "MCP server Dockerfile"
-check_file "mcp-server/wrangler.toml" "Wrangler configuration"
+check_dir "../mcp/mcp-server" "MCP server directory"
+check_file "../mcp/mcp-server/package.json" "MCP server package.json"
+check_file "../mcp/mcp-server/Dockerfile" "MCP server Dockerfile"
+check_file "../mcp/mcp-server/wrangler.toml" "Wrangler configuration"
 
 # Test 2: Validate environment configuration
 print_status "Validating environment configuration..."
 
-if [ -f ".env.mcp" ]; then
+if [ -f "config/.env.mcp" ]; then
     # Load env variables for testing
     set -a
-    source .env.mcp
+    source config/.env.mcp
     set +a
     
     # Check required environment variables
@@ -104,7 +104,7 @@ if [ -f ".env.mcp" ]; then
     check_env "JWT_SECRET_KEY" "JWT secret key"
     check_env "NODE_ENV" "Node environment"
 else
-    print_error "Environment file .env.mcp not found"
+    print_error "Environment file config/.env.mcp not found"
 fi
 
 # Test 3: Validate Dockerfile syntax
@@ -148,13 +148,13 @@ check_executable "deploy-mcp-fata-plus.sh" "Fata.plus deployment script"
 # Test 5: Validate MCP server package.json
 print_status "Validating MCP server configuration..."
 
-if [ -f "mcp-server/package.json" ]; then
+if [ -f "../mcp/mcp-server/package.json" ]; then
     test_count=$((test_count + 1))
     
     # Check for required scripts
-    if grep -q '"build":' "mcp-server/package.json" && \
-       grep -q '"start":' "mcp-server/package.json" && \
-       grep -q '"build:worker":' "mcp-server/package.json"; then
+    if grep -q '"build":' "../mcp/mcp-server/package.json" && \
+       grep -q '"start":' "../mcp/mcp-server/package.json" && \
+       grep -q '"build:worker":' "../mcp/mcp-server/package.json"; then
         print_success "MCP server scripts configured"
         pass_count=$((pass_count + 1))
     else
@@ -165,15 +165,15 @@ fi
 # Test 6: Check Docker Compose structure
 print_status "Validating Docker Compose structure..."
 
-if [ -f "docker-compose.mcp.yml" ]; then
+if [ -f "../docker/docker-compose.mcp.yml" ]; then
     test_count=$((test_count + 1))
     
     # Basic Docker Compose validation
-    if grep -q "version:" "docker-compose.mcp.yml" && \
-       grep -q "services:" "docker-compose.mcp.yml" && \
-       grep -q "fataplus-mcp-server:" "docker-compose.mcp.yml" && \
-       grep -q "networks:" "docker-compose.mcp.yml" && \
-       grep -q "volumes:" "docker-compose.mcp.yml"; then
+    if grep -q "version:" "../docker/docker-compose.mcp.yml" && \
+       grep -q "services:" "../docker/docker-compose.mcp.yml" && \
+       grep -q "fataplus-mcp-server:" "../docker/docker-compose.mcp.yml" && \
+       grep -q "networks:" "../docker/docker-compose.mcp.yml" && \
+       grep -q "volumes:" "../docker/docker-compose.mcp.yml"; then
         print_success "Docker Compose structure valid"
         pass_count=$((pass_count + 1))
     else
@@ -195,7 +195,7 @@ if [ $pass_count -eq $test_count ]; then
     print_success "🎉 All tests passed! MCP configuration is ready for deployment."
     echo
     echo "Next steps:"
-    echo "1. Configure your .env.mcp with actual values"
+    echo "1. Configure your config/.env.mcp with actual values"
     echo "2. Test deployment: ./deploy-mcp-docker.sh -e dev"
     echo "3. Deploy to production: ./deploy-mcp-docker.sh -e production"
     exit 0

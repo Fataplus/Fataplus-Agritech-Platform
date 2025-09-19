@@ -15,7 +15,7 @@ NC='\033[0m' # No Color
 # Configuration
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="${SCRIPT_DIR}"
-ENV_FILE="${PROJECT_ROOT}/.env.cloudflare"
+ENV_FILE="${PROJECT_ROOT}/config/.env.cloudflare"
 WRANGLER_CONFIG="${PROJECT_ROOT}/wrangler.toml"
 
 # Default values

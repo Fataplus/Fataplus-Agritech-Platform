@@ -116,17 +116,64 @@ cloudron_login() {
 # Function to backup current app
 backup_app() {
     print_info "Creating backup before deployment..."
-    
+
+    # Check system resources before backup
+    print_info "Checking system resources..."
+    check_system_resources
+
     # Create a backup with timestamp
     BACKUP_NAME="pre-deploy-$(date +%Y%m%d-%H%M%S)"
-    
+
+    # Set Node.js memory limit for backup process
+    export NODE_OPTIONS="--max-old-space-size=4096"
+
     cloudron backup --app $CLOUDRON_APP_ID --label "$BACKUP_NAME"
-    
+
     if [ $? -eq 0 ]; then
         print_status "Backup created: $BACKUP_NAME"
         echo "LAST_BACKUP=$BACKUP_NAME" > .last_backup
     else
-        print_warning "Backup creation failed, continuing anyway"
+        print_error "Backup creation failed"
+        print_warning "Trying to restart Cloudron services..."
+        restart_cloudron_services
+        return 1
+    fi
+}
+
+check_system_resources() {
+    # Check available memory
+    AVAILABLE_MEMORY=$(free -m | awk 'NR==2{printf "%.0f", $7}')
+    if [ $AVAILABLE_MEMORY -lt 2048 ]; then
+        print_warning "Low memory detected: ${AVAILABLE_MEMORY}MB available"
+        print_info "Attempting to free up memory..."
+        # Kill non-essential processes
+        sudo systemctl stop cloudron-target.service || true
+        sleep 10
+        AVAILABLE_MEMORY=$(free -m | awk 'NR==2{printf "%.0f", $7}')
+        print_info "Memory after cleanup: ${AVAILABLE_MEMORY}MB"
+    fi
+
+    # Check disk space
+    DISK_USAGE=$(df / | tail -1 | awk '{print $5}' | sed 's/%//')
+    if [ $DISK_USAGE -gt 85 ]; then
+        print_warning "High disk usage detected: ${DISK_USAGE}%"
+        print_info "Cleaning up old logs and temporary files..."
+        sudo find /var/log -name "*.log" -type f -mtime +30 -delete 2>/dev/null || true
+        sudo find /tmp -type f -mtime +7 -delete 2>/dev/null || true
+    fi
+}
+
+restart_cloudron_services() {
+    print_info "Restarting Cloudron services to clear memory issues..."
+    sudo systemctl restart cloudron.target
+    sleep 30
+
+    # Check if services are back online
+    if sudo systemctl is-active --quiet cloudron.target; then
+        print_status "Cloudron services restarted successfully"
+    else
+        print_error "Failed to restart Cloudron services"
+        return 1
     fi
 }
 

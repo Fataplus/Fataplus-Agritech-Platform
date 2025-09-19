@@ -163,9 +163,9 @@ echo
 
 # Test 1: Core deployment files exist
 print_status "Checking core deployment files..."
-validate_file "$PROJECT_ROOT/docker-compose.cloudflare.yml"
-validate_file "$PROJECT_ROOT/Dockerfile.cloudflare"
-validate_file "$PROJECT_ROOT/.env.cloudflare.example"
+validate_file "$PROJECT_ROOT/deployment/docker/docker-compose.cloudflare.yml"
+validate_file "$PROJECT_ROOT/deployment/docker/Dockerfile.cloudflare"
+validate_file "$PROJECT_ROOT/config/.env.cloudflare.example"
 validate_file "$PROJECT_ROOT/CLOUDFLARE_DEPLOYMENT.md"
 validate_file "$PROJECT_ROOT/CLOUDFLARE_QUICKSTART.md"
 
@@ -203,7 +203,7 @@ echo
 print_status "Validating configuration file syntax..."
 validate_syntax "$PROJECT_ROOT/infrastructure/cloudflare/wrangler.toml" "toml"
 validate_syntax "$PROJECT_ROOT/infrastructure/cloudflare/pages.toml" "toml"
-validate_docker_compose "$PROJECT_ROOT/docker-compose.cloudflare.yml"
+validate_docker_compose "$PROJECT_ROOT/deployment/docker/docker-compose.cloudflare.yml"
 
 echo
 
@@ -302,7 +302,7 @@ echo
 # Test 9: Environment template validation
 print_status "Validating environment template..."
 
-ENV_TEMPLATE="$PROJECT_ROOT/.env.cloudflare.example"
+ENV_TEMPLATE="$PROJECT_ROOT/config/.env.cloudflare.example"
 if [ -f "$ENV_TEMPLATE" ]; then
     # Check for required environment variables
     REQUIRED_VARS=(

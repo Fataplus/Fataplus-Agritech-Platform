@@ -46,13 +46,13 @@ Le serveur MCP Fataplus fournit aux assistants IA un accès aux données agricol
 ### Étape 1 : Configuration Cloudflare
 ```bash
 # Copier le template d'environnement
-cp .env.cloudflare.example .env.cloudflare
+cp config/.env.cloudflare.example config/.env.cloudflare
 
 # Éditer avec vos clés Cloudflare
-nano .env.cloudflare
+nano config/.env.cloudflare
 ```
 
-**Variables requises dans `.env.cloudflare` :**
+**Variables requises dans `config/.env.cloudflare` :**
 ```bash
 CF_ACCOUNT_ID=your-cloudflare-account-id
 CF_API_TOKEN=your-cloudflare-api-token
@@ -98,13 +98,13 @@ Après déploiement, votre serveur MCP sera accessible via :
 ### Étape 1 : Configuration Docker
 ```bash
 # Copier le template d'environnement Docker
-cp .env.mcp.example .env.mcp
+cp config/.env.mcp.example config/.env.mcp
 
 # Éditer avec vos configurations
-nano .env.mcp
+nano config/.env.mcp
 ```
 
-**Variables principales dans `.env.mcp` :**
+**Variables principales dans `config/.env.mcp` :**
 ```bash
 NODE_ENV=production
 MCP_PORT=3001
@@ -131,13 +131,13 @@ OPENWEATHER_API_KEY=your-openweather-api-key
 ### Étape 3 : Gestion des Services
 ```bash
 # Voir les logs
-docker compose -f docker-compose.mcp.yml logs -f fataplus-mcp-server
+docker compose -f deployment/docker/docker-compose.mcp.yml logs -f fataplus-mcp-server
 
 # Redémarrer le serveur
-docker compose -f docker-compose.mcp.yml restart fataplus-mcp-server
+docker compose -f deployment/docker/docker-compose.mcp.yml restart fataplus-mcp-server
 
 # Arrêter tous les services
-docker compose -f docker-compose.mcp.yml down
+docker compose -f deployment/docker/docker-compose.mcp.yml down
 
 # Mise à jour du déploiement
 ./deploy-mcp-docker.sh -e production -f
@@ -239,7 +239,7 @@ curl -X POST https://mcp.yourdomain.com/mcp/resources \
 ### Docker Monitoring
 ```bash
 # Logs des services
-docker compose -f docker-compose.mcp.yml logs -f
+docker compose -f deployment/docker/docker-compose.mcp.yml logs -f
 
 # Métriques des conteneurs
 docker stats
@@ -290,13 +290,13 @@ wrangler tail fataplus-mcp-server --env production
 #### 2. Problèmes Docker
 ```bash
 # Vérifier les conteneurs
-docker compose -f docker-compose.mcp.yml ps
+docker compose -f deployment/docker/docker-compose.mcp.yml ps
 
 # Logs détaillés
-docker compose -f docker-compose.mcp.yml logs fataplus-mcp-server
+docker compose -f deployment/docker/docker-compose.mcp.yml logs fataplus-mcp-server
 
 # Redémarrer les services
-docker compose -f docker-compose.mcp.yml restart
+docker compose -f deployment/docker/docker-compose.mcp.yml restart
 ```
 
 #### 3. Problèmes de Connectivité
@@ -305,10 +305,10 @@ docker compose -f docker-compose.mcp.yml restart
 curl -v http://localhost:3001/health
 
 # Test base de données
-docker compose -f docker-compose.mcp.yml exec mcp-postgres pg_isready
+docker compose -f deployment/docker/docker-compose.mcp.yml exec mcp-postgres pg_isready
 
 # Test cache
-docker compose -f docker-compose.mcp.yml exec mcp-redis redis-cli ping
+docker compose -f deployment/docker/docker-compose.mcp.yml exec mcp-redis redis-cli ping
 ```
 
 ## 📚 Ressources Supplémentaires

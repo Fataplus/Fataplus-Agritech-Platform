@@ -17,7 +17,7 @@ NC='\033[0m' # No Color
 # Configuration
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="${SCRIPT_DIR}"
-MCP_ENV_FILE="${PROJECT_ROOT}/.env.mcp"
+MCP_ENV_FILE="${PROJECT_ROOT}/config/.env.mcp"
 
 # Default values
 DEPLOYMENT_ENVIRONMENT="production"
@@ -85,7 +85,7 @@ EXAMPLES:
 
 PREREQUISITES:
     - Docker and Docker Compose installed
-    - MCP environment file configured (.env.mcp)
+    - MCP environment file configured (config/.env.mcp)
     - Sufficient disk space for volumes
     - Network connectivity for external services
 
@@ -118,7 +118,7 @@ check_prerequisites() {
     if [ ! -f "$MCP_ENV_FILE" ]; then
         print_error "MCP environment file not found: $MCP_ENV_FILE"
         print_status "Creating template environment file..."
-        cp "${PROJECT_ROOT}/.env.mcp.example" "$MCP_ENV_FILE"
+        cp "${PROJECT_ROOT}/config/.env.mcp.example" "$MCP_ENV_FILE"
         print_warning "Please configure $MCP_ENV_FILE before proceeding."
         exit 1
     fi
@@ -194,7 +194,7 @@ backup_data() {
 deploy_mcp_server() {
     print_status "Deploying Fataplus MCP Server with Docker Compose..."
 
-    local compose_file="${PROJECT_ROOT}/docker-compose.mcp.yml"
+    local compose_file="${PROJECT_ROOT}/deployment/docker/docker-compose.mcp.yml"
     local compose_args=()
 
     # Build compose command arguments
@@ -257,7 +257,7 @@ run_health_checks() {
     done
 
     if [ $attempt -eq $max_attempts ]; then
-        print_warning "MCP server health check timeout. Check logs with: docker compose -f docker-compose.mcp.yml logs fataplus-mcp-server"
+        print_warning "MCP server health check timeout. Check logs with: docker compose -f deployment/docker/docker-compose.mcp.yml logs fataplus-mcp-server"
         return 1
     fi
 
@@ -279,14 +279,14 @@ run_health_checks() {
     fi
 
     # Check database connectivity
-    if docker compose -f "${PROJECT_ROOT}/docker-compose.mcp.yml" exec -T mcp-postgres pg_isready > /dev/null 2>&1; then
+    if docker compose -f "${PROJECT_ROOT}/deployment/docker/docker-compose.mcp.yml" exec -T mcp-postgres pg_isready > /dev/null 2>&1; then
         print_success "PostgreSQL database is ready"
     else
         print_warning "PostgreSQL database connection issues"
     fi
 
     # Check Redis connectivity
-    if docker compose -f "${PROJECT_ROOT}/docker-compose.mcp.yml" exec -T mcp-redis redis-cli ping > /dev/null 2>&1; then
+    if docker compose -f "${PROJECT_ROOT}/deployment/docker/docker-compose.mcp.yml" exec -T mcp-redis redis-cli ping > /dev/null 2>&1; then
         print_success "Redis cache is ready"
     else
         print_warning "Redis cache connection issues"
@@ -320,9 +320,9 @@ show_deployment_summary() {
     echo "- Redis: localhost:${MCP_REDIS_PORT:-6379}"
     echo
     echo "=== Management Commands ==="
-    echo "View logs: docker compose -f docker-compose.mcp.yml logs -f fataplus-mcp-server"
-    echo "Restart server: docker compose -f docker-compose.mcp.yml restart fataplus-mcp-server"
-    echo "Stop services: docker compose -f docker-compose.mcp.yml down"
+    echo "View logs: docker compose -f deployment/docker/docker-compose.mcp.yml logs -f fataplus-mcp-server"
+    echo "Restart server: docker compose -f deployment/docker/docker-compose.mcp.yml restart fataplus-mcp-server"
+    echo "Stop services: docker compose -f deployment/docker/docker-compose.mcp.yml down"
     echo "Update deployment: $0 -e $DEPLOYMENT_ENVIRONMENT"
     echo
     echo "=== Next Steps ==="
@@ -336,7 +336,7 @@ show_deployment_summary() {
 # Function to cleanup on error
 cleanup_on_error() {
     print_error "Deployment failed. Cleaning up..."
-    docker compose -f "${PROJECT_ROOT}/docker-compose.mcp.yml" down --remove-orphans || true
+    docker compose -f "${PROJECT_ROOT}/deployment/docker/docker-compose.mcp.yml" down --remove-orphans || true
     exit 1
 }
 

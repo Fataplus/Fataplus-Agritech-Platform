@@ -20,7 +20,7 @@ NC='\033[0m' # No Color
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$SCRIPT_DIR"
 MCP_DIR="$PROJECT_ROOT/mcp-server"
-ENV_FILE="$PROJECT_ROOT/.env.cloudflare"
+ENV_FILE="$PROJECT_ROOT/config/.env.cloudflare"
 
 # Domain configuration
 PRODUCTION_DOMAIN="mcp.fata.plus"

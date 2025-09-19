@@ -271,7 +271,7 @@ wrangler login
 # Vérifier les zones disponibles
 wrangler zone list
 
-# Vérifier l'ID de zone dans .env.cloudflare
+# Vérifier l'ID de zone dans config/.env.cloudflare
 ```
 
 ### Problèmes de connectivité
