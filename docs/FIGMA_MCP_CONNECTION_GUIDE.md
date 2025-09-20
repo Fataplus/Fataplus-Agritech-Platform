@@ -27,7 +27,7 @@ FIGMA_MCP_PORT=3845
 FIGMA_MCP_HOST=127.0.0.1
 
 # FIGMA API CREDENTIALS
-FIGMA_API_KEY=figd_feqBOA7QYsosHDsYj4ZXLVxvyJNwUKjtYtlQjG_2
+FIGMA_API_KEY=YOUR_FIGMA_API_KEY
 
 # CONNECTION MODE
 FIGMA_MCP_MODE=stdio
@@ -63,7 +63,7 @@ node scripts/figma-mcp-connection-test.js --help
 
 ```bash
 # Test stdio connection directly
-echo '{"jsonrpc":"2.0","method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"test-client","version":"1.0.0"}},"id":1}' | npx figma-developer-mcp --figma-api-key=figd_feqBOA7QYsosHDsYj4ZXLVxvyJNwUKjtYtlQjG_2 --stdio
+echo '{"jsonrpc":"2.0","method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"test-client","version":"1.0.0"}},"id":1}' | npx figma-developer-mcp --figma-api-key=YOUR_FIGMA_API_KEY --stdio
 ```
 
 ## Available Tools

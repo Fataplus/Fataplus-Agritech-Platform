@@ -10,7 +10,7 @@ This guide documents the integration of Figma design systems into the Fataplus w
 - **Server**: Figma MCP Server v0.6.0
 - **URL**: `http://127.0.0.1:3845/mcp`
 - **Mode**: stdio (standard input/output)
-- **API Key**: `figd_feqBOA7QYsosHDsYj4ZXLVxvyJNwUKjtYtlQjG_2`
+- **API Key**: `YOUR_FIGMA_API_KEY` (set via FIGMA_API_KEY environment variable)
 
 ### ⚠️ Current Issue
 - **Problem**: 403 Forbidden error when accessing the target Figma file
