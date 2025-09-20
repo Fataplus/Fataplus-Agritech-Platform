@@ -1,7 +1,7 @@
 # Figma API Setup Guide
 
 ## 🚨 Issue Identified
-Your API key `figd_feqBOA7QYsosHDsYj4ZXLVxvyJNwUKjtYtlQjG_2` is returning "Invalid token" error.
+Your API key `[YOUR_FIGMA_API_KEY]` is returning "Invalid token" error.
 
 ## 🔧 Solution: Generate New API Key
 

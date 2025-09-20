@@ -4,7 +4,7 @@ const { spawn } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
-const FIGMA_API_KEY = 'figd_feqBOA7QYsosHDsYj4ZXLVxvyJNwUKjtYtlQjG_2';
+const FIGMA_API_KEY = process.env.FIGMA_API_KEY || 'YOUR_FIGMA_API_KEY_HERE';
 
 // Test with different public Figma files to check API key permissions
 const TEST_FILES = [

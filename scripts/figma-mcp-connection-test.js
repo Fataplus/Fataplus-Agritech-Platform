@@ -27,7 +27,7 @@ try {
 
 class FigmaMCPClient {
   constructor() {
-    this.figmaApiKey = config.FIGMA_API_KEY || 'figd_feqBOA7QYsosHDsYj4ZXLVxvyJNwUKjtYtlQjG_2';
+    this.figmaApiKey = config.FIGMA_API_KEY || 'YOUR_FIGMA_API_KEY_HERE';
     this.mode = config.FIGMA_MCP_MODE || 'stdio';
     this.debug = config.FIGMA_MCP_DEBUG === 'true';
     this.requestId = 1;
