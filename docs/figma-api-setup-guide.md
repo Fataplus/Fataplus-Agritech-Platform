@@ -26,7 +26,7 @@ Edit `/config/.env.figma-mcp`:
 
 ```bash
 # Replace this line:
-FIGMA_API_KEY=figd_feqBOA7QYsosHDsYj4ZXLVxvyJNwUKjtYtlQjG_2
+FIGMA_API_KEY=YOUR_FIGMA_API_KEY
 
 # With your new token:
 FIGMA_API_KEY=figd_YOUR_NEW_TOKEN_HERE
@@ -35,7 +35,7 @@ FIGMA_API_KEY=figd_YOUR_NEW_TOKEN_HERE
 ### Step 5: Test the New Token
 ```bash
 # Update the token in scripts too
-sed -i '' 's/figd_feqBOA7QYsosHDsYj4ZXLVxvyJNwUKjtYtlQjG_2/figd_YOUR_NEW_TOKEN_HERE/g' scripts/*.js
+sed -i '' 's/YOUR_FIGMA_API_KEY/figd_YOUR_NEW_TOKEN_HERE/g' scripts/*.js
 
 # Test the connection
 node scripts/test-figma-access.js
