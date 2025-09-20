@@ -1,0 +1,130 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+  namespace: fataplus-staging
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: standard
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+  namespace: fataplus-production
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Gi  # Larger storage for production
+  storageClassName: standard
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redis-pvc
+  namespace: fataplus-staging
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: standard
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redis-pvc
+  namespace: fataplus-production
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi  # Larger storage for production Redis cluster
+  storageClassName: standard
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-init-config
+  namespace: fataplus-staging
+data:
+  init.sql: |
+    -- Create PostGIS extension
+    CREATE EXTENSION IF NOT EXISTS postgis;
+
+    -- Create database schemas
+    CREATE SCHEMA IF NOT EXISTS fataplus;
+    CREATE SCHEMA IF NOT EXISTS audit;
+
+    -- Set default permissions
+    GRANT ALL PRIVILEGES ON SCHEMA fataplus TO fataplus_user;
+    GRANT ALL PRIVILEGES ON SCHEMA audit TO fataplus_user;
+
+    -- Create default roles
+    CREATE ROLE IF NOT EXISTS fataplus_read;
+    CREATE ROLE IF NOT EXISTS fataplus_write;
+    CREATE ROLE IF NOT EXISTS fataplus_admin;
+
+    -- Grant permissions to roles
+    GRANT CONNECT ON DATABASE fataplus_staging TO fataplus_read;
+    GRANT CONNECT ON DATABASE fataplus_staging TO fataplus_write;
+    GRANT CONNECT ON DATABASE fataplus_staging TO fataplus_admin;
+
+    GRANT USAGE ON SCHEMA fataplus TO fataplus_read;
+    GRANT SELECT ON ALL TABLES IN SCHEMA fataplus TO fataplus_read;
+
+    GRANT USAGE ON SCHEMA fataplus TO fataplus_write;
+    GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA fataplus TO fataplus_write;
+
+    GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA fataplus TO fataplus_admin;
+    GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA fataplus TO fataplus_admin;
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-init-config
+  namespace: fataplus-production
+data:
+  init.sql: |
+    -- Create PostGIS extension
+    CREATE EXTENSION IF NOT EXISTS postgis;
+
+    -- Create database schemas
+    CREATE SCHEMA IF NOT EXISTS fataplus;
+    CREATE SCHEMA IF NOT EXISTS audit;
+
+    -- Set default permissions
+    GRANT ALL PRIVILEGES ON SCHEMA fataplus TO fataplus_user;
+    GRANT ALL PRIVILEGES ON SCHEMA audit TO fataplus_user;
+
+    -- Create default roles with production-specific permissions
+    CREATE ROLE IF NOT EXISTS fataplus_read;
+    CREATE ROLE IF NOT EXISTS fataplus_write;
+    CREATE ROLE IF NOT EXISTS fataplus_admin;
+
+    -- Grant permissions to roles
+    GRANT CONNECT ON DATABASE fataplus_prod TO fataplus_read;
+    GRANT CONNECT ON DATABASE fataplus_prod TO fataplus_write;
+    GRANT CONNECT ON DATABASE fataplus_prod TO fataplus_admin;
+
+    GRANT USAGE ON SCHEMA fataplus TO fataplus_read;
+    GRANT SELECT ON ALL TABLES IN SCHEMA fataplus TO fataplus_read;
+
+    GRANT USAGE ON SCHEMA fataplus TO fataplus_write;
+    GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA fataplus TO fataplus_write;
+
+    GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA fataplus TO fataplus_admin;
+    GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA fataplus TO fataplus_admin;
+
+    -- Production-specific optimizations
+    ALTER SYSTEM SET shared_preload_libraries = 'pg_stat_statements';
+    ALTER SYSTEM SET track_activity_query_size = 2048;
+    ALTER SYSTEM SET log_min_duration_statement = 1000;

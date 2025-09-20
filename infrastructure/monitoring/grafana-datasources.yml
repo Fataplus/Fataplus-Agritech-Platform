@@ -1,0 +1,85 @@
+# Fataplus Grafana Datasources Configuration
+# Datasources for monitoring African agricultural platform
+
+apiVersion: 1
+
+datasources:
+  # Prometheus datasource
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    editable: true
+    jsonData:
+      httpMethod: POST
+      queryTimeout: 60s
+      timeInterval: 15s
+
+  # PostgreSQL datasource
+  - name: PostgreSQL
+    type: postgres
+    url: postgres://fataplus_user:{{ .Values.database.password }}@postgres:5432/fataplus_{{ .Values.environment }}
+    user: fataplus_user
+    password: {{ .Values.database.password }}
+    database: fataplus_{{ .Values.environment }}
+    isDefault: false
+    editable: true
+    jsonData:
+      sslmode: require
+      maxOpenConns: 100
+      maxIdleConns: 25
+      connMaxLifetime: 14400
+      postgresVersion: 1500
+      timescaledb: false
+
+  # Redis datasource
+  - name: Redis
+    type: redis-datasource
+    url: redis://redis:6379
+    password: {{ .Values.redis.password }}
+    isDefault: false
+    editable: true
+    jsonData:
+      poolSize: 10
+      timeout: 10
+      pingInterval: 30
+
+  # Loki datasource for logs
+  - name: Loki
+    type: loki
+    url: http://loki:3100
+    isDefault: false
+    editable: true
+    jsonData:
+      maxLines: 1000
+
+  # CloudWatch datasource (for AWS integration)
+  - name: CloudWatch
+    type: cloudwatch
+    url: https://monitoring.{{ .Values.aws_region }}.amazonaws.com
+    isDefault: false
+    editable: true
+    jsonData:
+      authType: credentials
+      defaultRegion: {{ .Values.aws_region }}
+
+  # Jaeger datasource for tracing
+  - name: Jaeger
+    type: jaeger
+    url: http://jaeger:16686
+    isDefault: false
+    editable: true
+
+  # Elasticsearch datasource
+  - name: Elasticsearch
+    type: elasticsearch
+    url: http://elasticsearch:9200
+    isDefault: false
+    editable: true
+    jsonData:
+      esVersion: 8.0.0
+      timeField: "@timestamp"
+      logMessageField: message
+      logLevelField: level
+      maxConcurrentShardRequests: 256

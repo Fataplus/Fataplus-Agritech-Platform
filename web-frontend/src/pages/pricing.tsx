@@ -60,7 +60,7 @@ export default function PricingPage() {
   const faqs = [
     {
       question: 'How does the pricing calculator work?',
-      answer: 'Our pricing calculator allows you to select specific services and estimate costs based on your project timeline. It includes both development services (priced at €28.57/day) and SaaS subscriptions (€1/user/month).'
+      answer: 'Our pricing calculator allows you to select specific services and estimate costs based on your project timeline. It includes comprehensive development services (priced at €28.57/day) and optional SaaS subscriptions (€1/user/month). You can choose to include or exclude the SaaS platform based on your needs.'
     },
     {
       question: 'What is included in the Professional plan?',
@@ -68,19 +68,35 @@ export default function PricingPage() {
     },
     {
       question: 'Do you offer custom development services?',
-      answer: 'Yes! We offer custom development services at €28.57 per day. This includes UI/UX design, no-code/low-code development, AI integration, and more. Use our calculator to estimate your project costs.'
+      answer: 'Yes! We offer comprehensive custom development services at €28.57 per day, including UX research, persona creation, UI design, design system creation, landing page design, no-code/low-code development, AI integration, analytics, A/B testing, and accessibility audits. Use our calculator to estimate your project costs.'
+    },
+    {
+      question: 'Can I use your services without the SaaS platform?',
+      answer: 'Absolutely! Our pricing calculator allows you to choose whether to include the SaaS platform subscription. You can opt for development services only (agency services) or include the ongoing platform subscription based on your specific needs and budget.'
+    },
+    {
+      question: 'What makes your UX research different?',
+      answer: 'Our UX research is specifically tailored for African agricultural contexts. We conduct user interviews with farmers, create detailed personas that reflect local agricultural practices, and design solutions that work in low-connectivity environments with mobile-first approaches.'
+    },
+    {
+      question: 'Do you offer design system creation?',
+      answer: 'Yes! We create comprehensive design systems that include component libraries, design tokens, documentation, and guidelines. Our design systems are optimized for agricultural applications and support both web and mobile platforms.'
     },
     {
       question: 'Is there a free trial?',
-      answer: 'Yes! Smallholder farmers can access our platform for free with basic features. Professional and Enterprise plans include free trials. Contact us to learn more.'
+      answer: 'Yes! Smallholder farmers can access our platform for free with basic features. Professional and Enterprise plans include free trials. Contact us to learn more about our development services trial.'
     },
     {
       question: 'What payment methods do you accept?',
-      answer: 'We accept mobile money payments, bank transfers, and credit cards. For African markets, we prioritize local payment methods for ease of use.'
+      answer: 'We accept mobile money payments, bank transfers, and credit cards. For African markets, we prioritize local payment methods like M-Pesa, Airtel Money, and other mobile money solutions for ease of use.'
     },
     {
       question: 'Do you offer discounts for NGOs and cooperatives?',
-      answer: 'Yes! We offer special pricing for agricultural cooperatives, NGOs, and development programs. Contact our team to discuss discounted rates for impact-driven organizations.'
+      answer: 'Yes! We offer special pricing for agricultural cooperatives, NGOs, and development programs. Contact our team to discuss discounted rates for impact-driven organizations and learn about our SDG-aligned pricing models.'
+    },
+    {
+      question: 'What is included in your accessibility audit?',
+      answer: 'Our accessibility audit includes WCAG 2.1 AA compliance testing, recommendations for improving accessibility for users with disabilities, mobile accessibility optimization, and implementation guidance to ensure your agricultural platform serves all users inclusively.'
     }
   ];
 
@@ -188,49 +204,145 @@ export default function PricingPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
               <h2 className="text-3xl font-bold text-earth-900 mb-4">
-                Development Services
+                Comprehensive Development Services
               </h2>
               <p className="text-lg text-earth-600">
-                Professional development services to bring your agricultural vision to life
+                From user research to deployment, we provide end-to-end digital solutions for African agriculture
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <Card className="text-center">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+              {/* Design & UX Services */}
+              <Card className="text-center border-l-4 border-primary-500">
                 <CardContent className="pt-6">
-                  <div className="text-3xl mb-4">🎨</div>
-                  <h3 className="text-lg font-bold text-earth-900 mb-2">UI/UX Design</h3>
-                  <p className="text-earth-600 text-sm mb-3">Farmer-centric design systems</p>
+                  <div className="text-3xl mb-4">🔍</div>
+                  <h3 className="text-lg font-bold text-earth-900 mb-2">UX Research & User Studies</h3>
+                  <p className="text-earth-600 text-sm mb-3">User interviews, behavioral analysis, qualitative testing</p>
+                  <Badge variant="primary" className="text-xs">5-10 days</Badge>
+                </CardContent>
+              </Card>
+
+              <Card className="text-center border-l-4 border-primary-500">
+                <CardContent className="pt-6">
+                  <div className="text-3xl mb-4">👥</div>
+                  <h3 className="text-lg font-bold text-earth-900 mb-2">Persona Creation</h3>
+                  <p className="text-earth-600 text-sm mb-3">Detailed personas, empathy maps, user journeys</p>
+                  <Badge variant="primary" className="text-xs">3-6 days</Badge>
+                </CardContent>
+              </Card>
+
+              <Card className="text-center border-l-4 border-primary-500">
+                <CardContent className="pt-6">
+                  <div className="text-3xl mb-4">✍️</div>
+                  <h3 className="text-lg font-bold text-earth-900 mb-2">UX Writing</h3>
+                  <p className="text-earth-600 text-sm mb-3">Information architecture, microcopy, content strategy</p>
                   <Badge variant="primary" className="text-xs">3-5 days</Badge>
                 </CardContent>
               </Card>
 
-              <Card className="text-center">
+              {/* UI Design Services */}
+              <Card className="text-center border-l-4 border-secondary-500">
                 <CardContent className="pt-6">
-                  <div className="text-3xl mb-4">⚡</div>
-                  <h3 className="text-lg font-bold text-earth-900 mb-2">No-Code Apps</h3>
-                  <p className="text-earth-600 text-sm mb-3">Rapid application development</p>
-                  <Badge variant="secondary" className="text-xs">6-12 days</Badge>
+                  <div className="text-3xl mb-4">🎨</div>
+                  <h3 className="text-lg font-bold text-earth-900 mb-2">UI Design & Interface Design</h3>
+                  <p className="text-earth-600 text-sm mb-3">High-fidelity mockups, adaptive design, UI components</p>
+                  <Badge variant="secondary" className="text-xs">5-12 days</Badge>
                 </CardContent>
               </Card>
 
-              <Card className="text-center">
+              <Card className="text-center border-l-4 border-secondary-500">
+                <CardContent className="pt-6">
+                  <div className="text-3xl mb-4">📚</div>
+                  <h3 className="text-lg font-bold text-earth-900 mb-2">Design System Creation</h3>
+                  <p className="text-earth-600 text-sm mb-3">Complete design system, documentation, component library</p>
+                  <Badge variant="secondary" className="text-xs">8-15 days</Badge>
+                </CardContent>
+              </Card>
+
+              <Card className="text-center border-l-4 border-secondary-500">
+                <CardContent className="pt-6">
+                  <div className="text-3xl mb-4">📄</div>
+                  <h3 className="text-lg font-bold text-earth-900 mb-2">Landing Page Design</h3>
+                  <p className="text-earth-600 text-sm mb-3">Conversion-optimized landing pages, A/B testing design</p>
+                  <Badge variant="secondary" className="text-xs">4-8 days</Badge>
+                </CardContent>
+              </Card>
+
+              {/* Development Services */}
+              <Card className="text-center border-l-4 border-accent-500">
+                <CardContent className="pt-6">
+                  <div className="text-3xl mb-4">⚡</div>
+                  <h3 className="text-lg font-bold text-earth-900 mb-2">No-Code Apps</h3>
+                  <p className="text-earth-600 text-sm mb-3">Rapid application development with Bubble/Adalo</p>
+                  <Badge variant="warning" className="text-xs">6-12 days</Badge>
+                </CardContent>
+              </Card>
+
+              <Card className="text-center border-l-4 border-accent-500">
                 <CardContent className="pt-6">
                   <div className="text-3xl mb-4">🤖</div>
                   <h3 className="text-lg font-bold text-earth-900 mb-2">AI Integration</h3>
-                  <p className="text-earth-600 text-sm mb-3">Smart agricultural features</p>
+                  <p className="text-earth-600 text-sm mb-3">Smart agricultural features and AI agents</p>
                   <Badge variant="success" className="text-xs">2-5 days</Badge>
                 </CardContent>
               </Card>
 
-              <Card className="text-center">
+              <Card className="text-center border-l-4 border-accent-500">
                 <CardContent className="pt-6">
                   <div className="text-3xl mb-4">🚀</div>
-                  <h3 className="text-lg font-bold text-earth-900 mb-2">Deployment</h3>
-                  <p className="text-earth-600 text-sm mb-3">Launch and go-live support</p>
+                  <h3 className="text-lg font-bold text-earth-900 mb-2">Deployment & Launch</h3>
+                  <p className="text-earth-600 text-sm mb-3">Go-live support, monitoring, and optimization</p>
                   <Badge variant="warning" className="text-xs">2-3 days</Badge>
                 </CardContent>
               </Card>
+
+              {/* Additional Services */}
+              <Card className="text-center border-l-4 border-earth-500">
+                <CardContent className="pt-6">
+                  <div className="text-3xl mb-4">📊</div>
+                  <h3 className="text-lg font-bold text-earth-900 mb-2">Analytics Integration</h3>
+                  <p className="text-earth-600 text-sm mb-3">Data visualization, automated reports, user insights</p>
+                  <Badge variant="info" className="text-xs">3-6 days</Badge>
+                </CardContent>
+              </Card>
+
+              <Card className="text-center border-l-4 border-earth-500">
+                <CardContent className="pt-6">
+                  <div className="text-3xl mb-4">🧪</div>
+                  <h3 className="text-lg font-bold text-earth-900 mb-2">A/B Testing Design</h3>
+                  <p className="text-earth-600 text-sm mb-3">Data-driven optimization and iterative improvements</p>
+                  <Badge variant="info" className="text-xs">3-5 days</Badge>
+                </CardContent>
+              </Card>
+
+              <Card className="text-center border-l-4 border-earth-500">
+                <CardContent className="pt-6">
+                  <div className="text-3xl mb-4">♿</div>
+                  <h3 className="text-lg font-bold text-earth-900 mb-2">Accessibility Audit</h3>
+                  <p className="text-earth-600 text-sm mb-3">WCAG compliance and inclusive design improvements</p>
+                  <Badge variant="info" className="text-xs">3-5 days</Badge>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Service Categories Legend */}
+            <div className="flex flex-wrap justify-center gap-4 mb-8">
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-primary-500 rounded"></div>
+                <span className="text-sm text-earth-600">UX Research & Strategy</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-secondary-500 rounded"></div>
+                <span className="text-sm text-earth-600">UI Design & Visual</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-accent-500 rounded"></div>
+                <span className="text-sm text-earth-600">Development & Technical</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-earth-500 rounded"></div>
+                <span className="text-sm text-earth-600">Analytics & Optimization</span>
+              </div>
             </div>
           </div>
         </section>
@@ -271,8 +383,8 @@ export default function PricingPage() {
               Ready to Get Started?
             </h2>
             <p className="text-xl text-primary-100 mb-8">
-              Choose the plan that fits your agricultural needs and start transforming
-              your operations today.
+              Choose the plan that fits your agricultural needs or select from our comprehensive
+              development services including UX research, design systems, and landing page optimization.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/solutions">

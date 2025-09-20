@@ -1,0 +1,609 @@
+# Fataplus Backup and Disaster Recovery Configuration
+# Multi-region backup strategy for African agricultural platform
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: backup
+  labels:
+    name: backup
+    environment: {{ .Values.environment }}
+    app: fataplus
+
+---
+# Velero Backup Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: velero-config
+  namespace: backup
+data:
+  velero.yml: |
+    # Velero configuration for backup and disaster recovery
+    backups-enabled: true
+    restic-enabled: true
+    restic-timeout: 1h
+    default-backup-ttl: 720h  # 30 days
+    default-snapshot-location: default
+    default-volume-snapshot-location: default
+
+    # Backup schedules
+    backup-schedules:
+      daily:
+        schedule: "0 1 * * *"  # Daily at 1 AM
+        ttl: 168h            # 7 days
+        snapshot-volumes: true
+        include-resources: "*"
+        exclude-namespaces: ["kube-system", "kube-public", "backup"]
+        storage-location: default
+
+      weekly:
+        schedule: "0 2 * * 0"  # Weekly on Sunday at 2 AM
+        ttl: 720h            # 30 days
+        snapshot-volumes: true
+        include-resources: "*"
+        exclude-namespaces: ["kube-system", "kube-public"]
+        storage-location: regional
+
+      monthly:
+        schedule: "0 3 1 * *"  # Monthly on 1st at 3 AM
+        ttl: 2160h           # 90 days
+        snapshot-volumes: true
+        include-resources: "*"
+        storage-location: longterm
+
+    # Restore configurations
+    restore-strategies:
+      critical:
+        namespace-mappings:
+          fataplus-staging: fataplus-recovery
+          default: default-recovery
+        included-resources:
+          - deployments
+          - statefulsets
+          - configmaps
+          - secrets
+          - persistentvolumes
+          - persistentvolumeclaims
+
+      full:
+        namespace-mappings:
+          "*": "*"
+        included-resources: "*"
+        preserve-nodeports: true
+
+---
+# Velero Backup Storage Location
+apiVersion: velero.io/v1
+kind: BackupStorageLocation
+metadata:
+  name: default
+  namespace: backup
+spec:
+  provider: aws
+  objectStorage:
+    bucket: fataplus-backups-{{ .Values.environment }}
+  config:
+    region: {{ .Values.aws_region }}
+    s3ForcePathStyle: "true"
+    s3Url: "https://s3.{{ .Values.aws_region }}.amazonaws.com"
+
+---
+# Regional Backup Storage Location
+apiVersion: velero.io/v1
+kind: BackupStorageLocation
+metadata:
+  name: regional
+  namespace: backup
+spec:
+  provider: aws
+  objectStorage:
+    bucket: fataplus-backups-regional-{{ .Values.environment }}
+  config:
+    region: {{ .Values.aws_region }}
+    s3ForcePathStyle: "true"
+    s3Url: "https://s3.{{ .Values.aws_region }}.amazonaws.com"
+
+---
+# Long-term Backup Storage Location
+apiVersion: velero.io/v1
+kind: BackupStorageLocation
+metadata:
+  name: longterm
+  namespace: backup
+spec:
+  provider: aws
+  objectStorage:
+    bucket: fataplus-backups-longterm-{{ .Values.environment }}
+  config:
+    region: {{ .Values.aws_region }}
+    s3ForcePathStyle: "true"
+    s3Url: "https://s3.{{ .Values.aws_region }}.amazonaws.com"
+
+---
+# Volume Snapshot Location
+apiVersion: velero.io/v1
+kind: VolumeSnapshotLocation
+metadata:
+  name: default
+  namespace: backup
+spec:
+  provider: aws
+  config:
+    region: {{ .Values.aws_region }}
+
+---
+# Database Backup Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-backup-config
+  namespace: backup
+data:
+  backup-script.sh: |
+    #!/bin/bash
+    # PostgreSQL backup script
+
+    set -e
+
+    # Configuration
+    DB_HOST="${POSTGRES_HOST:-postgres}"
+    DB_PORT="${POSTGRES_PORT:-5432}"
+    DB_NAME="${POSTGRES_DB:-fataplus_production}"
+    DB_USER="${POSTGRES_USER:-fataplus_user}"
+    BACKUP_DIR="/backups/postgres"
+    TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+    ENCRYPTION_KEY="${BACKUP_ENCRYPTION_KEY}"
+
+    # Create backup directory
+    mkdir -p "${BACKUP_DIR}"
+
+    # Create backup
+    pg_dump \
+      --host="${DB_HOST}" \
+      --port="${DB_PORT}" \
+      --username="${DB_USER}" \
+      --dbname="${DB_NAME}" \
+      --no-password \
+      --format=custom \
+      --compress=9 \
+      --verbose \
+      --file="${BACKUP_DIR}/fataplus_${TIMESTAMP}.dump"
+
+    # Encrypt backup
+    if [ -n "${ENCRYPTION_KEY}" ]; then
+      openssl enc -aes-256-cbc -salt -in "${BACKUP_DIR}/fataplus_${TIMESTAMP}.dump" \
+        -out "${BACKUP_DIR}/fataplus_${TIMESTAMP}.dump.enc" \
+        -pass "pass:${ENCRYPTION_KEY}"
+      rm "${BACKUP_DIR}/fataplus_${TIMESTAMP}.dump"
+    fi
+
+    # Upload to S3
+    aws s3 cp "${BACKUP_DIR}/" "s3://fataplus-backups-${ENVIRONMENT}/postgres/" --recursive
+
+    # Clean up old backups (keep last 7 days)
+    find "${BACKUP_DIR}" -name "*.dump*" -mtime +7 -delete
+
+    echo "PostgreSQL backup completed: fataplus_${TIMESTAMP}"
+
+  restore-script.sh: |
+    #!/bin/bash
+    # PostgreSQL restore script
+
+    set -e
+
+    # Configuration
+    DB_HOST="${POSTGRES_HOST:-postgres}"
+    DB_PORT="${POSTGRES_PORT:-5432}"
+    DB_NAME="${POSTGRES_DB:-fataplus_production}"
+    DB_USER="${POSTGRES_USER:-fataplus_user}"
+    BACKUP_DIR="/backups/postgres"
+    BACKUP_FILE="${1}"
+    ENCRYPTION_KEY="${BACKUP_ENCRYPTION_KEY}"
+
+    # Download backup from S3
+    aws s3 cp "s3://fataplus-backups-${ENVIRONMENT}/postgres/${BACKUP_FILE}" "${BACKUP_DIR}/"
+
+    # Decrypt backup if encrypted
+    if [[ "${BACKUP_FILE}" == *.enc ]]; then
+      openssl enc -aes-256-cbc -d -in "${BACKUP_DIR}/${BACKUP_FILE}" \
+        -out "${BACKUP_DIR}/${BACKUP_FILE%.enc}" \
+        -pass "pass:${ENCRYPTION_KEY}"
+      BACKUP_FILE="${BACKUP_FILE%.enc}"
+    fi
+
+    # Restore database
+    pg_restore \
+      --host="${DB_HOST}" \
+      --port="${DB_PORT}" \
+      --username="${DB_USER}" \
+      --dbname="${DB_NAME}" \
+      --no-password \
+      --verbose \
+      --clean \
+      --if-exists \
+      "${BACKUP_DIR}/${BACKUP_FILE}"
+
+    echo "PostgreSQL restore completed: ${BACKUP_FILE}"
+
+---
+# Database Backup CronJob
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: postgres-backup
+  namespace: backup
+spec:
+  schedule: "0 1 * * *"  # Daily at 1 AM
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: postgres-backup
+            image: postgres:15-alpine
+            command: ["/bin/bash", "/scripts/backup-script.sh"]
+            env:
+            - name: POSTGRES_HOST
+              value: "postgres-service"
+            - name: POSTGRES_PORT
+              value: "5432"
+            - name: POSTGRES_DB
+              value: "fataplus_{{ .Values.environment }}"
+            - name: POSTGRES_USER
+              value: "fataplus_user"
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: password
+            - name: ENVIRONMENT
+              value: "{{ .Values.environment }}"
+            - name: BACKUP_ENCRYPTION_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: backup-secret
+                  key: encryption-key
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: aws-credentials
+                  key: access-key-id
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: aws-credentials
+                  key: secret-access-key
+            - name: AWS_DEFAULT_REGION
+              value: "{{ .Values.aws_region }}"
+            volumeMounts:
+            - name: backup-scripts
+              mountPath: /scripts
+            - name: backup-storage
+              mountPath: /backups
+          volumes:
+          - name: backup-scripts
+            configMap:
+              name: postgres-backup-config
+              defaultMode: 0755
+          - name: backup-storage
+            emptyDir: {}
+          restartPolicy: OnFailure
+
+---
+# File System Backup Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: filesystem-backup-config
+  namespace: backup
+data:
+  backup-script.sh: |
+    #!/bin/bash
+    # File system backup script
+
+    set -e
+
+    # Configuration
+    BACKUP_DIR="/backups/filesystem"
+    TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+    ENCRYPTION_KEY="${BACKUP_ENCRYPTION_KEY}"
+
+    # Directories to backup
+    BACKUP_PATHS=(
+      "/app/uploads"
+      "/app/logs"
+      "/app/data"
+      "/app/config"
+    )
+
+    # Create backup directory
+    mkdir -p "${BACKUP_DIR}"
+
+    # Create tar archive
+    tar -czf "${BACKUP_DIR}/filesystem_${TIMESTAMP}.tar.gz" "${BACKUP_PATHS[@]}"
+
+    # Encrypt backup
+    if [ -n "${ENCRYPTION_KEY}" ]; then
+      openssl enc -aes-256-cbc -salt -in "${BACKUP_DIR}/filesystem_${TIMESTAMP}.tar.gz" \
+        -out "${BACKUP_DIR}/filesystem_${TIMESTAMP}.tar.gz.enc" \
+        -pass "pass:${ENCRYPTION_KEY}"
+      rm "${BACKUP_DIR}/filesystem_${TIMESTAMP}.tar.gz"
+    fi
+
+    # Upload to S3
+    aws s3 cp "${BACKUP_DIR}/" "s3://fataplus-backups-${ENVIRONMENT}/filesystem/" --recursive
+
+    # Clean up old backups (keep last 7 days)
+    find "${BACKUP_DIR}" -name "*.tar.gz*" -mtime +7 -delete
+
+    echo "File system backup completed: filesystem_${TIMESTAMP}"
+
+---
+# File System Backup CronJob
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: filesystem-backup
+  namespace: backup
+spec:
+  schedule: "0 2 * * *"  # Daily at 2 AM
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: filesystem-backup
+            image: alpine:3.18
+            command: ["/bin/bash", "/scripts/backup-script.sh"]
+            env:
+            - name: ENVIRONMENT
+              value: "{{ .Values.environment }}"
+            - name: BACKUP_ENCRYPTION_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: backup-secret
+                  key: encryption-key
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: aws-credentials
+                  key: access-key-id
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: aws-credentials
+                  key: secret-access-key
+            - name: AWS_DEFAULT_REGION
+              value: "{{ .Values.aws_region }}"
+            volumeMounts:
+            - name: backup-scripts
+              mountPath: /scripts
+            - name: backup-storage
+              mountPath: /backups
+            - name: app-data
+              mountPath: /app
+              readOnly: true
+          volumes:
+          - name: backup-scripts
+            configMap:
+              name: filesystem-backup-config
+              defaultMode: 0755
+          - name: backup-storage
+            emptyDir: {}
+          - name: app-data
+            persistentVolumeClaim:
+              claimName: app-data-pvc
+          restartPolicy: OnFailure
+
+---
+# Disaster Recovery Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: disaster-recovery-config
+  namespace: backup
+data:
+  dr-plan.yaml: |
+    # Fataplus Disaster Recovery Plan
+
+    disaster_recovery:
+      # Recovery Point Objective (RPO)
+      rpo: "24h"  # Maximum data loss tolerance
+
+      # Recovery Time Objective (RTO)
+      rto: "4h"   # Maximum downtime tolerance
+
+      # Regional failover
+      regional_failover:
+        enabled: true
+        primary_region: "{{ .Values.primary_region }}"
+        backup_regions:
+          - "{{ .Values.backup_region_1 }}"
+          - "{{ .Values.backup_region_2 }}"
+
+      # Automated failover triggers
+      failover_triggers:
+        - health_check_failures: 3
+          time_window: "5m"
+        - error_rate_threshold: 0.5
+          time_window: "5m"
+        - database_connection_failures: 3
+          time_window: "2m"
+
+      # Recovery procedures
+      recovery_procedures:
+        database_recovery:
+          - restore_from_latest_backup
+          - validate_data_integrity
+          - update_connection_strings
+          - restart_applications
+
+        application_recovery:
+          - deploy_from_backup
+          - restore_configurations
+          - validate_functionality
+          - update_dns_records
+
+        infrastructure_recovery:
+          - recreate_resources
+          - restore_networking
+          - configure_monitoring
+          - test_connectivity
+
+      # Testing procedures
+      testing:
+        frequency: "quarterly"
+        test_types:
+          - backup_validation
+          - restore_test
+          - failover_drill
+          - performance_test
+
+      # Notification procedures
+      notifications:
+        backup_success: true
+        backup_failure: true
+        recovery_initiated: true
+        recovery_completed: true
+        channels:
+          - email
+          - slack
+          - sms
+
+---
+# Backup Monitoring
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backup-monitoring-config
+  namespace: backup
+data:
+  backup-monitor.py: |
+    #!/usr/bin/env python3
+    """Backup monitoring and validation script"""
+
+    import boto3
+    import json
+    import logging
+    from datetime import datetime, timedelta
+    botocore.exceptions import ClientError
+
+    # Configure logging
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger(__name__)
+
+    class BackupMonitor:
+        def __init__(self, region: str, environment: str):
+            self.region = region
+            self.environment = environment
+            self.s3_client = boto3.client('s3', region_name=region)
+            self.cloudwatch = boto3.client('cloudwatch', region_name=region)
+
+        def check_backup_status(self):
+            """Check if recent backups exist"""
+            try:
+                # Check daily backups
+                daily_bucket = f"fataplus-backups-{self.environment}"
+                daily_objects = self.s3_client.list_objects_v2(
+                    Bucket=daily_bucket,
+                    Prefix="postgres/"
+                )
+
+                # Check for recent backup (last 24 hours)
+                recent_backup = False
+                cutoff_time = datetime.utcnow() - timedelta(hours=24)
+
+                for obj in daily_objects.get('Contents', []):
+                    if obj['LastModified'] > cutoff_time:
+                        recent_backup = True
+                        break
+
+                return recent_backup
+
+            except ClientError as e:
+                logger.error(f"Error checking backup status: {e}")
+                return False
+
+        def validate_backup_integrity(self):
+            """Validate backup file integrity"""
+            try:
+                bucket = f"fataplus-backups-{self.environment}"
+                objects = self.s3_client.list_objects_v2(Bucket=bucket)
+
+                for obj in objects.get('Contents', []):
+                    # Check file size
+                    if obj['Size'] < 1024:  # Less than 1KB
+                        logger.warning(f"Small backup file detected: {obj['Key']}")
+
+                return True
+
+            except ClientError as e:
+                logger.error(f"Error validating backup integrity: {e}")
+                return False
+
+        def publish_backup_metrics(self, backup_successful: bool):
+            """Publish backup metrics to CloudWatch"""
+            try:
+                self.cloudwatch.put_metric_data(
+                    Namespace='Fataplus/Backup',
+                    MetricData=[
+                        {
+                            'MetricName': 'BackupSuccess',
+                            'Value': 1 if backup_successful else 0,
+                            'Unit': 'Count'
+                        }
+                    ]
+                )
+            except ClientError as e:
+                logger.error(f"Error publishing metrics: {e}")
+
+        def send_alert(self, message: str):
+            """Send backup alert"""
+            logger.error(f"BACKUP ALERT: {message}")
+            # In production, integrate with notification system
+
+    def main():
+        monitor = BackupMonitor(region='us-east-1', environment='production')
+
+        # Check backup status
+        backup_successful = monitor.check_backup_status()
+        if not backup_successful:
+            monitor.send_alert("No recent backup found")
+
+        # Validate backup integrity
+        integrity_ok = monitor.validate_backup_integrity()
+        if not integrity_ok:
+            monitor.send_alert("Backup integrity check failed")
+
+        # Publish metrics
+        monitor.publish_backup_metrics(backup_successful)
+
+        logger.info(f"Backup monitoring completed. Success: {backup_successful}")
+
+    if __name__ == "__main__":
+        main()
+
+---
+# Backup Secrets
+apiVersion: v1
+kind: Secret
+metadata:
+  name: backup-secret
+  namespace: backup
+type: Opaque
+data:
+  encryption-key: {{ .Values.backup.encryption_key | b64enc }}
+  api-token: {{ .Values.backup.api_token | b64enc }}
+
+---
+# AWS Credentials
+apiVersion: v1
+kind: Secret
+metadata:
+  name: aws-credentials
+  namespace: backup
+type: Opaque
+data:
+  access-key-id: {{ .Values.aws.access_key_id | b64enc }}
+  secret-access-key: {{ .Values.aws.secret_access_key | b64enc }}

@@ -1,0 +1,205 @@
+{
+  "name": "Fataplus Design System",
+  "description": "Comprehensive design system for Fataplus agricultural platform",
+  "version": "1.0.0",
+  "lastModified": "2024-09-19T22:15:00Z",
+  "colors": {
+    "primary": {
+      "brand": {
+        "50": "#E8F5E9",
+        "100": "#C8E6C9",
+        "200": "#A5D6A7",
+        "300": "#81C784",
+        "400": "#66BB6A",
+        "500": "#4CAF50",
+        "600": "#43A047",
+        "700": "#388E3C",
+        "800": "#2E7D32",
+        "900": "#1B5E20"
+      },
+      "secondary": {
+        "50": "#F3E5F5",
+        "100": "#E1BEE7",
+        "200": "#CE93D8",
+        "300": "#BA68C8",
+        "400": "#AB47BC",
+        "500": "#9C27B0",
+        "600": "#8E24AA",
+        "700": "#7B1FA2",
+        "800": "#6A1B9A",
+        "900": "#4A148C"
+      }
+    },
+    "neutral": {
+      "gray": {
+        "50": "#FAFAFA",
+        "100": "#F5F5F5",
+        "200": "#EEEEEE",
+        "300": "#E0E0E0",
+        "400": "#BDBDBD",
+        "500": "#9E9E9E",
+        "600": "#757575",
+        "700": "#616161",
+        "800": "#424242",
+        "900": "#212121"
+      }
+    },
+    "semantic": {
+      "success": "#4CAF50",
+      "warning": "#FF9800",
+      "error": "#F44336",
+      "info": "#2196F3"
+    }
+  },
+  "typography": {
+    "fontFamily": {
+      "primary": "'Inter', sans-serif",
+      "secondary": "'Roboto', sans-serif",
+      "monospace": "'JetBrains Mono', monospace"
+    },
+    "fontSize": {
+      "xs": "12px",
+      "sm": "14px",
+      "base": "16px",
+      "lg": "18px",
+      "xl": "20px",
+      "2xl": "24px",
+      "3xl": "30px",
+      "4xl": "36px",
+      "5xl": "48px"
+    },
+    "fontWeight": {
+      "light": "300",
+      "normal": "400",
+      "medium": "500",
+      "semibold": "600",
+      "bold": "700",
+      "extrabold": "800"
+    },
+    "lineHeight": {
+      "tight": "1.25",
+      "snug": "1.375",
+      "normal": "1.5",
+      "relaxed": "1.625",
+      "loose": "2"
+    }
+  },
+  "spacing": {
+    "unit": "4px",
+    "scale": {
+      "0": "0",
+      "1": "4px",
+      "2": "8px",
+      "3": "12px",
+      "4": "16px",
+      "5": "20px",
+      "6": "24px",
+      "8": "32px",
+      "10": "40px",
+      "12": "48px",
+      "16": "64px",
+      "20": "80px",
+      "24": "96px",
+      "32": "128px"
+    }
+  },
+  "borderRadius": {
+    "none": "0",
+      "sm": "2px",
+      "base": "4px",
+      "md": "6px",
+      "lg": "8px",
+      "xl": "12px",
+      "2xl": "16px",
+      "3xl": "24px",
+      "full": "9999px"
+  },
+  "shadows": {
+    "sm": "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+    "base": "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)",
+    "md": "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+    "lg": "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
+    "xl": "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+    "2xl": "0 25px 50px -12px rgba(0, 0, 0, 0.25)"
+  },
+  "components": {
+    "Button": {
+      "variants": {
+        "primary": {
+          "backgroundColor": "primary.brand.500",
+          "color": "white",
+          "padding": "spacing.6 spacing.8",
+          "borderRadius": "borderRadius.md",
+          "fontWeight": "typography.fontWeight.medium",
+          "hover": {
+            "backgroundColor": "primary.brand.600"
+          }
+        },
+        "secondary": {
+          "backgroundColor": "secondary.500",
+          "color": "white",
+          "padding": "spacing.6 spacing.8",
+          "borderRadius": "borderRadius.md",
+          "fontWeight": "typography.fontWeight.medium",
+          "hover": {
+            "backgroundColor": "secondary.600"
+          }
+        },
+        "outline": {
+          "backgroundColor": "transparent",
+          "color": "primary.brand.500",
+          "border": "1px solid",
+          "borderColor": "primary.brand.500",
+          "padding": "spacing.6 spacing.8",
+          "borderRadius": "borderRadius.md",
+          "fontWeight": "typography.fontWeight.medium",
+          "hover": {
+            "backgroundColor": "primary.brand.50"
+          }
+        }
+      }
+    },
+    "Card": {
+      "base": {
+        "backgroundColor": "white",
+        "borderRadius": "borderRadius.lg",
+        "boxShadow": "shadows.base",
+        "padding": "spacing.6"
+      }
+    },
+    "Input": {
+      "base": {
+        "backgroundColor": "white",
+        "border": "1px solid",
+        "borderColor": "neutral.gray.300",
+        "borderRadius": "borderRadius.md",
+        "padding": "spacing.3 spacing.4",
+        "fontSize": "typography.fontSize.base",
+        "focus": {
+          "borderColor": "primary.brand.500",
+          "boxShadow": "0 0 0 3px rgba(76, 175, 80, 0.1)"
+        }
+      }
+    },
+    "Badge": {
+      "variants": {
+        "success": {
+          "backgroundColor": "semantic.success",
+          "color": "white"
+        },
+        "warning": {
+          "backgroundColor": "semantic.warning",
+          "color": "white"
+        },
+        "error": {
+          "backgroundColor": "semantic.error",
+          "color": "white"
+        },
+        "info": {
+          "backgroundColor": "semantic.info",
+          "color": "white"
+        }
+      }
+    }
+  }
+}

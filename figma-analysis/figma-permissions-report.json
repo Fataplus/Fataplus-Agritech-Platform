@@ -1,0 +1,29 @@
+[
+  {
+    "file": {
+      "key": "L6QcvvFA3Ww8fG6a6Wv6l9",
+      "name": "Figma Community Sample",
+      "description": "Public sample file"
+    },
+    "success": false,
+    "error": "403 Forbidden"
+  },
+  {
+    "file": {
+      "key": "zR6G5xJvQ0Xq8YqL0wQ0mQ",
+      "name": "Design System Example",
+      "description": "Public design system"
+    },
+    "success": false,
+    "error": "403 Forbidden"
+  },
+  {
+    "file": {
+      "key": "n1AqRbX6deIXncAMnQbiXW",
+      "name": "Fataplus Design Systems",
+      "description": "Target file (permission issue)"
+    },
+    "success": false,
+    "error": "403 Forbidden"
+  }
+]

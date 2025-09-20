@@ -4,8 +4,8 @@
 set -e
 
 # Configuration
-BASE_URL="https://api.fata.plus"
-STAGING_URL="https://staging-api.fata.plus"
+BASE_URL="http://204.69.207.1:8000"
+STAGING_URL="http://204.69.207.1:8001"
 HEALTH_ENDPOINT="/health"
 SECURITY_ENDPOINT="/security/health"
 TIMEOUT=10

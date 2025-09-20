@@ -1,0 +1,161 @@
+# Fataplus Monitoring Configuration
+# Prometheus configuration for African regional deployment
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    environment: "{{ .Values.environment }}"
+    region: "{{ .Values.region }}"
+
+# Rule files for alerting
+rule_files:
+  - "alert_rules.yml"
+  - "recording_rules.yml"
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093
+
+# Scrape configurations for African regional endpoints
+scrape_configs:
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Node exporters for infrastructure monitoring
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets:
+        - 'node-exporter-africa-south-1:9100'
+        - 'node-exporter-eu-west-1:9100'
+        - 'node-exporter-us-east-1:9100'
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+
+  # Application monitoring - Web Backend
+  - job_name: 'web-backend'
+    static_configs:
+      - targets:
+        - 'web-backend-service:8000'
+    metrics_path: '/metrics'
+    scrape_interval: 15s
+    scrape_timeout: 10s
+
+  # Application monitoring - AI Service
+  - job_name: 'ai-service'
+    static_configs:
+      - targets:
+        - 'ai-services:8001'
+    metrics_path: '/metrics'
+    scrape_interval: 15s
+
+  # Application monitoring - MCP Service
+  - job_name: 'mcp-service'
+    static_configs:
+      - targets:
+        - 'mcp-service:8002'
+    metrics_path: '/metrics'
+    scrape_interval: 15s
+
+  # Frontend monitoring
+  - job_name: 'web-frontend'
+    static_configs:
+      - targets:
+        - 'web-frontend-service:3000'
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+
+  # PostgreSQL monitoring
+  - job_name: 'postgres'
+    static_configs:
+      - targets:
+        - 'postgres-exporter:9187'
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+
+  # Redis monitoring
+  - job_name: 'redis'
+    static_configs:
+      - targets:
+        - 'redis-exporter:9121'
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+
+  # Nginx monitoring
+  - job_name: 'nginx'
+    static_configs:
+      - targets:
+        - 'nginx-exporter:9113'
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+
+  # Blackbox monitoring for external endpoints
+  - job_name: 'blackbox'
+    metrics_path: /probe
+    params:
+      module: [http_2xx]
+    static_configs:
+      - targets:
+        - https://api.fata.plus/health
+        - https://fata.plus/health
+        - https://mcp.fata.plus/health
+        - https://staging.fata.plus/health
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox-exporter:9115
+
+  # Mobile money API monitoring
+  - job_name: 'mobile-money-apis'
+    static_configs:
+      - targets:
+        - 'mpesa-api:8080'
+        - 'mobile-money-service:8081'
+    metrics_path: '/metrics'
+    scrape_interval: 60s
+
+  # Weather API monitoring
+  - job_name: 'weather-apis'
+    static_configs:
+      - targets:
+        - 'weather-api-service:8082'
+    metrics_path: '/metrics'
+    scrape_interval: 60s
+
+  # Custom application metrics
+  - job_name: 'fataplus-app'
+    static_configs:
+      - targets:
+        - 'web-backend-service:8000'
+        - 'ai-services:8001'
+        - 'mcp-service:8002'
+    metrics_path: '/app-metrics'
+    scrape_interval: 30s
+    scheme: http
+
+  # Regional database monitoring
+  - job_name: 'regional-databases'
+    static_configs:
+      - targets:
+        - 'postgres-kenya:5432'
+        - 'postgres-south-africa:5432'
+        - 'postgres-nigeria:5432'
+        - 'postgres-ghana:5432'
+    metrics_path: '/metrics'
+    scrape_interval: 60s
+
+  # CDN monitoring
+  - job_name: 'cdn-monitoring'
+    static_configs:
+      - targets:
+        - 'cloudfront-monitoring:8080'
+    metrics_path: '/cdn-metrics'
+    scrape_interval: 120s

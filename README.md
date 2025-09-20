@@ -1,491 +1,400 @@
-# Fataplus Agritech Platform
+# 🌾 Fataplus Agritech Platform
 
-**Building the future of African Agriculture through context-driven, AI-powered digital solutions**
+**Building the Future of African Agriculture through Intelligent, Context-Aware Digital Solutions**
 
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/Version-1.0.0--prod-green.svg)]()
-[[![Build Status](https://img.shields.io/badge/Build-Production%20Ready-brightgreen.svg)]()
-[![Deployment](https://img.shields.io/badge/Deployment-Cloudron%20Ready-blue.svg)]()
+Fataplus is a comprehensive green tech SaaS platform designed specifically for African agriculture, combining custom application development with scalable digital solutions. Founded in Madagascar, we empower farmers, cooperatives, and agricultural businesses through AI-powered tools, offline-first interfaces, and culturally-adapted technologies aligned with United Nations Sustainable Development Goals.
 
-## 🌟 Vision
+## 🎯 Mission & Vision
 
-Fataplus is a multi-context SaaS platform designed specifically for African agriculture, combining the flexibility of custom application development with the scalability of a modular platform. Unlike traditional SaaS or ERP systems, Fataplus focuses on "contexts" - specialized modules that can be combined to create infinite possibilities in agritech.
+**Mission**: "Connect, Cultivate, Prosper - We act as catalysts for Malagasy agripreneurs and cooperatives to scale through innovative digital tools, no-code applications, and AI integrations that boost productivity, reduce post-harvest losses by 30%, and strengthen climate resilience."
 
-## 🚀 Key Features
+**Vision**: "Empowering Agripreneurs for Sustainable and Digital Agriculture - Building the future of African agriculture through context-driven, AI-powered digital solutions that adapt to Madagascar's unique challenges and opportunities."
 
-- **Multi-Context Architecture**: Weather prediction, livestock management, e-commerce, LMS, gamification
-- **Offline-First Design**: Optimized for unreliable connectivity in rural African areas
-- **Multi-Language Support**: Support for African languages (Swahili, Arabic, French, Portuguese)
-- **Mobile Money Integration**: M-Pesa, Airtel Money, and other payment systems
-- **AI-Powered Insights**: Weather prediction, disease detection, market analysis
-- **Spatial Data Management**: Farm boundaries, GPS tracking with PostGIS
-- **Real-time Collaboration**: For cooperatives and agricultural communities
+## 🏗️ Platform Architecture
 
-## 🏗️ Architecture
-
-### Microservices Architecture
-```
-├── web-frontend/     # Next.js React application
-├── web-backend/      # FastAPI Python services
-├── mobile-app/       # React Native mobile application
-├── ai-services/      # AI/ML microservices
-├── infrastructure/   # Docker, Kubernetes, Terraform
-└── tools/           # CLI tools and scripts
-```
-
-### Technology Stack
-- **Frontend**: Next.js 14, React 18, TypeScript 5.3, Tailwind CSS
-- **Backend**: FastAPI, Python 3.11, PostgreSQL, Redis
-- **AI Framework**: Motia for unified APIs, workflows, and AI agents
-- **Mobile**: React Native, Expo
-- **AI/ML**: TensorFlow, PyTorch, scikit-learn
-- **AI Integration**: Model Context Protocol (MCP) Server
-- **Infrastructure**: Docker, Kubernetes, Terraform, AWS/GCP/Azure
-- **Monitoring**: Prometheus, Grafana, ELK Stack
-
-## 📋 Prerequisites
-
-- Node.js 18+
-- Python 3.11+
-- PostgreSQL 15+
-- Redis 7+
-- Docker & Docker Compose
-
-## 🚀 Quick Start
-
-### Development Environment
-
-#### 1. Clone the repository
-```bash
-git clone https://github.com/your-org/fataplus.git
-cd fataplus
-```
-
-#### 2. Set up environment variables
-```bash
-# For local development
-cp .env.example .env
-
-# For Cloudflare deployment
-cp .env.cloudflare.example .env.cloudflare
-
-# Edit with your configuration
-```
-
-#### 3. Start development environment
-```bash
-# Start all services
-docker-compose up -d
-
-# Or start individual services
-cd web-frontend && npm install && npm run dev
-cd web-backend && pip install -r requirements.txt && python main.py
-```
-
-#### 3. Start Full Local Development Environment (All Services)
-```bash
-# Start complete platform with all services (PostgreSQL, Redis, MinIO, AI services, etc.)
-./start-local-dev.sh
-
-# Or manually with Docker Compose
-docker-compose -f docker-compose.full-local.yml up -d
-```
-
-#### 4. Access the application
-- **Web App**: http://localhost:3000
-- **API Documentation**: http://localhost:8000/docs
-- **AI Services**: http://localhost:8001
-- **SmolLM2 Service**: http://localhost:8002
-- **Motia Service**: http://localhost:8003
-- **MCP Server**: http://localhost:3001
-- **Mobile App**: Follow mobile setup instructions
-
-See [LOCAL_DEVELOPMENT.md](./LOCAL_DEVELOPMENT.md) for detailed instructions on the full local development environment.
-
-### Production Deployment
-
-#### 🌍 Cloudflare Edge Deployment (NEW!)
-```bash
-# Quick deployment to Cloudflare's global edge network
-cp .env.cloudflare.example .env.cloudflare
-# Edit .env.cloudflare with your Cloudflare credentials
-
-# Deploy to staging
-./deploy-cloudflare.sh -e staging
-
-# Deploy to production
-./deploy-cloudflare.sh -e production
-
-# Manage your Cloudflare deployment
-./cloudflare-manage.sh status
-```
-
-**Cloudflare Features:**
-- 🚀 Global edge deployment with 300+ locations
-- 💾 R2 Storage for files and assets
-- 🗄 D1 Database for relational data
-- ⚡ Workers for serverless API endpoints
-- 🌐 Pages for frontend hosting
-- 📈 Built-in analytics and monitoring
-
-See [CLOUDFLARE_DEPLOYMENT.md](./CLOUDFLARE_DEPLOYMENT.md) for detailed instructions.
-
-#### 🚀 Automatic CI/CD Deployment
-Push to `main` branch automatically deploys to production:
-```bash
-git push origin main  # Triggers automatic deployment to https://yourdomain.com
-```
-
-The CI/CD pipeline:
-- ✅ Runs comprehensive tests on all components
-- ✅ Builds production Docker images
-- ✅ Deploys to Cloudron with zero downtime
-- ✅ Performs health checks and integration tests
-- ✅ Sends deployment notifications
-- ✅ Automatic rollback on failure
-
-#### Manual Cloudron Deployment
-```bash
-# Deploy to Cloudron manually
-CLOUDRON_APP_ID=your-app-id ./deploy-cloudron.sh
-```
-
-#### Production Environment Setup
-```bash
-# Set up production environment
-cp .env.production .env
-# Edit .env with production values
-
-# Deploy using production configuration
-docker-compose -f docker-compose.production.yml up -d
-```
-
-#### Cloud Deployment
-Refer to [PRODUCTION_DEPLOYMENT.md](./PRODUCTION_DEPLOYMENT.md) for detailed cloud deployment instructions.
-
-## 📁 Project Structure
+### Core Components
 
 ```
-fataplus/
-├── specs/                    # Product specifications and documentation
-│   ├── 001-fataplus-agritech-platform/
-│   │   ├── spec.md          # Product Requirements Document
-│   │   ├── plan.md          # Implementation plan
-│   │   ├── research.md      # Technical research findings
-│   │   ├── data-model.md    # Database schema design
-│   │   ├── contracts/       # OpenAPI specifications
-│   │   ├── roadmap.md       # Strategic roadmap
-│   │   └── dev-todo.md      # Development todo list
-├── mcp-server/              # Model Context Protocol server for AI integration
-├── web-frontend/            # Next.js web application
-├── web-backend/             # FastAPI backend services
-├── mobile-app/              # React Native mobile app
-├── ai-services/             # AI/ML microservices
-│   ├── smollm2/             # SmolLM2 agricultural AI service
-│   └── ...                  # Other AI services
-├── motia-service/           # Motia agricultural intelligence service
-├── infrastructure/          # Infrastructure as code
-├── tools/                   # Development tools and scripts
-├── docs/                    # Additional documentation
-├── docker-compose.full-local.yml  # Full local development environment
-├── start-local-dev.sh       # Script to start local development environment
-├── stop-local-dev.sh        # Script to stop local development environment
-└── LOCAL_DEVELOPMENT.md     # Documentation for local development
+FP-09/
+├── README.md                          # Main project documentation
+├── package.json                       # Root dependencies (PM2)
+├── assets/                           # Media assets & branding
+│   ├── icon.png                      # Platform favicon
+│   └── logo.svg                      # Fataplus brand logo
+├── agribot-space/                    # 🤖 AgriBot.space - AI Agricultural Assistant
+├── ai-services/                      # 🧠 AI/ML services & models
+├── cloudflare-deploy/                # ☁️ Cloudflare Workers deployments
+├── config/                           # ⚙️ Configuration files
+├── data/                             # 💾 Data directories (minio, postgres, redis)
+├── deployment/                       # 🚀 Deployment configurations
+│   ├── deploy.sh                     # Main deployment script
+│   ├── releases/                     # Release archives
+│   ├── cloudflare/                   # Cloudflare deployments
+│   ├── docker/                       # Docker configurations
+│   └── scripts/                      # Deployment scripts
+├── docs/                             # 📚 Documentation
+├── figma-analysis/                   # 🎨 Figma design system analysis
+├── infrastructure/                   # 🏗️ Infrastructure as code
+├── memory/                           # 🧠 Project memory & context
+├── mobile-app/                       # 📱 Mobile application (React Native)
+├── motia-service/                    # ⚡ Motia workflow service
+├── scan_results/                     # 🔒 Security scan results
+├── scripts/                          # 🔧 Automation scripts
+├── secrets/                          # 🔐 Secret management
+├── specs/                            # 📋 Project specifications
+├── templates/                        # 📝 Project templates
+├── tests/                            # 🧪 Test suites
+├── tools/                            # 🛠️ Development tools
+├── web-backend/                      # 🐍 Python FastAPI backend
+└── web-frontend/                     # ⚛️ Next.js React frontend
 ```
 
-## 🔧 Development
+### Multi-Context SaaS Platform Features
 
-### Setting up the development environment
+#### 🌦️ **Weather Intelligence**
+- Real-time weather monitoring and forecasting
+- Climate-resilient farming recommendations
+- Seasonal planning and risk assessment
+- SMS/USSD alerts for critical weather events
 
-1. **Install dependencies**:
-   ```bash
-   # Web Frontend
-   cd web-frontend && npm install
+#### 🐄 **Livestock Management**
+- Digital herd management and health tracking
+- Disease outbreak prevention and monitoring
+- Breeding programs and genetic optimization
+- Feed formulation and nutritional planning
 
-   # Web Backend
-   cd web-backend && pip install -r requirements.txt
+#### 🌱 **Crop Production**
+- Precision agriculture and yield optimization
+- Pest and disease detection with AI vision
+- Soil health monitoring and fertility management
+- Harvest timing and post-harvest handling
 
-   # AI Services
-   cd ai-services && pip install -r requirements.txt
+#### 🏪 **Market Intelligence**
+- Real-time commodity pricing across markets
+- Buyer-seller matching and negotiation support
+- Export compliance and documentation
+- Supply chain traceability
 
-   # Mobile App
-   cd mobile-app && npm install
-   ```
+#### 📚 **Learning Management System (LMS)**
+- Gamified agricultural education
+- Multi-language learning paths
+- Certification and skill development
+- Community knowledge sharing
 
-2. **Set up databases**:
-   ```bash
-   # Start PostgreSQL and Redis
-   docker-compose up postgres redis -d
+## 👥 Target Users & Impact
 
-   # Run database migrations
-   cd web-backend && alembic upgrade head
-   ```
+### Primary User Segments
 
-3. **Start development servers**:
-   ```bash
-   # Terminal 1: Web Frontend
-   cd web-frontend && npm run dev
+#### 👤 **Individual Farmers** (80% of Malagasy population)
+- **Challenges**: Limited digital literacy, unreliable connectivity, resource constraints
+- **Solutions**: SMS/USSD interfaces, offline-first apps, voice-based interactions
+- **Impact**: +30% income through better market access and productivity
 
-   # Terminal 2: Web Backend
-   cd web-backend && python main.py
+#### 🤝 **Agricultural Cooperatives**
+- **Challenges**: Member coordination, collective decision-making, market negotiation
+- **Solutions**: Multi-user platforms, data aggregation tools, bulk operations
+- **Impact**: Enhanced collective bargaining, improved quality standards
 
-   # Terminal 3: AI Services
-   cd ai-services && python main.py
+#### 🏢 **Agricultural Businesses**
+- **Challenges**: Supply chain complexity, regulatory compliance, international markets
+- **Solutions**: ERP integrations, export compliance tools, advanced analytics
+- **Impact**: Improved operational efficiency, market expansion
 
-   # Terminal 4: Mobile App
-   cd mobile-app && npm start
-   ```
+### SDG Alignment & Social Impact
+Fataplus services directly contribute to UN Sustainable Development Goals:
+- **SDG 1**: Zero Poverty - Increased farmer incomes
+- **SDG 2**: Zero Hunger - Enhanced food security
+- **SDG 3**: Good Health - Better nutrition outcomes
+- **SDG 5**: Gender Equality - Women's digital inclusion
+- **SDG 8**: Decent Work - Rural job creation
+- **SDG 9**: Industry & Infrastructure - Digital rural infrastructure
+- **SDG 12**: Responsible Consumption - Reduced food waste
+- **SDG 13**: Climate Action - Climate-resilient farming
 
-### Running Tests
+## 🛠️ Technology Stack
 
-```
-# Web Frontend
-cd web-frontend && npm test
+### Frontend & User Experience
+- **Framework**: Next.js 14 with React 18
+- **Language**: TypeScript for type safety
+- **Styling**: Tailwind CSS with custom design system
+- **Mobile**: React Native for native mobile experience
+- **Offline**: Progressive Web App with service workers
 
-# Web Backend
-cd web-backend && pytest
+### Backend & Infrastructure
+- **API**: FastAPI (Python) with automatic OpenAPI docs
+- **Database**: PostgreSQL with PostGIS for spatial data
+- **Cache**: Redis for high-performance caching
+- **Storage**: MinIO for object storage
+- **Deployment**: Cloudflare Pages, Workers, and Docker
+- **Orchestration**: PM2 for process management
 
-# AI Services
-cd ai-services && pytest
+### AI & Intelligence
+- **LLMs**: Integration with OpenAI, Anthropic, and local models
+- **Computer Vision**: TensorFlow/PyTorch for pest detection
+- **RAG**: Retrieval-Augmented Generation for context-aware responses
+- **MCP**: Model Context Protocol for AI tool integration
+- **Automation**: n8n workflows for intelligent automation
 
-# MCP Server
-cd mcp-server && npm test
+### Specialized Services
+- **AgriBot.space**: AI agricultural assistant (agribot.space)
+- **Context API**: Premium AI knowledge service
+- **Search & Analysis**: AI-powered agricultural research
+- **Design System**: Comprehensive UI component library
+- **MCP Server**: Unified AI gateway for the ecosystem
 
-# Mobile App
-cd mobile-app && npm test
+## 🤝 Strategic Partnerships
 
-# Production validation
-./validate-production.sh
+### Government & Policy Alignment
+- **MINAE (Ministry of Agriculture)**: National digital agriculture strategy alignment
+- **FOFIFA**: Agricultural research and extension collaboration
+- **MIARY Program**: Government-funded startup acceleration
+- **Land Certification Program**: $600M digital land management
 
-# Health checks
-./health-check.sh --domain yourdomain.com
-```
+### International Development Partners
+- **World Bank CASEF**: $150M agricultural development funding
+- **AFD (France)**: €95M agroecology and climate adaptation
+- **GIZ (Germany)**: Climate adaptation and value chain development
+- **USAID SALOHI**: $84.7M food security and livelihoods
+- **IFAD DEFIS+**: $150M climate resilience funding
 
-## 🚀 CI/CD Pipeline
+### Industry & Cooperative Networks
+- **FIFATA**: 369,500 family farming households
+- **ANTAM**: Agricultural training and extension services
+- **Zafy Tody**: Premier Malagasy tech incubator
+- **TTM**: Agricultural marketplace integration
 
-### Automatic Deployment
-The platform includes a comprehensive CI/CD pipeline that automatically deploys to production on every push to the `main` branch.
+## 🚀 Key Products & Services
 
-#### Pipeline Stages
-1. **🔍 Quality Assurance**
-   - Lint code and type checking
-   - Unit and integration tests
-   - Security scanning with CodeQL and Trivy
-   - Docker image builds and validation
+### 1. **Multi-Context SaaS Platform** (001)
+Government-aligned platform serving weather, livestock, crops, market, and LMS contexts with MIARY program integration.
 
-2. **📦 Build & Package**
-   - Build production Docker images
-   - Push to GitHub Container Registry
-   - Generate deployment artifacts
+### 2. **Fataplus Design System** (002)
+Comprehensive UI component library supporting cultural adaptation, multi-language interfaces, and accessibility compliance.
 
-3. **🚀 Deploy to Production**
-   - Zero-downtime deployment to Cloudron
-   - Automatic backup before deployment
-   - Health checks and integration tests
-   - Automatic rollback on failure
+### 3. **Fataplus MCP Server** (003)
+Unified AI gateway providing intelligent access to the complete Fataplus ecosystem through standardized protocols.
 
-4. **📊 Monitoring & Notifications**
-   - Post-deployment health validation
-   - Slack notifications
-   - Deployment status reporting
+### 4. **Search & Analysis Platform** (004)
+AI-powered research platform with web crawling, LLM analysis, and automated workflow integration.
 
-#### Deployment Triggers
-- **Automatic**: Push to `main` branch → Deploy to https://yourdomain.com
-- **Manual**: GitHub Actions workflow dispatch
-- **Scheduled**: Daily health checks and dependency updates
+### 5. **Context API Service** (005)
+Premium AI knowledge service delivering structured agricultural domain expertise and system prompts.
 
-#### Setup CI/CD
-1. Configure GitHub secrets (see [CICD_DEPLOYMENT.md](./CICD_DEPLOYMENT.md))
-2. Set up Cloudron access tokens and SSH keys
-3. Configure notification webhooks (optional)
-4. Push to `main` branch to trigger first deployment
+### 6. **AgriBot.space** (006)
+AI agricultural assistant providing intelligent, context-aware guidance for farmers and agricultural professionals.
 
-```bash
-# Quick setup example
-git checkout main
-git add .
-git commit -m "feat: trigger production deployment"
-git push origin main  # 🚀 Deploys to https://yourdomain.com
-```
+## 🌍 Regional Focus & Impact
 
-## 🤖 AI Integration (MCP Server)
+### Madagascar Agricultural Context
+- **GDP Contribution**: Agriculture represents 25% of GDP
+- **Employment**: 80% of population employed in agriculture
+- **Productivity Gap**: Only 30-50% of potential due to modern practice limitations
+- **Climate Vulnerability**: Cyclone and drought impacts
+- **Export Focus**: Vanilla, cacao, coffee, cloves, lychee
 
-Fataplus includes a Model Context Protocol (MCP) server that enables AI assistants and language models to interact with the platform's agricultural data and services.
-
-### Features
-
-- **Weather Data Access**: Real-time weather information for farming decisions
-- **Livestock Management**: Access to livestock health and inventory data
-- **Market Intelligence**: Current agricultural market prices and trends
-- **Farm Analytics**: Performance metrics and insights for farm management
-- **Gamification Data**: User engagement and achievement tracking
-- **Task Management**: Create and manage farm operation reminders
-
-### Quick Start with MCP
-
-1. **Start the MCP Server**:
-   ```bash
-   cd mcp-server
-   ./setup.sh
-   npm start
-   ```
-
-2. **Configure Claude Desktop** (or other MCP client):
-   ```json
-   {
-     "mcpServers": {
-       "fataplus": {
-         "command": "node",
-         "args": ["/path/to/fataplus/mcp-server/dist/index.js"],
-         "env": {
-           "FATAPLUS_API_URL": "http://localhost:8000",
-           "FATAPLUS_API_KEY": "your-api-key"
-         }
-       }
-     }
-   }
-   ```
-
-3. **Example Queries**:
-   - "What's the weather forecast for Antananarivo next week?"
-   - "Show me current rice prices in Madagascar"
-   - "How is farm FP001 performing this month?"
-   - "Create a reminder to fertilize the rice fields"
-
-### MCP Server Architecture
-
-The MCP server provides both **tools** (for executing actions) and **resources** (for accessing data):
-
-- **Tools**: `get_weather_data`, `get_livestock_info`, `get_market_prices`, `create_task_reminder`
-- **Resources**: `fataplus://weather/current`, `fataplus://market/prices`, `fataplus://farms/analytics`
-
-### Docker Integration
-
-The MCP server is included in the main Docker Compose setup:
-
-```bash
-# Start all services including MCP server
-docker-compose up -d
-
-# Start only MCP server
-docker-compose up mcp-server
-```
-
-Access at: `http://localhost:3001`
-
-## 📚 Documentation
-
-- **[Product Requirements](./specs/001-fataplus-agritech-platform/spec.md)**: Comprehensive PRD with business model and user scenarios
-- **[Implementation Plan](./specs/001-fataplus-agritech-platform/plan.md)**: Technical architecture and development phases
-- **[API Documentation](./web-backend/docs)**: OpenAPI specifications for all services
-- **[Development Guide](./docs/development.md)**: Setup and contribution guidelines
-- **[Mobile App Offline LLM Guide](./mobile-app/README.md)**: Implementation details for offline AI features
-- **[Madagascar Deployment Strategy](./mobile-app/MADAGASCAR_DEPLOYMENT.md)**: Context-specific deployment approach
-
-## 🌍 Target Markets
-
-### Primary Markets
-- **Madagascar**: Initial launch market with government partnerships
-- **East Africa**: Kenya, Tanzania, Uganda
-- **West Africa**: Senegal, Ghana, Nigeria
-
-### User Segments
-- **Individual Farmers**: Small-scale farmers needing digital tools
-- **Agricultural Cooperatives**: Managing multiple farmers and operations
-- **Agribusinesses**: Larger enterprises requiring complex workflows
-- **Government Agencies**: Extension services and policy implementation
-- **Development Organizations**: NGOs and international development partners
-
-## 🤝 Partnerships & Ecosystem
-
-### Strategic Partners
-- **Zafy Tody**: Premier technology incubator partnership
-- **MIARY Program**: Government funding and implementation support
-- **MINAE**: Ministry of Agriculture digital transformation alignment
-- **Private Sector**: ANTAM, TTM, agricultural cooperatives
-
-### Technology Partners
-- **Cloud Providers**: AWS, GCP, Azure for African regional presence
-- **AI Platforms**: Integration with agricultural AI research institutions
-- **Mobile Networks**: Partnerships with telecom providers for SMS fallbacks
-- **Financial Services**: Mobile money integration partners
+### Value Chain Opportunities
+- **High-Value Exports**: Premium branding and traceability
+- **Domestic Staples**: Rice, cassava, maize supply chain optimization
+- **Emerging Sectors**: Aquaculture, horticulture market development
 
 ## 📊 Business Model
 
-### Revenue Streams
-- **Agency Services**: €28.57/day for custom development (150,000 MGA TTC)
-- **SaaS Subscriptions**: Per-seat licensing (€1/month) and installation fees ($5,000)
-- **Training & Consulting**: SDG-aligned capacity building programs
-- **Partnership Commissions**: Revenue sharing with strategic partners
+### Service-Based Agency
+- **Daily Rate**: 150,000 MGA TTC (~€28.57)
+- **Services**: Product design, no-code development, AI integration, branding
+- **Blueprint Offerings**: 20+ predefined agricultural solutions
 
-### Pricing Strategy
-- **Freemium Model**: Basic features free, premium contexts paid
-- **Pay-per-Context**: Flexible pricing based on needed modules
-- **Regional Pricing**: Adjusted for local purchasing power
-- **Volume Discounts**: For cooperatives and large organizations
+### SaaS Platform Revenue
+- **Freemium Model**: Free basic access, premium advanced features
+- **Context Subscriptions**: Tiered pricing per agricultural context
+- **Enterprise Solutions**: Custom deployments for large cooperatives
 
-## 🎯 Impact & Sustainability
+### Strategic Advantages
+- **Local Expertise**: Deep understanding of Malagasy agricultural context
+- **SDG Alignment**: Explicit focus on sustainable development impact
+- **Innovation Network**: Strong partnerships with Zafy Tody and MIARY
+- **Multi-Modal Approach**: Agency + SaaS + training ecosystem
 
-### SDG Alignment
-- **SDG 2**: Zero Hunger - Improved agricultural productivity
-- **SDG 3**: Good Health - Better livestock health management
-- **SDG 5**: Gender Equality - Women's empowerment in agriculture
-- **SDG 8**: Decent Work - Better livelihoods for farmers
-- **SDG 13**: Climate Action - Climate-resilient farming practices
+## 🎯 Success Metrics
 
-### Sustainability Goals
-- **Carbon Neutral**: Local data centers and optimized applications
-- **Local Employment**: 80%+ local team composition
-- **Knowledge Transfer**: Capacity building and training programs
-- **Open Source**: Contributing to agricultural technology ecosystem
+### User Adoption Targets
+- **Daily Active Users**: 50,000 within 2 years
+- **Context Usage**: Average 3 contexts per active user
+- **Productivity Increase**: 25% improvement in agricultural productivity
+- **Income Growth**: 30% increase in farmer income
 
-## 🛡️ Security & Compliance
+### Platform Performance
+- **System Availability**: 99.9% uptime
+- **Response Time**: <2 seconds for user interactions
+- **Data Accuracy**: 95% accuracy in AI recommendations
+- **User Satisfaction**: >4.5/5 average rating
 
-### Security Features
-- **Multi-tenant Architecture**: Isolated data for each organization
-- **End-to-end Encryption**: Data protection in transit and at rest
-- **Role-based Access Control**: Granular permissions system
-- **Audit Logging**: Complete audit trail for compliance
+## 🏁 Getting Started
 
-### Compliance Standards
-- **Local Regulations**: Compliance with African data protection laws
-- **International Standards**: GDPR alignment for international users
-- **Agricultural Standards**: Compliance with food safety and traceability requirements
-- **Financial Compliance**: Secure handling of mobile money transactions
+### Prerequisites
+- Node.js 18+ and Python 3.9+
+- PostgreSQL and Redis databases
+- Docker for containerized deployment
 
-## 📞 Support & Community
+### Quick Start
+```bash
+# Clone the repository
+git clone <repository-url>
+cd FP-09
 
-- **Documentation**: Comprehensive guides and API references
-- **Community Forum**: User-to-user support and knowledge sharing
-- **Training Programs**: Regular workshops and certification courses
-- **Technical Support**: 24/7 support for enterprise customers
-- **Partnership Portal**: Resources for technology and business partners
+# Install dependencies
+npm install
+cd web-backend && pip install -r requirements.txt
+
+# Start development environment
+npm run dev          # Frontend (port 3000)
+cd web-backend && python -m uvicorn src.main:app --reload  # Backend (port 8000)
+```
+
+### Deployment
+```bash
+# Deploy to Cloudflare
+cd deployment
+./deploy.sh
+
+# Check deployment status
+cd scripts
+./verify-deployment.sh
+```
+
+## 📚 Documentation
+
+Detailed documentation is available in the `docs/` and `specs/` directories:
+- `specs/001-fataplus-agritech-platform/` - Main platform specification
+- `specs/002-fataplus-design-system/` - Design system documentation
+- `specs/006-agribot-space/` - AgriBot assistant specification
+- `docs/CLOUDFLARE_DEPLOYMENT_GUIDE.md` - Cloudflare deployment guide
 
 ## 🤝 Contributing
 
-We welcome contributions from the community! Please see our [Contributing Guide](./CONTRIBUTING.md) for details.
-
-### Development Workflow
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests for new functionality
-5. Submit a pull request
+We welcome contributions from the agricultural technology community. Please see our contributing guidelines and join our mission to transform African agriculture through innovative digital solutions.
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- **Zafy Tody** for incubator partnership and ecosystem support
-- **MIARY Program** for government funding and strategic alignment
-- **MINAE** for policy support and digital agriculture vision
-- **Agricultural Community** for domain expertise and user insights
-- **Open Source Community** for the tools and frameworks that make this possible
+This project is part of Fataplus Agritech's mission to empower African agriculture through sustainable digital innovation.
 
 ---
 
-**Fataplus** - Building the future of African Agriculture through innovative technology and strategic partnerships.
+**🌾 Built with ❤️ for the future of African agriculture**
 
-🌱 *"From Farm to Future"*
+## 🚀 Live Deployments
+
+- **API Backend**: https://api.fata.plus
+- **Admin Dashboard**: https://admin.fata.plus
+- **OpenID Provider**: https://my.fata.plus
+
+## 🔐 Authentication System
+
+The platform uses OpenID Connect for secure authentication:
+
+1. **Initiation**: User clicks login on admin dashboard
+2. **Redirect**: Sent to `my.fata.plus/openid/auth`
+3. **Authentication**: User logs in with credentials
+4. **Callback**: Redirected back to API with authorization code
+5. **Token Exchange**: API exchanges code for JWT tokens
+6. **Session**: User session established and dashboard displayed
+
+## 🛠️ Technology Stack
+
+### Backend (API)
+- **Runtime**: Cloudflare Workers
+- **Storage**: Cloudflare KV for sessions and caching
+- **Authentication**: OpenID Connect with PKCE
+- **Security**: JWT verification, CORS headers, rate limiting
+
+### Frontend (Dashboard)
+- **Framework**: Next.js 15 with App Router
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **Charts**: Recharts for data visualization
+- **Deployment**: Cloudflare Pages (static export)
+
+## 📊 Dashboard Features
+
+- **Real-time Metrics**: User counts, farm statistics, performance data
+- **User Management**: View recent users and their activities
+- **Farm Management**: Monitor farm operations and status
+- **Activity Charts**: Visual representation of system performance
+- **Alerts Panel**: System notifications and warnings
+- **Authentication**: Secure OpenID Connect integration
+
+## 🚀 Quick Start
+
+### Deploy API Backend
+```bash
+cd projects/api
+npm install
+npx wrangler deploy
+```
+
+### Deploy Frontend Dashboard
+```bash
+cd projects/backoffice-dashboard
+npm install
+npm run build
+npx wrangler pages deploy out --project-name fataplus-admin-dashboard
+```
+
+### Setup DNS
+```bash
+cd projects/scripts
+./setup-dns.sh
+```
+
+## 📋 API Endpoints
+
+### Authentication
+- `POST /auth/openid/login` - Initiate OpenID flow
+- `POST /auth/openid/callback` - Handle OpenID callback
+- `GET /auth/me` - Get current user session
+- `POST /auth/logout` - Terminate session
+
+### Dashboard
+- `GET /admin/dashboard` - Get dashboard data
+
+## 🛡️ Security Features
+
+- **PKCE Flow**: Proof Key for Code Exchange for enhanced security
+- **JWT Verification**: RSA256 signature verification
+- **Session Management**: Secure session storage with expiration
+- **CORS Protection**: Proper cross-origin resource sharing
+- **Rate Limiting**: Protection against brute force attacks
+- **Secure Headers**: Security headers for enhanced protection
+
+## 📈 Monitoring
+
+The platform includes comprehensive monitoring:
+- DNS propagation monitoring
+- Deployment verification scripts
+- Health check endpoints
+- Performance metrics tracking
+
+## 📝 Documentation
+
+Detailed documentation is available in the `projects/docs/` directory:
+- `DEPLOYMENT_SUCCESS.md` - Complete deployment guide
+- `DNS_QUICK_SETUP.md` - DNS configuration steps
+- `DEPLOYMENT_VERIFICATION.md` - Verification procedures
+
+## 🔍 Testing
+
+Run deployment tests:
+```bash
+cd projects/scripts
+./test-deployment.sh
+```
+
+Monitor DNS propagation:
+```bash
+./monitor-dns.sh
+```
+
+---
+
+**Built with ❤️ for modern agriculture**
+

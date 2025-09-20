@@ -1,0 +1,76 @@
+# Fataplus Grafana Dashboards Configuration
+# Dashboards for monitoring African agricultural platform
+
+apiVersion: 1
+
+providers:
+  - name: 'default'
+    orgId: 1
+    folder: ''
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 10
+    allowUiUpdates: true
+    options:
+      path: /etc/grafana/provisioning/dashboards
+
+dashboards:
+  # Main System Overview Dashboard
+  - name: 'Fataplus System Overview'
+    path: '/etc/grafana/provisioning/dashboards/system-overview.json'
+    folder: 'Fataplus'
+    overwrite: true
+
+  # Regional Performance Dashboard
+  - name: 'Regional Performance'
+    path: '/etc/grafana/provisioning/dashboards/regional-performance.json'
+    folder: 'Fataplus'
+    overwrite: true
+
+  # Application Performance Dashboard
+  - name: 'Application Performance'
+    path: '/etc/grafana/provisioning/dashboards/app-performance.json'
+    folder: 'Fataplus'
+    overwrite: true
+
+  # Database Performance Dashboard
+  - name: 'Database Performance'
+    path: '/etc/grafana/provisioning/dashboards/database-performance.json'
+    folder: 'Fataplus'
+    overwrite: true
+
+  # Business Metrics Dashboard
+  - name: 'Business Metrics'
+    path: '/etc/grafana/provisioning/dashboards/business-metrics.json'
+    folder: 'Fataplus'
+    overwrite: true
+
+  # Security Dashboard
+  - name: 'Security Overview'
+    path: '/etc/grafana/provisioning/dashboards/security-overview.json'
+    folder: 'Fataplus'
+    overwrite: true
+
+  # Mobile Money Dashboard
+  - name: 'Mobile Money Operations'
+    path: '/etc/grafana/provisioning/dashboards/mobile-money.json'
+    folder: 'Fataplus'
+    overwrite: true
+
+  # Weather Data Dashboard
+  - name: 'Weather Data Quality'
+    path: '/etc/grafana/provisioning/dashboards/weather-data.json'
+    folder: 'Fataplus'
+    overwrite: true
+
+  # Regional Infrastructure Dashboard
+  - name: 'Regional Infrastructure'
+    path: '/etc/grafana/provisioning/dashboards/regional-infrastructure.json'
+    folder: 'Fataplus'
+    overwrite: true
+
+  # User Activity Dashboard
+  - name: 'User Activity Analytics'
+    path: '/etc/grafana/provisioning/dashboards/user-activity.json'
+    folder: 'Fataplus'
+    overwrite: true

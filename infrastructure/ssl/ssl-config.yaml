@@ -1,0 +1,457 @@
+# Fataplus SSL Certificate Configuration
+# Multi-region SSL certificate management for African deployment
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cert-manager
+  labels:
+    name: cert-manager
+    environment: {{ .Values.environment }}
+    app: fataplus
+
+---
+# ClusterIssuer for Let's Encrypt
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+  namespace: cert-manager
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: {{ .Values.ssl.email }}
+    privateKeySecretRef:
+      name: letsencrypt-prod
+    solvers:
+    - http01:
+        ingress:
+          class: nginx
+    - dns01:
+        cloudflare:
+          apiTokenSecretRef:
+            name: cloudflare-api-token
+            key: api-token
+
+---
+# ClusterIssuer for staging (testing)
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-staging
+  namespace: cert-manager
+spec:
+  acme:
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    email: {{ .Values.ssl.email }}
+    privateKeySecretRef:
+      name: letsencrypt-staging
+    solvers:
+    - http01:
+        ingress:
+          class: nginx
+
+---
+# Production Certificate for main domain
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: fataplus-main-tls
+  namespace: default
+spec:
+  secretName: fataplus-main-tls-secret
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  commonName: fata.plus
+  dnsNames:
+    - fata.plus
+    - www.fata.plus
+    - api.fata.plus
+    - admin.fata.plus
+    - mcp.fata.plus
+    - app.fata.plus
+
+---
+# Staging Certificate
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: fataplus-staging-tls
+  namespace: default
+spec:
+  secretName: fataplus-staging-tls-secret
+  issuerRef:
+    name: letsencrypt-staging
+    kind: ClusterIssuer
+  commonName: staging.fata.plus
+  dnsNames:
+    - staging.fata.plus
+    - api.staging.fata.plus
+    - admin.staging.fata.plus
+    - mcp.staging.fata.plus
+    - app.staging.fata.plus
+
+---
+# Regional Certificates for African deployment
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: fataplus-kenya-tls
+  namespace: default
+spec:
+  secretName: fataplus-kenya-tls-secret
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  commonName: kenya.fata.plus
+  dnsNames:
+    - kenya.fata.plus
+    - api.kenya.fata.plus
+    - app.kenya.fata.plus
+
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: fataplus-south-africa-tls
+  namespace: default
+spec:
+  secretName: fataplus-south-africa-tls-secret
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  commonName: south-africa.fata.plus
+  dnsNames:
+    - south-africa.fata.plus
+    - api.south-africa.fata.plus
+    - app.south-africa.fata.plus
+
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: fataplus-nigeria-tls
+  namespace: default
+spec:
+  secretName: fataplus-nigeria-tls-secret
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  commonName: nigeria.fata.plus
+  dnsNames:
+    - nigeria.fata.plus
+    - api.nigeria.fata.plus
+    - app.nigeria.fata.plus
+
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: fataplus-ghana-tls
+  namespace: default
+spec:
+  secretName: fataplus-ghana-tls-secret
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  commonName: ghana.fata.plus
+  dnsNames:
+    - ghana.fata.plus
+    - api.ghana.fata.plus
+    - app.ghana.fata.plus
+
+---
+# Wildcard Certificate for development
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: fataplus-dev-tls
+  namespace: default
+spec:
+  secretName: fataplus-dev-tls-secret
+  issuerRef:
+    name: letsencrypt-staging
+    kind: ClusterIssuer
+  commonName: "*.dev.fata.plus"
+  dnsNames:
+    - "*.dev.fata.plus"
+    - dev.fata.plus
+
+---
+# Cloudflare API Token Secret
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cloudflare-api-token
+  namespace: cert-manager
+type: Opaque
+data:
+  api-token: {{ .Values.cloudflare.api_token | b64enc }}
+
+---
+# SSL Configuration for Nginx Ingress
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-ssl-config
+  namespace: default
+data:
+  ssl.conf: |
+    # SSL Configuration
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers 'TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384';
+    ssl_prefer_server_ciphers off;
+    ssl_session_cache shared:SSL:10m;
+    ssl_session_timeout 1d;
+    ssl_session_tickets off;
+    ssl_stapling on;
+    ssl_stapling_verify on;
+    resolver 8.8.8.8 8.8.4.4 valid=300s;
+    resolver_timeout 5s;
+
+    # HSTS
+    add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
+
+    # Security Headers
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+
+    # CORS for APIs
+    add_header Access-Control-Allow-Origin "{{ .Values.cors.origins }}" always;
+    add_header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS" always;
+    add_header Access-Control-Allow-Headers "Origin, X-Requested-With, Content-Type, Accept, Authorization" always;
+
+    # Rate Limiting
+    limit_req_zone $binary_remote_addr zone=api:10m rate=10r/s;
+    limit_req_zone $binary_remote_addr zone=login:10m rate=5r/m;
+
+    # Security rules
+    server_tokens off;
+    more_clear_headers Server;
+
+    # Block suspicious requests
+    if ($request_method !~ ^(GET|HEAD|POST)$ ) {
+        return 405;
+    }
+
+    if ($http_user_agent ~* (sqlmap|curl|wget|python|nikto|nmap|shellshock) ) {
+        return 403;
+    }
+
+    if ($args ~* "union.*select.*\(" ) {
+        return 403;
+    }
+
+---
+# Regional Ingress Configuration
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: fataplus-regional-ingress
+  namespace: default
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      more_set_headers "X-Region: $geoip_country_code";
+      more_set_headers "X-Datacenter: $upstream_addr";
+spec:
+  tls:
+  - hosts:
+    - fata.plus
+    - www.fata.plus
+    - api.fata.plus
+    - admin.fata.plus
+    - mcp.fata.plus
+    - app.fata.plus
+    secretName: fataplus-main-tls-secret
+  rules:
+  - host: fata.plus
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: web-frontend-service
+            port:
+              number: 3000
+  - host: api.fata.plus
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: web-backend-service
+            port:
+              number: 8000
+  - host: mcp.fata.plus
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: mcp-service
+            port:
+              number: 8002
+  - host: admin.fata.plus
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: web-frontend-service
+            port:
+              number: 3000
+
+---
+# Staging Ingress
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: fataplus-staging-ingress
+  namespace: default
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-staging
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  tls:
+  - hosts:
+    - staging.fata.plus
+    - api.staging.fata.plus
+    - admin.staging.fata.plus
+    - mcp.staging.fata.plus
+    secretName: fataplus-staging-tls-secret
+  rules:
+  - host: staging.fata.plus
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: web-frontend-service
+            port:
+              number: 3000
+  - host: api.staging.fata.plus
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: web-backend-service
+            port:
+              number: 8000
+
+---
+# Regional Ingress for African markets
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: fataplus-kenya-ingress
+  namespace: default
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+spec:
+  tls:
+  - hosts:
+    - kenya.fata.plus
+    - api.kenya.fata.plus
+    secretName: fataplus-kenya-tls-secret
+  rules:
+  - host: kenya.fata.plus
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: web-frontend-service
+            port:
+              number: 3000
+
+---
+# CDN Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cdn-config
+  namespace: default
+data:
+  cloudfront-config.json: |
+    {
+      "Comment": "Fataplus CDN Configuration",
+      "DefaultRootObject": "index.html",
+      "Origins": {
+        "Quantity": 1,
+        "Items": [
+          {
+            "Id": "fataplus-origin",
+            "DomainName": "fata.plus",
+            "CustomOriginConfig": {
+              "HTTPPort": 80,
+              "HTTPSPort": 443,
+              "OriginProtocolPolicy": "https-only",
+              "OriginSslProtocols": {
+                "Quantity": 1,
+                "Items": ["TLSv1.2"]
+              }
+            }
+          }
+        ]
+      },
+      "DefaultCacheBehavior": {
+        "TargetOriginId": "fataplus-origin",
+        "ViewerProtocolPolicy": "redirect-to-https",
+        "MinTTL": 0,
+        "MaxTTL": 31536000,
+        "DefaultTTL": 86400,
+        "Compress": true,
+        "AllowedMethods": {
+          "Quantity": 3,
+          "Items": ["HEAD", "GET", "OPTIONS"],
+          "CachedMethods": {
+            "Quantity": 2,
+            "Items": ["HEAD", "GET"]
+          }
+        },
+        "ForwardedValues": {
+          "QueryString": false,
+          "Cookies": {
+            "Forward": "none"
+          }
+        }
+      },
+      "PriceClass": "PriceClass_100",
+      "Enabled": true,
+      "ViewerCertificate": {
+        "ACMCertificateArn": "arn:aws:acm:us-east-1:123456789012:certificate/abcdef123456",
+        "SslSupportMethod": "sni-only",
+        "MinimumProtocolVersion": "TLSv1.2_2019"
+      },
+      "Restrictions": {
+        "GeoRestriction": {
+          "RestrictionType": "whitelist",
+          "Locations": {
+            "Quantity": 4,
+            "Items": ["KE", "ZA", "NG", "GH"]
+          }
+        }
+      }
+    }

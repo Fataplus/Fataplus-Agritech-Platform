@@ -1,34 +1,231 @@
+/* Fataplus Design System - Agricultural Theme */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Import Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700&display=swap');
+/* Import agricultural components */
+@import './agricultural-components.css';
 
+/* Base styles with Agricultural Design System */
 @layer base {
-  * {
-    @apply border-gray-200;
+  :root {
+    /* Primary Agricultural Colors */
+    --color-primary-50: #f0fdf4;
+    --color-primary-100: #dcfce7;
+    --color-primary-200: #bbf7d0;
+    --color-primary-300: #86efac;
+    --color-primary-400: #4ade80;
+    --color-primary-500: #22c55e; /* Agricultural Green */
+    --color-primary-600: #16a34a;
+    --color-primary-700: #15803d;
+    --color-primary-800: #166534;
+    --color-primary-900: #14532d;
+
+    /* Earth & Nature Colors */
+    --color-earth-50: #fafaf9;
+    --color-earth-100: #f5f5f4;
+    --color-earth-200: #e7e5e4;
+    --color-earth-300: #d6d3d1;
+    --color-earth-400: #a8a29e;
+    --color-earth-500: #78716c; /* Stone */
+    --color-earth-600: #57534e;
+    --color-earth-700: #44403c;
+    --color-earth-800: #292524;
+    --color-earth-900: #1c1917;
+
+    /* Agricultural Accent Colors */
+    --color-accent-50: #ecfdf5;
+    --color-accent-100: #d1fae5;
+    --color-accent-200: #a7f3d0;
+    --color-accent-300: #6ee7b7;
+    --color-accent-400: #34d399;
+    --color-accent-500: #10b981; /* Teal accent */
+    --color-accent-600: #059669;
+    --color-accent-700: #047857;
+    --color-accent-800: #065f46;
+    --color-accent-900: #064e3b;
+
+    /* Success & Growth Colors */
+    --color-success-50: #ecfdf5;
+    --color-success-100: #d1fae5;
+    --color-success-200: #a7f3d0;
+    --color-success-300: #6ee7b7;
+    --color-success-400: #34d399;
+    --color-success-500: #10b981;
+    --color-success-600: #059669;
+    --color-success-700: #047857;
+    --color-success-800: #065f46;
+    --color-success-900: #064e3b;
+
+    /* Typography */
+    --font-family-primary: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-family-secondary: 'Poppins', system-ui, -apple-system, sans-serif;
+
+    /* Font Sizes */
+    --font-size-xs: 0.75rem;
+    --font-size-sm: 0.875rem;
+    --font-size-base: 1rem;
+    --font-size-lg: 1.125rem;
+    --font-size-xl: 1.25rem;
+    --font-size-2xl: 1.5rem;
+    --font-size-3xl: 1.875rem;
+    --font-size-4xl: 2.25rem;
+    --font-size-5xl: 3rem;
+
+    /* Spacing */
+    --spacing-1: 0.25rem;
+    --spacing-2: 0.5rem;
+    --spacing-3: 0.75rem;
+    --spacing-4: 1rem;
+    --spacing-6: 1.5rem;
+    --spacing-8: 2rem;
+
+    /* Border Radius */
+    --border-radius-lg: 0.5rem;
+    --border-radius-xl: 0.75rem;
+    --border-radius-2xl: 1rem;
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    font-family: var(--font-family-primary);
+    line-height: 1.5;
+  }
+
   body {
-    @apply bg-gradient-to-br from-emerald-50 via-white to-teal-50 text-gray-900;
-    font-family: 'Inter', sans-serif;
+    margin: 0;
+    font-family: var(--font-family-primary);
+    font-size: var(--font-size-base);
+    line-height: 1.6;
+    color: #111827; /* gray-900 */
+    background-color: #ffffff;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Heading styles */
+  h1, h2, h3, h4, h5, h6 {
+    margin: 0;
+    font-weight: 600;
+    line-height: 1.3;
+    color: #111827;
+  }
+
+  h1 {
+    font-size: var(--font-size-4xl);
+    font-weight: 700;
+    letter-spacing: -0.025em;
+  }
+
+  h2 {
+    font-size: var(--font-size-3xl);
+    letter-spacing: -0.025em;
+  }
+
+  h3 {
+    font-size: var(--font-size-2xl);
+    letter-spacing: -0.025em;
+  }
+
+  /* Focus styles */
+  *:focus {
+    outline: 2px solid var(--color-primary-500);
+    outline-offset: 2px;
   }
 }
 
+/* Component styles with Agricultural theme */
 @layer components {
-  /* Button Components */
+  /* Agricultural pattern background (subtle, no harsh gradients) */
+  .bg-agricultural-pattern {
+    background-image: radial-gradient(circle at 25% 25%, #f0fdf4 0%, transparent 50%),
+                      radial-gradient(circle at 75% 75%, #ecfdf5 0%, transparent 50%);
+    background-size: 20px 20px;
+  }
+
+  /* Button Components - Enhanced Agricultural Theme */
   .btn-primary {
-    @apply bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl;
+    background-color: var(--color-primary-500);
+    color: white;
+    border: 1px solid var(--color-primary-500);
+    padding: var(--spacing-3) var(--spacing-6);
+    border-radius: var(--border-radius-xl);
+    font-weight: 500;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .btn-primary:hover {
+    background-color: var(--color-primary-600);
+    border-color: var(--color-primary-600);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .btn-primary:active {
+    transform: translateY(0);
   }
 
   .btn-secondary {
-    @apply bg-white hover:bg-gray-50 text-gray-900 font-semibold py-3 px-6 rounded-lg border-2 border-gray-200 transition-all duration-200 transform hover:scale-105 shadow-md hover:shadow-lg;
+    background-color: var(--color-earth-500);
+    color: white;
+    border: 1px solid var(--color-earth-500);
+    padding: var(--spacing-3) var(--spacing-6);
+    border-radius: var(--border-radius-xl);
+    font-weight: 500;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .btn-secondary:hover {
+    background-color: var(--color-earth-600);
+    border-color: var(--color-earth-600);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-lg);
   }
 
   .btn-outline {
-    @apply bg-transparent hover:bg-green-600 text-green-600 hover:text-white font-semibold py-3 px-6 rounded-lg border-2 border-green-600 transition-all duration-200;
+    background-color: transparent;
+    color: var(--color-primary-600);
+    border: 1px solid var(--color-primary-600);
+    padding: var(--spacing-3) var(--spacing-6);
+    border-radius: var(--border-radius-xl);
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+
+  .btn-outline:hover {
+    background-color: var(--color-primary-50);
+    border-color: var(--color-primary-600);
+    color: var(--color-primary-700);
+  }
+
+  /* Card Components - Agricultural Theme */
+  .card {
+    background: white;
+    border: 1px solid #e5e7eb; /* gray-200 */
+    border-radius: var(--border-radius-xl);
+    box-shadow: var(--shadow-sm);
+    transition: all 0.2s ease;
+  }
+
+  .card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+
+  .feature-card {
+    @apply bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-all duration-300 hover:-translate-y-2;
   }
 
   /* Section Components */
@@ -41,21 +238,15 @@
   }
 
   .section-light {
-    @apply bg-gray-50;
-  }
-
-  /* Card Components */
-  .card {
-    @apply bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300;
-  }
-
-  .feature-card {
-    @apply bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-all duration-300 hover:-translate-y-2;
+    background-color: #f9fafb; /* gray-50 */
   }
 
   /* Text Components */
   .text-gradient {
-    @apply bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent;
+    background: linear-gradient(135deg, var(--color-primary-500), var(--color-accent-500));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 
   .text-hero {
@@ -69,9 +260,165 @@
   .text-section-subtitle {
     @apply text-xl text-gray-600 text-center mb-12 max-w-3xl mx-auto;
   }
+
+  /* Form Components */
+  .form-input {
+    border: 1px solid #d1d5db; /* gray-300 */
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-3) var(--spacing-4);
+    font-size: var(--font-size-base);
+    transition: all 0.2s ease;
+    background-color: white;
+  }
+
+  .form-input:focus {
+    border-color: var(--color-primary-500);
+    box-shadow: 0 0 0 3px #dcfce7; /* primary-100 */
+    outline: none;
+  }
+
+  .form-input::placeholder {
+    color: #9ca3af; /* gray-400 */
+  }
+
+  /* Badge Components */
+  .badge-primary {
+    background-color: #dcfce7; /* primary-100 */
+    color: #166534; /* primary-800 */
+    padding: var(--spacing-1) var(--spacing-2);
+    border-radius: 9999px;
+    font-size: var(--font-size-xs);
+    font-weight: 500;
+  }
+
+  .badge-secondary {
+    background-color: #f5f5f4; /* earth-100 */
+    color: #44403c; /* earth-700 */
+    padding: var(--spacing-1) var(--spacing-2);
+    border-radius: 9999px;
+    font-size: var(--font-size-xs);
+    font-weight: 500;
+  }
+
+  .badge-success {
+    background-color: #d1fae5; /* success-100 */
+    color: #065f46; /* success-800 */
+    padding: var(--spacing-1) var(--spacing-2);
+    border-radius: 9999px;
+    font-size: var(--font-size-xs);
+    font-weight: 500;
+  }
+
+  .badge-warning {
+    background-color: #fef3c7; /* warning-100 */
+    color: #92400e; /* warning-800 */
+    padding: var(--spacing-1) var(--spacing-2);
+    border-radius: 9999px;
+    font-size: var(--font-size-xs);
+    font-weight: 500;
+  }
+
+  /* Loading spinner */
+  .spinner {
+    border: 2px solid #e5e7eb; /* gray-200 */
+    border-top: 2px solid var(--color-primary-500);
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  /* Agricultural theme animations */
+  .animate-grow {
+    animation: grow 0.3s ease-out;
+  }
+
+  @keyframes grow {
+    0% {
+      transform: scale(0.95);
+      opacity: 0;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  .animate-harvest {
+    animation: harvest 2s ease-in-out infinite;
+  }
+
+  @keyframes harvest {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-4px);
+    }
+  }
 }
 
-/* Custom animations */
+/* Utility classes */
+@layer utilities {
+  /* Color utilities */
+  .text-agricultural-primary { color: var(--color-primary-600); }
+  .text-agricultural-secondary { color: var(--color-earth-600); }
+  .text-agricultural-accent { color: var(--color-accent-600); }
+
+  .bg-agricultural-primary { background-color: var(--color-primary-500); }
+  .bg-agricultural-secondary { background-color: var(--color-earth-500); }
+  .bg-agricultural-accent { background-color: var(--color-accent-500); }
+
+  /* Focus utilities */
+  .focus-agricultural {
+    outline: 2px solid var(--color-primary-500);
+    outline-offset: 2px;
+  }
+
+  /* Animation utilities */
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.3s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slideUp {
+    from {
+      transform: translateY(10px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  /* Keep existing utilities */
+  .container-max {
+    max-width: 80rem;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .focus-ring {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.5);
+  }
+}
+
+/* Custom animations - Enhanced */
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -100,12 +447,40 @@
   animation: pulse-green 2s infinite;
 }
 
-/* Responsive utilities */
-.container-max {
-  @apply max-w-7xl mx-auto;
+/* Print styles */
+@media print {
+  body {
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .card {
+    box-shadow: none;
+    border: 1px solid #e5e5e5;
+  }
 }
 
-/* Focus states for accessibility */
-.focus-ring {
-  @apply focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2;
+/* Dark mode support (optional) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-neutral-900: #f9fafb;
+    --color-neutral-100: #111827;
+    --color-neutral-200: #1f2937;
+    --color-neutral-800: #e5e7eb;
+  }
+
+  body {
+    background-color: #111827;
+    color: #f9fafb;
+  }
+
+  .card {
+    background-color: #1f2937;
+    border-color: #374151;
+    color: #f9fafb;
+  }
 }

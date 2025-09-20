@@ -1,0 +1,147 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-service
+  namespace: fataplus-staging
+  labels:
+    app: postgres
+    tier: database
+spec:
+  selector:
+    app: postgres
+    tier: database
+  ports:
+  - protocol: TCP
+    port: 5432
+    targetPort: 5432
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-service
+  namespace: fataplus-production
+  labels:
+    app: postgres
+    tier: database
+spec:
+  selector:
+    app: postgres
+    tier: database
+  ports:
+  - protocol: TCP
+    port: 5432
+    targetPort: 5432
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-service
+  namespace: fataplus-staging
+  labels:
+    app: redis
+    tier: cache
+spec:
+  selector:
+    app: redis
+    tier: cache
+  ports:
+  - protocol: TCP
+    port: 6379
+    targetPort: 6379
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-service
+  namespace: fataplus-production
+  labels:
+    app: redis
+    tier: cache
+spec:
+  selector:
+    app: redis
+    tier: cache
+  ports:
+  - protocol: TCP
+    port: 6379
+    targetPort: 6379
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-backend-service
+  namespace: fataplus-staging
+  labels:
+    app: web-backend
+    tier: backend
+spec:
+  selector:
+    app: web-backend
+    tier: backend
+  ports:
+  - protocol: TCP
+    port: 8000
+    targetPort: 8000
+    name: http
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-backend-service
+  namespace: fataplus-production
+  labels:
+    app: web-backend
+    tier: backend
+spec:
+  selector:
+    app: web-backend
+    tier: backend
+  ports:
+  - protocol: TCP
+    port: 8000
+    targetPort: 8000
+    name: http
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-frontend-service
+  namespace: fataplus-staging
+  labels:
+    app: web-frontend
+    tier: frontend
+spec:
+  selector:
+    app: web-frontend
+    tier: frontend
+  ports:
+  - protocol: TCP
+    port: 3000
+    targetPort: 3000
+    name: http
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-frontend-service
+  namespace: fataplus-production
+  labels:
+    app: web-frontend
+    tier: frontend
+spec:
+  selector:
+    app: web-frontend
+    tier: frontend
+  ports:
+  - protocol: TCP
+    port: 3000
+    targetPort: 3000
+    name: http
+  type: ClusterIP

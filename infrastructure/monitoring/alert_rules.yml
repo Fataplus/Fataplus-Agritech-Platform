@@ -1,0 +1,159 @@
+# Fataplus Alert Rules
+# Critical alerts for African agricultural platform
+
+groups:
+  - name: fataplus_critical
+    interval: 30s
+    rules:
+      # High availability alerts
+      - alert: HighServiceErrorRate
+        expr: rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m]) > 0.05
+        for: 2m
+        labels:
+          severity: critical
+          region: "{{ $labels.region }}"
+        annotations:
+          summary: "High error rate detected in {{ $labels.job }}"
+          description: "Error rate is {{ $value | printf "%.2f" }}% for {{ $labels.job }} in {{ $labels.region }}"
+
+      - alert: ServiceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Service {{ $labels.job }} is down"
+          description: "{{ $labels.instance }} is not responding"
+
+      - alert: DatabaseConnectionFailure
+        expr: pg_up == 0
+        for: 30s
+        labels:
+          severity: critical
+        annotations:
+          summary: "Database connection failure"
+          description: "Cannot connect to PostgreSQL database in {{ $labels.region }}"
+
+      - alert: RedisConnectionFailure
+        expr: redis_up == 0
+        for: 30s
+        labels:
+          severity: critical
+        annotations:
+          summary: "Redis connection failure"
+          description: "Cannot connect to Redis cache in {{ $labels.region }}"
+
+  - name: fataplus_warnings
+    interval: 60s
+    rules:
+      # Performance alerts
+      - alert: HighResponseTime
+        expr: histogram_quantile(0.95, http_request_duration_seconds_bucket) > 2
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High response time detected"
+          description: "95th percentile response time is {{ $value }}s for {{ $labels.job }}"
+
+      - alert: HighMemoryUsage
+        expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes > 0.85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage"
+          description: "Memory usage is {{ $value | printf "%.0f" }}% on {{ $labels.instance }}"
+
+      - alert: HighCPUUsage
+        expr: 100 - (avg by (instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage"
+          description: "CPU usage is {{ $value | printf "%.0f" }}% on {{ $labels.instance }}"
+
+      - alert: LowDiskSpace
+        expr: (node_filesystem_avail_bytes / node_filesystem_size_bytes) < 0.15
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Low disk space"
+          description: "Only {{ $value | printf "%.0f" }}% disk space available on {{ $labels.instance }}"
+
+  - name: fataplus_business
+    interval: 300s
+    rules:
+      # Business logic alerts
+      - alert: LowUserActivity
+        expr: rate(http_requests_total{job="web-backend"}[1h]) < 10
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Low user activity detected"
+          description: "User activity has dropped below 10 requests per minute"
+
+      - alert: WeatherDataStale
+        expr: time() - weather_data_last_updated_timestamp > 3600
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Weather data is stale"
+          description: "Weather data has not been updated for over 1 hour in {{ $labels.region }}"
+
+      - alert: MobileMoneyAPIFailure
+        expr: rate(mobile_money_requests_failed_total[5m]) / rate(mobile_money_requests_total[5m]) > 0.1
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Mobile money API failure"
+          description: "Mobile money API failure rate is {{ $value | printf "%.2f" }}%"
+
+  - name: fataplus_regional
+    interval: 120s
+    rules:
+      # Regional infrastructure alerts
+      - alert: RegionalServiceDegradation
+        expr: rate(http_requests_total{status=~"5..", region=~"kenya|south_africa|nigeria|ghana"}[5m]) / rate(http_requests_total{region=~"kenya|south_africa|nigeria|ghana"}[5m]) > 0.03
+        for: 3m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Regional service degradation"
+          description: "Error rate in {{ $labels.region }} is {{ $value | printf "%.2f" }}%"
+
+      - alert: CDNLatencyHigh
+        expr: histogram_quantile(0.95, cdn_request_duration_seconds_bucket) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CDN latency"
+          description: "CDN latency is {{ $value }}s for {{ $labels.region }}"
+
+  - name: fataplus_security
+    interval: 60s
+    rules:
+      # Security alerts
+      - alert: FailedLoginAttempts
+        expr: rate(auth_failed_logins_total[5m]) > 5
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High failed login attempts"
+          description: "{{ $value }} failed login attempts per minute"
+
+      - alert: SuspiciousActivity
+        expr: rate(suspicious_requests_total[5m]) > 1
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Suspicious activity detected"
+          description: "Suspicious activity detected from {{ $labels.client_ip }}"

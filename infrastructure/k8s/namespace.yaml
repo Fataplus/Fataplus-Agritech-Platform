@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: fataplus-staging
+  labels:
+    name: fataplus-staging
+    environment: staging
+    app: fataplus
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: fataplus-production
+  labels:
+    name: fataplus-production
+    environment: production
+    app: fataplus

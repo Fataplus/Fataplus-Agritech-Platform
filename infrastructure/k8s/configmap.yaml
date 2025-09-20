@@ -1,0 +1,79 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fataplus-config
+  namespace: fataplus-staging
+data:
+  # Database Configuration
+  POSTGRES_DB: "fataplus_staging"
+  POSTGRES_USER: "fataplus_user"
+  POSTGRES_HOST: "postgres-service"
+  POSTGRES_PORT: "5432"
+
+  # Redis Configuration
+  REDIS_HOST: "redis-service"
+  REDIS_PORT: "6379"
+
+  # API Configuration
+  API_HOST: "0.0.0.0"
+  API_PORT: "8000"
+  API_ENVIRONMENT: "staging"
+  LOG_LEVEL: "INFO"
+
+  # AI Service Configuration
+  AI_SERVICE_HOST: "0.0.0.0"
+  AI_SERVICE_PORT: "8001"
+
+  # Frontend Configuration
+  NEXT_PUBLIC_APP_URL: "https://staging.fata.plus"
+
+  # MCP Configuration
+  MCP_PORT: "8002"
+
+  # Regional Settings (Africa)
+  TIMEZONE: "Africa/Nairobi"
+  DEFAULT_CURRENCY: "USD"
+  DEFAULT_LANGUAGE: "en"
+
+  # CORS Configuration
+  CORS_ORIGINS: "https://staging.fata.plus,http://localhost:3000,http://localhost:8000"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fataplus-config
+  namespace: fataplus-production
+data:
+  # Database Configuration
+  POSTGRES_DB: "fataplus_prod"
+  POSTGRES_USER: "fataplus_user"
+  POSTGRES_HOST: "postgres-service"
+  POSTGRES_PORT: "5432"
+
+  # Redis Configuration
+  REDIS_HOST: "redis-service"
+  REDIS_PORT: "6379"
+
+  # API Configuration
+  API_HOST: "0.0.0.0"
+  API_PORT: "8000"
+  API_ENVIRONMENT: "production"
+  LOG_LEVEL: "WARN"
+
+  # AI Service Configuration
+  AI_SERVICE_HOST: "0.0.0.0"
+  AI_SERVICE_PORT: "8001"
+
+  # Frontend Configuration
+  NEXT_PUBLIC_APP_URL: "https://fata.plus"
+
+  # MCP Configuration
+  MCP_PORT: "8002"
+
+  # Regional Settings (Africa)
+  TIMEZONE: "Africa/Nairobi"
+  DEFAULT_CURRENCY: "USD"
+  DEFAULT_LANGUAGE: "en"
+
+  # CORS Configuration
+  CORS_ORIGINS: "https://fata.plus,https://staging.fata.plus,https://mcp.fata.plus"
