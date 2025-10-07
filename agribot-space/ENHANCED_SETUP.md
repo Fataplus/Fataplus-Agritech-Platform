@@ -189,6 +189,10 @@ DEBUG=agribot:* npm run dev
 - `getBackendContext()` - Fetch user/session context
 - `trackUserInteraction()` - Log interactions for improvement
 
+## IDE clients: local MCP server (zen-mcp)
+
+If you want to run a local MCP server for development (for example to try local models or IDE integrations), we provide a short guide in `docs/zen-mcp.md` that copies the upstream "IDE Clients" snippets for Cursor, VS Code, CLAUDE CLI, and other clients. The guide uses the recommended uvx bootstrap method and includes example env variables and timeout recommendations.
+
 ### AuthContext
 - `createAnonymousSession()` - Create anonymous user session
 - `upgradeAnonymousToUser()` - Convert anonymous to authenticated

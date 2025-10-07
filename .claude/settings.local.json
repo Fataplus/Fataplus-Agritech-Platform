@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node:*)",
+      "Bash(git add:*)",
+      "Bash(git push:*)",
+      "Bash(git pull:*)",
+      "Bash(chmod:*)",
+      "Bash(curl:*)",
+      "Bash(./web-app-package.sh:*)",
+      "Bash(git commit:*)",
+      "Bash(./verify-deployment.sh:*)",
+      "Bash(nslookup:*)",
+      "Bash(./deployment/dns-setup.sh:*)",
+      "Bash(npm install:*)",
+      "Bash(wrangler:*)",
+      "Bash(./cloudflare-dns-setup.sh:*)",
+      "Bash(export:*)",
+      "Bash(npx create-next-app:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm run)",
+      "Bash(npx next build:*)",
+      "Bash(CLOUDFLARE_ACCOUNT_ID=f30dd0d409679ae65e841302cc0caa8c wrangler pages project create fataplus-admin-dashboard --production-branch main)",
+      "Bash(CLOUDFLARE_ACCOUNT_ID=f30dd0d409679ae65e841302cc0caa8c wrangler pages deploy . --project-name fataplus-admin-dashboard)",
+      "Bash(jq:*)",
+      "Bash(npx wrangler pages deploy:*)",
+      "Bash(tree:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

@@ -1,0 +1,365 @@
+version: '3.8'
+
+# ===========================================
+# FATAPLUS UNIFIED DOCKER COMPOSE
+# ===========================================
+# This is the single source of truth for all Fataplus Docker deployments
+# Supports multiple environments: development, staging, production
+# ===========================================
+
+x-common-env: &common-env
+  # Database Configuration
+  POSTGRES_DB: ${POSTGRES_DB:-fataplus_dev}
+  POSTGRES_USER: ${POSTGRES_USER:-fataplus_dev}
+  POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dev_password_change_me}
+
+  # Redis Configuration
+  REDIS_URL: redis://redis:6379
+
+  # MinIO Configuration
+  MINIO_ROOT_USER: ${MINIO_ROOT_USER:-dev_access_key_change_me}
+  MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-dev_secret_key_change_me}
+  MINIO_ENDPOINT: minio:9000
+
+  # JWT Configuration
+  JWT_SECRET_KEY: ${JWT_SECRET_KEY:-development_jwt_secret_replace_with_random_hex_32}
+  JWT_ACCESS_TOKEN_EXPIRE_MINUTES: ${JWT_ACCESS_TOKEN_EXPIRE_MINUTES:-30}
+  JWT_REFRESH_TOKEN_EXPIRE_DAYS: ${JWT_REFRESH_TOKEN_EXPIRE_DAYS:-7}
+
+  # Environment
+  ENVIRONMENT: ${ENVIRONMENT:-development}
+  NODE_ENV: ${NODE_ENV:-development}
+
+x-healthchecks: &postgres-healthcheck
+  healthcheck:
+    test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-fataplus_dev} -d ${POSTGRES_DB:-fataplus_dev}"]
+    interval: 10s
+    timeout: 5s
+    retries: 5
+    start_period: 30s
+
+x-redis-healthcheck: &redis-healthcheck
+  healthcheck:
+    test: ["CMD", "redis-cli", "ping"]
+    interval: 10s
+    timeout: 3s
+    retries: 3
+
+x-minio-healthcheck: &minio-healthcheck
+  healthcheck:
+    test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+    interval: 30s
+    timeout: 20s
+    retries: 3
+
+services:
+  # ===========================================
+  # DATABASE SERVICES
+  # ===========================================
+
+  postgres:
+    image: postgis/postgis:15-3.4
+    container_name: fataplus-postgres-${ENVIRONMENT:-dev}
+    environment:
+      <<: *common-env
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ../../infrastructure/docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    <<: *postgres-healthcheck
+    networks:
+      - fataplus-network
+    restart: unless-stopped
+    profiles:
+      - database
+      - full
+      - minimal
+
+  redis:
+    image: redis:7-alpine
+    container_name: fataplus-redis-${ENVIRONMENT:-dev}
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    <<: *redis-healthcheck
+    networks:
+      - fataplus-network
+    restart: unless-stopped
+    profiles:
+      - cache
+      - full
+      - minimal
+
+  minio:
+    image: minio/minio:latest
+    container_name: fataplus-minio-${ENVIRONMENT:-dev}
+    environment:
+      <<: *common-env
+    volumes:
+      - minio_data:/data
+    ports:
+      - "${MINIO_PORT:-9000}:9000"
+      - "${MINIO_CONSOLE_PORT:-9001}:9001"
+    command: server /data --console-address ":9001"
+    <<: *minio-healthcheck
+    networks:
+      - fataplus-network
+    restart: unless-stopped
+    profiles:
+      - storage
+      - full
+
+  # ===========================================
+  # CORE APPLICATION SERVICES
+  # ===========================================
+
+  web-backend:
+    build:
+      context: ../../web-backend
+      dockerfile: Dockerfile
+      args:
+        ENVIRONMENT: ${ENVIRONMENT:-development}
+    container_name: fataplus-web-backend-${ENVIRONMENT:-dev}
+    environment:
+      <<: *common-env
+      DATABASE_URL: postgresql://${POSTGRES_USER:-fataplus_dev}:${POSTGRES_PASSWORD:-dev_password_change_me}@postgres:5432/${POSTGRES_DB:-fataplus_dev}
+      # Individual DB variables for auth service compatibility
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${POSTGRES_DB:-fataplus_dev}
+      DB_USER: ${POSTGRES_USER:-fataplus_dev}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-dev_password_change_me}
+      # Redis variables for auth service
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_DB: 0
+      AI_SERVICES_URL: http://ai-services:8001
+      MOTIA_SERVICE_URL: http://motia-service:8001
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000,http://localhost:3001}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    volumes:
+      - ../../web-backend:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - fataplus-network
+    restart: unless-stopped
+    profiles:
+      - backend
+      - full
+      - minimal
+    command: ./start.sh
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  web-frontend:
+    build:
+      context: ../../web-frontend
+      dockerfile: Dockerfile
+    container_name: fataplus-web-frontend-${ENVIRONMENT:-dev}
+    environment:
+      <<: *common-env
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    volumes:
+      - ../../web-frontend:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      - web-backend
+    networks:
+      - fataplus-network
+    restart: unless-stopped
+    profiles:
+      - frontend
+      - full
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    command: ${FRONTEND_COMMAND:-npm run dev}
+
+  # ===========================================
+  # AI & INTELLIGENCE SERVICES
+  # ===========================================
+
+  ai-services:
+    build:
+      context: ../../ai-services
+      dockerfile: Dockerfile
+    container_name: fataplus-ai-services-${ENVIRONMENT:-dev}
+    environment:
+      <<: *common-env
+      DATABASE_URL: postgresql://${POSTGRES_USER:-fataplus_dev}:${POSTGRES_PASSWORD:-dev_password_change_me}@postgres:5432/${POSTGRES_DB:-fataplus_dev}
+      AI_SERVICE_HOST: 0.0.0.0
+      AI_SERVICE_PORT: 8001
+    ports:
+      - "${AI_SERVICE_PORT:-8001}:8001"
+    volumes:
+      - ../../ai-services:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    networks:
+      - fataplus-network
+    restart: unless-stopped
+    profiles:
+      - ai
+      - full
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  motia-service:
+    build:
+      context: ../../motia-service
+      dockerfile: Dockerfile
+    container_name: fataplus-motia-${ENVIRONMENT:-dev}
+    environment:
+      <<: *common-env
+      DATABASE_URL: postgresql://${POSTGRES_USER:-fataplus_dev}:${POSTGRES_PASSWORD:-dev_password_change_me}@postgres:5432/${POSTGRES_DB:-fataplus_dev}
+      MOTIA_PORT: 8003
+      MAIN_BACKEND_URL: http://web-backend:8000
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      WEATHER_API_KEY: ${WEATHER_API_KEY:-}
+    ports:
+      - "${MOTIA_PORT:-8003}:8001"
+    volumes:
+      - ../../motia-service:/app
+      - /app/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - fataplus-network
+    restart: unless-stopped
+    profiles:
+      - ai
+      - full
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8003/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ===========================================
+  # SPECIALIZED SERVICES
+  # ===========================================
+
+  mcp-server:
+    build:
+      context: ../mcp/mcp-server
+      dockerfile: Dockerfile
+    container_name: fataplus-mcp-server-${ENVIRONMENT:-dev}
+    environment:
+      <<: *common-env
+      FATAPLUS_API_URL: http://web-backend:8000
+      FATAPLUS_API_KEY: ${FATAPLUS_API_KEY:-}
+      MCP_SERVER_PORT: 3001
+      MCP_SERVER_HOST: 0.0.0.0
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      DEBUG: ${DEBUG:-false}
+    ports:
+      - "${MCP_PORT:-3001}:3001"
+    volumes:
+      - ../mcp/mcp-server:/app
+      - /app/node_modules
+    depends_on:
+      - web-backend
+    networks:
+      - fataplus-network
+    restart: unless-stopped
+    profiles:
+      - mcp
+      - full
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # agribot-space:
+  #   build:
+  #     context: ../../agribot-space
+  #     dockerfile: Dockerfile
+  #   container_name: fataplus-agribot-${ENVIRONMENT:-dev}
+  #   environment:
+  #     <<: *common-env
+  #     NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+  #     OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+  #     ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+  #     STRIPE_PUBLIC_KEY: ${STRIPE_PUBLIC_KEY:-}
+  #     STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+  #   ports:
+  #     - "${AGRIBOT_PORT:-3002}:3000"
+  #   volumes:
+  #     - ../../agribot-space:/app
+  #     - /app/node_modules
+  #     - /app/.next
+  #   depends_on:
+  #     - web-backend
+  #   networks:
+  #     - fataplus-network
+  #   restart: unless-stopped
+  #   profiles:
+  #     - agribot
+  #     - full
+
+  # ===========================================
+  # PRODUCTION SERVICES (nginx, monitoring, etc.)
+  # ===========================================
+
+  nginx:
+    image: nginx:alpine
+    container_name: fataplus-nginx-${ENVIRONMENT:-dev}
+    ports:
+      - "${NGINX_HTTP_PORT:-80}:80"
+      - "${NGINX_HTTPS_PORT:-443}:443"
+    volumes:
+      - ../../infrastructure/nginx/nginx.${ENVIRONMENT:-dev}.conf:/etc/nginx/nginx.conf:ro
+      - ../../infrastructure/ssl:/etc/ssl/certs:ro
+    depends_on:
+      - web-frontend
+      - web-backend
+    networks:
+      - fataplus-network
+    restart: unless-stopped
+    profiles:
+      - production
+      - full
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  minio_data:
+    driver: local
+
+networks:
+  fataplus-network:
+    driver: bridge
+    name: fataplus-${ENVIRONMENT:-dev}-network

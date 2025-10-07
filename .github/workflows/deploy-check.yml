@@ -1,0 +1,26 @@
+name: Deployment smoke check
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  deploy-dry-run:
+    name: Unified deploy dry-run
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python (for tests)
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Make deploy script executable
+        run: chmod +x deployment/unified-deploy.sh
+
+      - name: Run unified deploy in dry-run
+        run: deployment/unified-deploy.sh -t docker-compose -e staging -n
