@@ -230,7 +230,7 @@ const PDFTemplate: React.FC<{ data: PDFData }> = ({ data }) => (
           <Text style={styles.companyName}>Fataplus</Text>
           <Text style={styles.companyDetails}>AgriTech Solutions</Text>
           <Text style={styles.companyDetails}>Antananarivo, Madagascar</Text>
-          <Text style={styles.companyDetails}>contact@fataplus.mg</Text>
+          <Text style={styles.companyDetails}>contact@fata.plus</Text>
         </View>
       </View>
 
